@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/lChap701/Manage-a-Book-Trading-Club#readme",
   "dependencies": {
-    "body-parser": "^1.19.0"
+    "body-parser": "^1.19.0",
+    "passport-local": "^1.0.0"
   }
 }
