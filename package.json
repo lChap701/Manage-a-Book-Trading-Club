@@ -1,0 +1,28 @@
+{
+  "name": "manage-a-book-trading-club",
+  "version": "1.0.0",
+  "description": "A project that was created for freeCodeCamp and is used to allow users to trade books when they have an account.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+    "test": "node tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lChap701/Manage-a-Book-Trading-Club.git"
+  },
+  "keywords": [
+    "MERN",
+    "Stack",
+    "passport",
+    "bcrypt",
+    "login",
+    "book-trading"
+  ],
+  "author": "Lucas Chapman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lChap701/Manage-a-Book-Trading-Club/issues"
+  },
+  "homepage": "https://github.com/lChap701/Manage-a-Book-Trading-Club#readme"
+}
