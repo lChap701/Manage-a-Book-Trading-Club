@@ -27,12 +27,12 @@ app.use(helmet.noSniff());
 
 app.use("/public", express.static(process.cwd() + "/public"));
 
-// Redirects to the homepage
+// Redirects to the home page
 app.get("/", (req, res) => {
   res.redirect("/books");
 });
 
-// Displays the homepage
+// Displays the home page
 app.get("/books", (req, res) => {
   res.sendFile(process.cwd() + "/public/index.html");
 });
@@ -40,6 +40,41 @@ app.get("/books", (req, res) => {
 // Displays the Requests Page
 /*app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
+});*/
+
+// Displays the Create Requests Page
+/*app.get("/requests/new", (req, res) => {
+  res.sendFile(process.cwd() + "/public/createRequests.html");
+});*/
+
+// Displays the Trades Page
+/*app.get("/trades", (req, res) => {
+  res.sendFile(process.cwd() + "/public/trades.html");
+});*/
+
+// Displays the Users Page
+/*app.get("/users", (req, res) => {
+  res.sendFile(process.cwd() + "/public/users.html");
+});*/
+
+// Displays the Login Page
+/*app.get("/login", (req, res) => {
+  res.sendFile(process.cwd() + "/public/login.html");
+});*/
+
+// Displays the Profile Page
+/*app.get("/users/:id", (req, res) => {
+  res.sendFile(process.cwd() + "/public/profile.html");
+});*/
+
+// Displays the Edit Profile Page
+/*app.get("/users/edit", (req, res) => {
+  res.sendFile(process.cwd() + "/public/editProfile.html");
+});*/
+
+// Displays the My Books Page
+/*app.get("/books/my", (req, res) => {
+  res.sendFile(process.cwd() + "/public/books.html");
 });*/
 
 // Displays the port being used to host the app
