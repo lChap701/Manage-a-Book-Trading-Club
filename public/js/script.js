@@ -225,7 +225,7 @@ const Dropdown = (props) => {
           <MyBooks />
         </Route>
         <Route path="/logout">
-          <Logout />
+          <Redirect to="/books" />
         </Route>
       </Switch>
     </div>
@@ -241,32 +241,58 @@ const CreateRequest = (props) => {
   return <h1>Create Request</h1>;
 };
 
+/**
+ * Component for displaying content on the Trades page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const Trades = (props) => {
   return <h1>Trades</h1>;
 };
 
+/**
+ * Component for displaying content on the Users page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const Users = (props) => {
   return <h1>Users</h1>;
 };
 
+/**
+ * Component for displaying content on the Login page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const Login = (props) => {
   return <h1>Login</h1>;
 };
 
+/**
+ * Component for displaying content on the Profile page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const Profile = (props) => {
   return <h1>Profile</h1>;
 };
 
+/**
+ * Component for displaying content on the Edit Profile page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const EditProfile = (props) => {
   return <h1>Edit Profile</h1>;
 };
 
+/**
+ * Component for displaying content on the My Books page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
 const MyBooks = (props) => {
   return <h1>My Books</h1>;
-};
-
-const Logout = (props) => {
-  return <h1>Logout</h1>;
 };
 
 ReactDOM.render(<BookExchange />, document.querySelector("#root"));
