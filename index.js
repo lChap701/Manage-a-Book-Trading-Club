@@ -69,7 +69,7 @@ app.get("/books", (req, res) => {
 
 // Displays the Edit Profile Page
 /*app.get("/users/edit", (req, res) => {
-  res.sendFile(process.cwd() + "/public/editProfile.html");
+  res.sendFile(process.cwd() + "/public/edit.html");
 });*/
 
 // Displays the My Books Page
