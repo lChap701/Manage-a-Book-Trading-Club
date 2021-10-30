@@ -12,6 +12,8 @@
     "url": "git+https://github.com/lChap701/Manage-a-Book-Trading-Club.git"
   },
   "keywords": [
+    "MERN",
+    "Stack",
     "passport",
     "bcrypt",
     "login",
