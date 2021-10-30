@@ -92,7 +92,6 @@ class BookExchange extends React.Component {
                             text: "Create Request",
                           },
                         ]}
-                        profile={"/users/" + this.state.userId}
                       />
                     )}
                     <NavLink className="nav-item nav-link" to="/trades">
@@ -114,7 +113,7 @@ class BookExchange extends React.Component {
                         dropLinkText={this.state.username}
                         links={[
                           {
-                            path: "/users/" + this.state.userId,
+                            path: "/users/:id",
                             text: "Profile",
                           },
                           {
@@ -130,7 +129,6 @@ class BookExchange extends React.Component {
                             text: "Logout",
                           },
                         ]}
-                        profile={"/users/" + this.state.userId}
                       />
                     )}
                   </div>
@@ -217,7 +215,7 @@ const Dropdown = (props) => {
         <Route path="/requests/new">
           <CreateRequest />
         </Route>
-        <Route path={props.profile}>
+        <Route path={"/users/:id"}>
           <Profile />
         </Route>
         <Route path="/users/edit">
