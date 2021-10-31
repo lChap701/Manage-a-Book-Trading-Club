@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Gideon Roman
+- Font Author: Copyright 2009-2021 The Gideon Roman Project Authors (https://github.com/googlefonts/gideon)
+- Font Source: http://fonts.gstatic.com/s/gideonroman/v1/e3tmeuGrVOys8sxzZgWlmXoge0PWovdU4w.ttf
+- Font License: SIL Open Font License, 1.1 (http://scripts.sil.org/OFL))
