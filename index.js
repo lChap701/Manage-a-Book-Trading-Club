@@ -25,7 +25,8 @@ const helmet = require("helmet");
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 
-app.use("/public", express.static(process.cwd() + "/public"));
+// Allows stylesheets, JS scripts, and other files to be loaded
+app.use(express.static(__dirname + "/public"));
 
 // Redirects to the home page
 app.get("/", (req, res) => {
