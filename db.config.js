@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 
 /**
  * Attempts to connect to the DB and displays the result in the console
+ * @module ./db.config
+ *
  */
 const connectDB = async () => {
   try {
