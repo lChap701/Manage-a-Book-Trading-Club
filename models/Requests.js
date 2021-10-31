@@ -1,0 +1,30 @@
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+
+const requestSchema = new Schema({
+  give_books: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Books",
+      required: "Request must include at least one book to give",
+    },
+  ],
+  take_books: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Books",
+      required: "Request must include at least one book to take",
+    },
+  ],
+  users: [{ type: Schema.Types.ObjectId, ref: "Users" }],
+  traded: { type: Boolean, default: false },
+});
+
+/**
+ * Model for the 'requests' collection
+ * @module ./models/Requests
+ *
+ */
+const Requests = mongoose.model("Requests", requestSchema);
+
+module.exports = Requests;
