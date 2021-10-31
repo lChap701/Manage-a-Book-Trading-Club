@@ -21,20 +21,25 @@ class BookExchange extends React.Component {
 
     this.state = {
       login: true,
-      userId: "",
-      username: "",
+      users: [],
+      books: [],
+      requests: [],
     };
+
+    //window.addEventListener("load", this.getData);
   }
 
-  checkLoggedIn() {}
-
-  getUserId(username) {
-    fetch(`${window.location.origin}/users?username=${username}`)
+  /**
+   * Gets all users, books, and requests that have been made
+   */
+  getData() {
+    fetch(`${window.location.origin}/api/users`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({
-          userId: data._id,
-          username: data.username,
+          users: data.users,
+          books: data.books,
+          requests: data.requests,
         });
       })
       .catch((e) => {
@@ -43,13 +48,22 @@ class BookExchange extends React.Component {
       });
   }
 
+  /**
+   * Determines if the user should be logged in or logged out
+   */
+  isLoggedIn() {
+    this.setState((state) => ({
+      login: !state.login,
+    }));
+  }
+
   render() {
     return (
       <div id="container">
         <Router>
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
-              <div class="container">
+              <div className="container">
                 <a className="navbar-brand" href="/books">
                   Book Exchange
                 </a>
@@ -92,6 +106,7 @@ class BookExchange extends React.Component {
                             text: "Create Request",
                           },
                         ]}
+                        requests={this.state.requests}
                       />
                     )}
                     <NavLink className="nav-item nav-link" to="/trades">
@@ -129,6 +144,7 @@ class BookExchange extends React.Component {
                             text: "Logout",
                           },
                         ]}
+                        requests={this.state.requests}
                       />
                     )}
                   </div>
@@ -138,11 +154,9 @@ class BookExchange extends React.Component {
           </header>
 
           <Switch>
-            <Route path="/books">
-              <Books />
-            </Route>
+            <Route path="/books" component={Books} />
             <Route path="/requests">
-              <Requests />
+              <Requests requests={this.state.requests} />
             </Route>
             <Route path="/trades">
               <Trades />
@@ -150,9 +164,7 @@ class BookExchange extends React.Component {
             <Route path="/users">
               <Users />
             </Route>
-            <Route path="/login">
-              <Login />
-            </Route>
+            <Route path="/login" component={Login} />
           </Switch>
         </Router>
       </div>
@@ -210,12 +222,12 @@ const Dropdown = (props) => {
 
       <Switch>
         <Route path="/requests">
-          <Requests />
+          <Requests requests={props.requests} />
         </Route>
         <Route path="/requests/new">
           <CreateRequest />
         </Route>
-        <Route path={"/users/:id"}>
+        <Route path="/users/:id">
           <Profile />
         </Route>
         <Route path="/users/edit">
