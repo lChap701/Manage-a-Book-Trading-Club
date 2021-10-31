@@ -25,6 +25,10 @@ const helmet = require("helmet");
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 
+// DB Connection
+const connectDB = require("./db.config");
+connectDB();
+
 // Allows stylesheets, JS scripts, and other files to be loaded
 app.use("/css", express.static(process.cwd() + "/public/css"));
 app.use("/js", express.static(process.cwd() + "/public/js"));
