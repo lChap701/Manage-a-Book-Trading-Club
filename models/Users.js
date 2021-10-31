@@ -9,6 +9,7 @@ const userSchema = new Schema({
   state: { type: String, trim: true },
   address: { type: String, trim: true },
   books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
+  requests: [{ type: Schema.Types.ObjectId, ref: "Requests" }],
 });
 
 /**
