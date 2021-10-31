@@ -26,7 +26,9 @@ app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 
 // Allows stylesheets, JS scripts, and other files to be loaded
-app.use(express.static(__dirname + "/public"));
+app.use("/css", express.static(process.cwd() + "/public/css"));
+app.use("/js", express.static(process.cwd() + "/public/js"));
+app.use("/favicon.io", express.static(process.cwd() + "/public/favicon.io"));
 
 // Redirects to the home page
 app.get("/", (req, res) => {
@@ -79,6 +81,6 @@ app.get("/books", (req, res) => {
 });*/
 
 // Displays the port being used to host the app
-const listener = app.listen(process.env.PORT || 3000, () => {
+const listener = app.listen(process.env.PORT || 8080, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
