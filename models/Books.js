@@ -10,8 +10,8 @@ const bookSchema = new Schema(
   },
   {
     timestamps: {
-      createdAt: "created",
-      updatedAt: "bumped",
+      createdAt: "addedAt",
+      updatedAt: "bumpedOn",
     },
   }
 );
