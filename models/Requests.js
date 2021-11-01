@@ -2,14 +2,14 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const requestSchema = new Schema({
-  give_books: [
+  giveBooks: [
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
       required: "Request must include at least one book to give",
     },
   ],
-  take_books: [
+  takeBooks: [
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
