@@ -25,7 +25,7 @@ const helmet = require("helmet");
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 
-// DB Connection
+// DB Setup
 const connectDB = require("./db.config");
 connectDB();
 
@@ -33,6 +33,10 @@ connectDB();
 app.use("/css", express.static(process.cwd() + "/public/css"));
 app.use("/js", express.static(process.cwd() + "/public/js"));
 app.use("/favicon.io", express.static(process.cwd() + "/public/favicon.io"));
+
+// API Routing
+const api = require("./routes/api");
+api(app);
 
 // Redirects to the home page
 app.get("/", (req, res) => {
