@@ -22,6 +22,8 @@ class BookExchange extends React.Component {
     this.state = {
       login: true,
       users: [],
+      userId: "",
+      username: "",
       books: [],
       requests: [],
     };
@@ -59,7 +61,7 @@ class BookExchange extends React.Component {
 
   render() {
     return (
-      <div id="container">
+      <div>
         <Router>
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
@@ -153,19 +155,21 @@ class BookExchange extends React.Component {
             </nav>
           </header>
 
-          <Switch>
-            <Route path="/books" component={Books} />
-            <Route path="/requests">
-              <Requests requests={this.state.requests} />
-            </Route>
-            <Route path="/trades">
-              <Trades />
-            </Route>
-            <Route path="/users">
-              <Users />
-            </Route>
-            <Route path="/login" component={Login} />
-          </Switch>
+          <div className="container">
+            <Switch>
+              <Route path="/books" component={Books} />
+              <Route path="/requests">
+                <Requests requests={this.state.requests} />
+              </Route>
+              <Route path="/trades">
+                <Trades />
+              </Route>
+              <Route path="/users">
+                <Users />
+              </Route>
+              <Route path="/login" component={Login} />
+            </Switch>
+          </div>
         </Router>
       </div>
     );
