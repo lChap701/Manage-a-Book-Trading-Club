@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const crud = require("../crud");
 
 /**
- * Module that handles most of the routing
+ * Module that handles routing for the API
  * @module ./routes/api
  *
  * @param {*} app   Represents the Express application
