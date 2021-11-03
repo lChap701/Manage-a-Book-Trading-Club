@@ -29,7 +29,6 @@ class BookExchange extends React.Component {
     };
 
     this.getData = this.getData.bind(this);
-    this.reload = this.reload.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
 
     //window.addEventListener("load", this.getData);
