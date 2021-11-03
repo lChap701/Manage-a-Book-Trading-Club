@@ -61,10 +61,6 @@ app.use("/css", express.static(process.cwd() + "/public/css"));
 app.use("/js", express.static(process.cwd() + "/public/js"));
 app.use("/favicon.io", express.static(process.cwd() + "/public/favicon.io"));
 
-// API Routing
-const api = require("./routes/api");
-api(app);
-
 // Passport/OAuth Routing
 const passport = require("passport");
 app.use(passport.initialize());
@@ -72,6 +68,10 @@ app.use(passport.session());
 
 const auth = require("./routes/auth");
 auth(app);
+
+// API Routing
+const api = require("./routes/api");
+api(app);
 
 // Redirects to the home page
 app.get("/", (req, res) => {
