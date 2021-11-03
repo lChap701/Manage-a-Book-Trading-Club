@@ -10,6 +10,9 @@ const crud = require("../crud");
  *
  */
 module.exports = (app) => {
+  // Will determine if the user is logged in
+  app.get("/api/session", (req, res) => res.json(req.user));
+
   app
     .route("/api/users")
     .get((req, res) => {
