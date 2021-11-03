@@ -99,7 +99,7 @@ app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
 });
 
-// Displays a 404 page
+// Displays the 404 Error Page
 app.use((req, res, next) => {
   res.status(404).type("text").send("Not Found");
 });
