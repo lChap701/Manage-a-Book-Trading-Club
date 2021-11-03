@@ -55,13 +55,6 @@ class BookExchange extends React.Component {
   }
 
   /**
-   * Reloads the page each time a <Link /> is clicked
-   */
-  reload() {
-    location.reload();
-  }
-
-  /**
    * Determines if the user should be logged in or logged out
    */
   isLoggedIn() {
