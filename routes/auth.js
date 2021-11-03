@@ -109,16 +109,16 @@ module.exports = (app) => {
     (req, res) => {
       req.logout();
       req.session = null;
-      res.redirect("/");
+      res.redirect("/books");
     }
   );
 
   /**
    * Checks if the user is logged in and redirects to the home page when logged in
-   * @param {*} req   Represents the request
-   * @param {*} res   Represents the response
-   * @param {*} next  Function for skipping to the next thing
-   * @returns         Returns nothing or next()
+   * @param {*} req           Represents the request
+   * @param {*} res           Represents the response
+   * @param {Function} next   Function for skipping to the next thing
+   * @returns                 Returns next()
    */
   function loggedIn(req, res, next) {
     if (req.user) res.redirect("/books");
@@ -127,10 +127,10 @@ module.exports = (app) => {
 
   /**
    * Checks if the user is logged out and redirects when logged out
-   * @param {*} req   Represents the request
-   * @param {*} res   Represents the response
-   * @param {*} next  Function for skipping to the next thing
-   * @returns         Returns nothing or next()
+   * @param {*} req           Represents the request
+   * @param {*} res           Represents the response
+   * @param {Function} next   Function for skipping to the next thing
+   * @returns                 Returns next()
    */
   function loggedOut(req, res, next) {
     if (!req.user) res.redirect("/books");
