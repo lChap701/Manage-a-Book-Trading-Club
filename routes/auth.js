@@ -21,6 +21,56 @@ module.exports = (app) => {
       (req, res) => res.redirect("/books")
     );
 
+  // Handles GitHub OAuth
+  app.get("/auth/github", passport.authenticate("github"));
+
+  // Callback URL for GitHub OAuth
+  app.get(
+    "/auth/github/callback",
+    passport.authenticate("github", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/books")
+  );
+
+  // Handles Facebook OAuth
+  app.get("/auth/facebook", passport.authenticate("facebook"));
+
+  // Callback URL for Facebook OAuth
+  app.get(
+    "/auth/facebook/callback",
+    passport.authenticate("facebook", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/books")
+  );
+
+  // Handles Twitter OAuth
+  app.get("/auth/twitter", passport.authenticate("twitter"));
+
+  // Callback URL for Twitter OAuth
+  app.get(
+    "/auth/twitter/callback",
+    passport.authenticate("twitter", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/books")
+  );
+
+  // Handles Google OAuth
+  app.get("/auth/google", passport.authenticate("google"));
+
+  // Callback URL for Google OAuth
+  app.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/books")
+  );
+
+  // Handles Microsoft OAuth
+  app.get("/auth/microsoft", passport.authenticate("microsoft"));
+
+  // Callback URL for Microsoft OAuth
+  app.get(
+    "/auth/microsoft/callback",
+    passport.authenticate("microsoft", { failureRedirect: "/login" }),
+    (req, res) => res.redirect("/books")
+  );
+
   // Displays the Book Exchange - Profile Page
   app.get(
     "/users/:id",
@@ -72,6 +122,6 @@ module.exports = (app) => {
    */
   function loggedOut(req, res, next) {
     if (!req.user) res.redirect("/books");
-    return next();  
+    return next();
   }
 };
