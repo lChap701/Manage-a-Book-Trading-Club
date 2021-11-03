@@ -102,7 +102,7 @@ module.exports = (app) => {
   );
 
   /**
-   * Checks if the user is logged in and redirects when not logged in
+   * Checks if the user is logged in and redirects to the home page when logged in
    * @param {*} req   Represents the request
    * @param {*} res   Represents the response
    * @param {*} next  Function for skipping to the next thing
@@ -114,7 +114,7 @@ module.exports = (app) => {
   }
 
   /**
-   * Checks if the user is logged out and redirects when not logged out
+   * Checks if the user is logged out and redirects when logged out
    * @param {*} req   Represents the request
    * @param {*} res   Represents the response
    * @param {*} next  Function for skipping to the next thing
