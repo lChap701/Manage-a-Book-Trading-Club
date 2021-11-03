@@ -112,7 +112,7 @@ module.exports = (app) => {
     passport.authenticate("local", { failureRedirect: "/login" }),
     (req, res) => {
       req.logout();
-      req.session = null;
+      req.session.destroy();
       res.redirect("/books");
     }
   );
