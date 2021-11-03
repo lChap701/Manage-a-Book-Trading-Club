@@ -9,9 +9,6 @@ const crud = require("./crud");
  *
  */
 module.exports = () => {
-  app.use(passport.initialize());
-  app.use(passport.session());
-
   // Serialization
   passport.serializeUser((user, done) => done(null, user._id));
   passport.deserializeUser((id, done) => {

@@ -62,6 +62,10 @@ const api = require("./routes/api");
 api(app);
 
 // Passport/OAuth Routing
+const passport = require("passport");
+app.use(passport.initialize());
+app.use(passport.session());
+
 const auth = require("./routes/auth");
 auth(app);
 
