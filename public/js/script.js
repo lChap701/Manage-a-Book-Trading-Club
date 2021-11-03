@@ -28,6 +28,10 @@ class BookExchange extends React.Component {
       requests: [],
     };
 
+    this.getData = this.getData.bind(this);
+    this.reload = this.reload.bind(this);
+    this.isLoggedIn = this.isLoggedIn.bind(this);
+
     //window.addEventListener("load", this.getData);
   }
 
@@ -51,6 +55,13 @@ class BookExchange extends React.Component {
   }
 
   /**
+   * Reloads the page each time a <Link /> is clicked
+   */
+  reload() {
+    location.reload();
+  }
+
+  /**
    * Determines if the user should be logged in or logged out
    */
   isLoggedIn() {
@@ -62,7 +73,8 @@ class BookExchange extends React.Component {
   render() {
     return (
       <div>
-        <Router>
+        {/* 'forceRefresh' is set to true in order to allow the browser while redirecting to page */}
+        <Router forceRefresh>
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
               <div className="container">
@@ -111,7 +123,11 @@ class BookExchange extends React.Component {
                         requests={this.state.requests}
                       />
                     )}
-                    <NavLink className="nav-item nav-link" to="/trades">
+                    <NavLink
+                      className="nav-item nav-link"
+                      to="/trades"
+                      onClick={this.reload}
+                    >
                       Trades
                     </NavLink>
                     <NavLink className="nav-item nav-link" to="/users">
