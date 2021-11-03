@@ -126,7 +126,7 @@ module.exports = (app) => {
   }
 
   /**
-   * Checks if the user is logged out and redirects when logged out
+   * Checks if the user is logged out and redirects to the home page when logged out
    * @param {*} req           Represents the request
    * @param {*} res           Represents the response
    * @param {Function} next   Function for skipping to the next thing
