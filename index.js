@@ -9,6 +9,12 @@ require("dotenv").config();
 
 // Express Setup
 const express = require("express");
+
+/**
+ * Module that contains the entire application
+ * @module ./index
+ *
+ */
 const app = express();
 
 // Cors Setup
@@ -25,6 +31,23 @@ const helmet = require("helmet");
 app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 
+// Cookie-Parser Setup
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+// Express-Session Setup
+const session = require("express-session");
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: { secure: false, value: "" },
+    httpOnly: false,
+    key: "express.sid",
+  })
+);
+
 // DB Setup
 const connectDB = require("./db.config");
 connectDB();
@@ -38,6 +61,10 @@ app.use("/favicon.io", express.static(process.cwd() + "/public/favicon.io"));
 const api = require("./routes/api");
 api(app);
 
+// Passport/OAuth Routing
+const auth = require("./routes/auth");
+auth(app);
+
 // Redirects to the home page
 app.get("/", (req, res) => {
   res.redirect("/books");
@@ -48,45 +75,30 @@ app.get("/books", (req, res) => {
   res.sendFile(process.cwd() + "/public/index.html");
 });
 
-// Displays the Requests Page
-/*app.get("/requests", (req, res) => {
+// Displays the Book Exchange - Requests Page
+app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
-});*/
+});
 
-// Displays the Create Requests Page
-/*app.get("/requests/new", (req, res) => {
+// Displays the Book Exchange - Create Requests Page
+app.get("/requests/new", (req, res) => {
   res.sendFile(process.cwd() + "/public/createRequests.html");
-});*/
+});
 
-// Displays the Trades Page
-/*app.get("/trades", (req, res) => {
+// Displays the Book Exchange - Trades Page
+app.get("/trades", (req, res) => {
   res.sendFile(process.cwd() + "/public/trades.html");
-});*/
+});
 
-// Displays the Users Page
-/*app.get("/users", (req, res) => {
+// Displays the Book Exchange - Users Page
+app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
-});*/
+});
 
-// Displays the Login Page
-/*app.get("/login", (req, res) => {
-  res.sendFile(process.cwd() + "/public/login.html");
-});*/
-
-// Displays the Profile Page
-/*app.get("/users/:id", (req, res) => {
-  res.sendFile(process.cwd() + "/public/profile.html");
-});*/
-
-// Displays the Edit Profile Page
-/*app.get("/users/edit", (req, res) => {
-  res.sendFile(process.cwd() + "/public/edit.html");
-});*/
-
-// Displays the My Books Page
-/*app.get("/books/my", (req, res) => {
-  res.sendFile(process.cwd() + "/public/books.html");
-});*/
+// Displays a 404 page
+app.use((req, res, next) => {
+  res.status(404).type("text").send("Not Found");
+});
 
 // Displays the port being used to host the app
 const listener = app.listen(process.env.PORT || 8080, () => {
