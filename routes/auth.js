@@ -1,13 +1,17 @@
 const passport = require("passport");
+const auth = require("../auth");
 
 /**
- * Module that handles routing for OAuth
+ * Module that handles routing for OAuth/Passport
  * @module ./routes/auth
  *
  * @param {*} app   Represents the Express application
  *
  */
 module.exports = (app) => {
+  // Finishes setting up Passport
+  auth();
+
   // Displays and handles POST requests for the Book Exchange - Login Page
   app
     .route("/login")
@@ -118,11 +122,11 @@ module.exports = (app) => {
    * @param {*} req           Represents the request
    * @param {*} res           Represents the response
    * @param {Function} next   Function for skipping to the next thing
-   * @returns                 Returns next()
+   * @returns                 Returns next() or nothing
    */
   function loggedIn(req, res, next) {
-    if (req.user) res.redirect("/books");
-    return next();
+    if (!req.user) return next();
+    res.redirect("/books");
   }
 
   /**
@@ -130,10 +134,10 @@ module.exports = (app) => {
    * @param {*} req           Represents the request
    * @param {*} res           Represents the response
    * @param {Function} next   Function for skipping to the next thing
-   * @returns                 Returns next()
+   * @returns                 Returns next() or nothing
    */
   function loggedOut(req, res, next) {
-    if (!req.user) res.redirect("/books");
-    return next();
+    if (req.user) return next();
+    res.redirect("/books");
   }
 };

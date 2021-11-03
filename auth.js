@@ -59,7 +59,7 @@ module.exports = () => {
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: proccess.env.GITHUB_CALLBACK_URL,
+        callbackURL: process.env.GITHUB_CALLBACK_URL,
       },
       getUser
     )
@@ -72,7 +72,7 @@ module.exports = () => {
       {
         clientID: process.env.FACEBOOK_CLIENT_ID,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        callbackURL: proccess.env.FACEBOOK_CALLBACK_URL,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL,
       },
       getUser
     )
@@ -83,9 +83,9 @@ module.exports = () => {
   passport.use(
     new TwitterStrategy(
       {
-        clientID: process.env.TWITTER_CLIENT_ID,
-        clientSecret: process.env.TWITTER_CLIENT_SECRET,
-        callbackURL: proccess.env.TWITTER_CALLBACK_URL,
+        consumerKey: process.env.TWITTER_CLIENT_ID,
+        consumerSecret: process.env.TWITTER_CLIENT_SECRET,
+        callbackURL: process.env.TWITTER_CALLBACK_URL,
       },
       getUser
     )
@@ -98,7 +98,7 @@ module.exports = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: proccess.env.GOOGLE_CALLBACK_URL,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL,
       },
       getUser
     )
@@ -111,7 +111,7 @@ module.exports = () => {
       {
         clientID: process.env.MICROSOFT_CLIENT_ID,
         clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-        callbackURL: proccess.env.MICROSOFT_CALLBACK_URL,
+        callbackURL: process.env.MICROSOFT_CALLBACK_URL,
       },
       getUser
     )

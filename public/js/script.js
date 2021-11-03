@@ -64,6 +64,16 @@ class BookExchange extends React.Component {
     }));
   }
 
+  /**
+   * Saves the username while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveUsername(e) {
+    this.setState({
+      username: e.target.innerHTML,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -117,11 +127,7 @@ class BookExchange extends React.Component {
                         requests={this.state.requests}
                       />
                     )}
-                    <NavLink
-                      className="nav-item nav-link"
-                      to="/trades"
-                      onClick={this.reload}
-                    >
+                    <NavLink className="nav-item nav-link" to="/trades">
                       Trades
                     </NavLink>
                     <NavLink className="nav-item nav-link" to="/users">
@@ -167,7 +173,9 @@ class BookExchange extends React.Component {
 
           <div className="container">
             <Switch>
-              <Route path="/books" component={Books} />
+              <Route path="/books">
+                <Books books={this.state.books} users={this.state.users} />
+              </Route>
               <Route path="/requests">
                 <Requests requests={this.state.requests} />
               </Route>
