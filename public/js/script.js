@@ -31,7 +31,7 @@ class BookExchange extends React.Component {
     this.getData = this.getData.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
 
-    //window.addEventListener("load", this.getData);
+    window.addEventListener("load", this.getData);
   }
 
   /**
@@ -41,11 +41,13 @@ class BookExchange extends React.Component {
     fetch(`${window.location.origin}/api/users`)
       .then((res) => res.json())
       .then((data) => {
-        this.setState({
-          users: data.users,
-          books: data.books,
-          requests: data.requests,
-        });
+        if (data.length > 0) {
+          this.setState({
+            users: data.users,
+            books: data.books,
+            requests: data.requests,
+          });
+        }
       })
       .catch((e) => {
         alert(e);
@@ -65,7 +67,7 @@ class BookExchange extends React.Component {
   render() {
     return (
       <div>
-        {/* 'forceRefresh' is set to true in order to allow the browser while redirecting to page */}
+        {/* 'forceRefresh' is set to true in order to allow the browser to reload */}
         <Router forceRefresh>
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
