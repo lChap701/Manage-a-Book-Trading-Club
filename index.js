@@ -42,8 +42,8 @@ app.use(
   session({
     name: "store.sid",
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: false,
+    resave: false,
+    saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true },
     store: new MemoryStore({
       checkPeriod: 1000 * 60 * 60 * 24,
