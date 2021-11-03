@@ -30,6 +30,7 @@ class BookExchange extends React.Component {
 
     this.getData = this.getData.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
+    this.getRequestedBooks = this.getRequestedBooks.bind(this);
 
     window.addEventListener("load", this.getData);
   }
@@ -53,6 +54,28 @@ class BookExchange extends React.Component {
         alert(e);
         console.error(e);
       });
+  }
+
+  /**
+   * Gets the books that were requested for trading from the server
+   */
+  getRequestedBooks() {
+    let books = [];
+
+    fetch(`${window.location.origin}/api/session/books`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data) return;
+        data.forEach((id) => {
+          books.push(this.state.books.find((book) => book._id == id));
+        });
+      })
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+
+    return books;
   }
 
   /**
@@ -125,6 +148,7 @@ class BookExchange extends React.Component {
                           },
                         ]}
                         requests={this.state.requests}
+                        takeBooks={this.getRequestedBooks()}
                       />
                     )}
                     <NavLink className="nav-item nav-link" to="/trades">
@@ -163,6 +187,7 @@ class BookExchange extends React.Component {
                           },
                         ]}
                         requests={this.state.requests}
+                        takeBooks={this.getRequestedBooks()}
                       />
                     )}
                   </div>
@@ -200,7 +225,13 @@ class BookExchange extends React.Component {
  * @returns             Returns the content that should be displayed
  */
 const Books = (props) => {
-  return <h1>Books</h1>;
+  return (
+    <form action="/requests/new/books" method="POST" className="panel">
+      <div className="text-center panel-header">
+        <h2>Books</h2>
+      </div>
+    </form>
+  );
 };
 
 /**
@@ -246,8 +277,11 @@ const Dropdown = (props) => {
         <Route path="/requests">
           <Requests requests={props.requests} />
         </Route>
+        <Route path="/requests/books/new">
+          <Redirect to="/requests/new" />
+        </Route>
         <Route path="/requests/new">
-          <CreateRequest />
+          <CreateRequest takeBooks={props.takeBooks} />
         </Route>
         <Route path="/users/:id">
           <Profile />
@@ -272,7 +306,21 @@ const Dropdown = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const CreateRequest = (props) => {
-  return <h1>Create Request</h1>;
+  return (
+    <div className="panel">
+      <div className="panel-header text-center">
+        <h1>Create Request</h1>
+      </div>
+
+      <div className="panel-body">
+        {props.takeBooks.map((book) => {
+          <div className="item" id={book._id}>
+            {book.name}
+          </div>;
+        })}
+      </div>
+    </div>
+  );
 };
 
 /**

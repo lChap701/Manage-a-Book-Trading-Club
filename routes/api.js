@@ -11,7 +11,14 @@ const crud = require("../crud");
  */
 module.exports = (app) => {
   // Will determine if the user is logged in
-  app.get("/api/session", (req, res) => res.json(req.user));
+  app.get("/api/session/user", (req, res) => res.json(req.user));
+
+  // Gets requested books during trades and removes 'books' property from 'req.session'
+  app.get("/api/session/books", (req, res) => {
+    const { books } = req.session.books;
+    delete req.session.books;
+    res.json(books);
+  });
 
   app
     .route("/api/users")

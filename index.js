@@ -6,6 +6,7 @@
  */
 
 require("dotenv").config();
+const axios = require("axios").default;
 
 // Express Setup
 const express = require("express");
@@ -90,7 +91,20 @@ app.get("/requests", (req, res) => {
 
 // Displays the Book Exchange - Create Requests Page
 app.get("/requests/new", (req, res) => {
+  delete req.session.books;
   res.sendFile(process.cwd() + "/public/createRequests.html");
+});
+
+// Form Handler for the form on the home page
+app.post("/requests/new/book", (req, res) => {
+  if (!req.body) return;
+  console.log(req.body);
+  let ids = [];
+  let keys = Object.keys(req.body);
+  keys.forEach((bookId) => ids.push(bookId.replace("book", "")));
+  req.session.books = ids;
+  console.log(req.session.books);
+  //req.session.save();
 });
 
 // Displays the Book Exchange - Trades Page
@@ -100,7 +114,7 @@ app.get("/trades", (req, res) => {
 
 // Displays the Book Exchange - Users Page
 app.get("/users", (req, res) => {
-  res.sendFile(process.cwd() + "/public/users.html");
+  es.sendFile(process.cwd() + "/public/users.html");
 });
 
 // Displays the 404 Error Page
