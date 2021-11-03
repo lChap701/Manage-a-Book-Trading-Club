@@ -42,7 +42,7 @@ app.use(
   session({
     name: "store.sid",
     secret: process.env.SESSION_SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: true,
     cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true },
     store: new MemoryStore({
@@ -112,3 +112,5 @@ app.use((req, res, next) => {
 const listener = app.listen(process.env.PORT || 8080, () => {
   console.log("Your app is listening on port " + listener.address().port);
 });
+
+module.exports = app; // for testing purposes
