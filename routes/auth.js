@@ -59,7 +59,7 @@ module.exports = (app) => {
    * @returns         Returns nothing or next()
    */
   function loggedIn(req, res, next) {
-    if (req.user) res.redirect(req.header("Referer") || "/");
+    if (req.user) res.redirect("/books");
     return next();
   }
 
@@ -71,7 +71,7 @@ module.exports = (app) => {
    * @returns         Returns nothing or next()
    */
   function loggedOut(req, res, next) {
-    if (req.user) return next();
-    res.redirect("/books");
+    if (!req.user) res.redirect("/books");
+    return next();  
   }
 };
