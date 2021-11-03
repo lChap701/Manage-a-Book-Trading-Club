@@ -42,6 +42,25 @@ module.exports = (app) => {
     });
 
   app.route("/api/books").get((req, res) => {
+    const { bookId } = req.query;
+    let books = [];
+
+    // For when books are requested for trades
+    if (bookId) {
+      if (Array.isArray(bookId)) {
+        bookId.forEach((id) => {
+          crud.getBook(id).then((book) => books.push(book));
+        });
+      } else {
+        crud.getBook(bookId).then((book) => {
+          books.push(book);
+        });
+      }
+
+      res.json(books);
+      return;
+    }
+
     crud
       .getAllBooks()
       .populate({ path: "users" })
