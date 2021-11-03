@@ -101,6 +101,18 @@ module.exports = (app) => {
     }
   );
 
+  // Logs the user out
+  app.get(
+    "/logout",
+    loggedOut,
+    passport.authenticate("local", { failureRedirect: "/login" }),
+    (req, res) => {
+      req.logout();
+      req.session = null;
+      res.redirect("/");
+    }
+  );
+
   /**
    * Checks if the user is logged in and redirects to the home page when logged in
    * @param {*} req   Represents the request
