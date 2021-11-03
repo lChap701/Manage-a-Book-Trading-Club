@@ -35,16 +35,20 @@ app.use(helmet.noSniff());
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
-// Express-Session Setup
+// Express-Session/MemoryStore Setup
 const session = require("express-session");
+const MemoryStore = require("memorystore")(session);
 app.use(
   session({
+    name: "store.sid",
     secret: process.env.SESSION_SECRET,
     resave: true,
-    saveUninitialized: true,
-    cookie: { secure: false, value: "" },
-    httpOnly: false,
-    key: "express.sid",
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true },
+    store: new MemoryStore({
+      checkPeriod: 1000 * 60 * 60 * 24,
+      stale: true,
+    }),
   })
 );
 
