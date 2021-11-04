@@ -142,7 +142,8 @@ class BookExchange extends React.Component {
       .then((data) => {
         if (!data) return [];
         data.forEach((id) => {
-          books.push(this.state.books.find((book) => book._id == id));
+          let el = this.state.books.find((book) => book._id == id);
+          if (el) books.push(el);
         });
       })
       .catch((e) => {
@@ -255,7 +256,7 @@ class BookExchange extends React.Component {
           <div className="container">
             <Switch>
               <Route path="/books">
-                <Books books={this.state.books} users={this.state.users} />
+                <Books books={this.state.books} login={this.state.login} />
               </Route>
               <Route path="/requests">
                 <Requests requests={this.state.requests} />
@@ -266,7 +267,9 @@ class BookExchange extends React.Component {
               <Route path="/users">
                 <Users />
               </Route>
-              <Route path="/login" component={Login} />
+              <Route path="/login">
+                <Login isLoggedIn={this.isLoggedIn} />
+              </Route>
             </Switch>
           </div>
         </Router>
@@ -283,8 +286,48 @@ class BookExchange extends React.Component {
 const Books = (props) => {
   return (
     <form action="/requests/new/books" method="POST" className="panel">
-      <div className="text-center panel-header">
-        <h2>Books</h2>
+      <div className="panel-header text-white p-1 mx-auto border-bottom-0">
+        <h2 className="text-center">Books</h2>
+      </div>
+
+      <div className="panel-body">
+        {props.books.length == 0 ? (
+          <div className="item border border-secondary p-5">
+            <h4 className="text-muted text-center mt-1">
+              No books are available at this time
+            </h4>
+          </div>
+        ) : (
+          props.books.map((book) => {
+            return (
+              <div className="item border border-secondary">
+                <div className="form-group">
+                  <input id={`book${book._id}`} name={`book${book._id}`} />
+                  <label for={`book${book._id}`}></label>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <div className="panel-footer border-top-0 p-2">
+        {!props.login ? (
+          <Link className="btn btn-success" to="/login">
+            Login to Add Books and Submit Requests
+          </Link>
+        ) : (
+          <div className="buttons">
+            <input
+              className="btn btn-success"
+              type="submit"
+              value="New Request"
+            />
+            <Link className="btn btn-success" to="/books/my">
+              My Books
+            </Link>
+          </div>
+        )}
       </div>
     </form>
   );
@@ -362,10 +405,11 @@ const Dropdown = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const CreateRequest = (props) => {
+  console.log(props.takeBooks);
   return (
     <div className="panel">
       <div className="panel-header text-center">
-        <h1>Create Request</h1>
+        <h2>Create Request</h2>
       </div>
 
       <div className="panel-body">
