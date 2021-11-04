@@ -113,8 +113,11 @@ module.exports = (app) => {
       .getBooks(req.params.id)
       .populate({ path: "users" })
       .populate({ path: "requests" })
-      .then((books) => (req.session.books = books));
-    res.sendFile(process.cwd() + "/public/books.html");
+      .then((books) => {
+        req.session.books = books;
+        res.sendFile(process.cwd() + "/public/books.html");
+      })
+      .catch((e) => console.log(e));
   });
 
   // Logs the user out
