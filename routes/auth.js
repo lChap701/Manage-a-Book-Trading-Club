@@ -16,9 +16,9 @@ module.exports = (app) => {
   // Displays and handles POST requests for the Book Exchange - Login Page
   app
     .route("/login")
-    .get(loggedIn, (req, res) => {
-      res.sendFile(process.cwd() + "/public/login.html");
-    })
+    .get(loggedIn, (req, res) =>
+      res.sendFile(process.cwd() + "/public/login.html")
+    )
 
     .post(
       loggedIn,
@@ -81,9 +81,7 @@ module.exports = (app) => {
     "/users/:id",
     loggedOut,
     passport.authenticate("local", { failureRedirect: "/login" }),
-    (req, res) => {
-      res.sendFile(process.cwd() + "/public/profile.html");
-    }
+    (req, res) => res.sendFile(process.cwd() + "/public/profile.html")
   );
 
   // Displays the Book Exchange - Edit Profile Page
@@ -91,9 +89,7 @@ module.exports = (app) => {
     "/users/edit",
     loggedOut,
     passport.authenticate("local", { failureRedirect: "/login" }),
-    (req, res) => {
-      res.sendFile(process.cwd() + "/public/editProfile.html");
-    }
+    (req, res) => res.sendFile(process.cwd() + "/public/editProfile.html")
   );
 
   // Displays the Book Exchange - My Books Page
@@ -101,9 +97,7 @@ module.exports = (app) => {
     "/books/my",
     loggedOut,
     passport.authenticate("local", { failureRedirect: "/login" }),
-    (req, res) => {
-      res.sendFile(process.cwd() + "/public/books.html");
-    }
+    (req, res) => res.sendFile(process.cwd() + "/public/books.html")
   );
 
   // Displays the Book Exchange - (username)'s Books Page
