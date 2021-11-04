@@ -21,7 +21,7 @@ class BookExchange extends React.Component {
 
     // States
     this.state = {
-      login: true,
+      login: false,
       users: [],
       userId: "",
       username: "",
@@ -52,6 +52,7 @@ class BookExchange extends React.Component {
     this.getBooks();
     this.getRequests();
     this.getTrades();
+    this.isLoggedIn();
     /* console.log(this.state.users); */
     /* console.log(this.state.books); */
     /* console.log(this.state.requests); */
@@ -119,7 +120,7 @@ class BookExchange extends React.Component {
     fetch(`${location.origin}/api/session/books`)
       .then((res) => res.json())
       .then((data) => {
-        if (!data) return;
+        if (!data) return [];
         data.forEach((id) => {
           books.push(this.state.books.find((book) => book._id == id));
         });
@@ -136,7 +137,13 @@ class BookExchange extends React.Component {
    * Determines if the user should be logged in or logged out
    */
   isLoggedIn() {
-    this.setState((state) => ({ login: !state.login }));
+    fetch(`${location.origin}/api/session/user`)
+      .then((res) => res.json())
+      .then((data) => this.setState({ login: Boolean(data) }))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
   }
 
   /**
@@ -179,7 +186,7 @@ class BookExchange extends React.Component {
                     <NavLink className="nav-item nav-link" to="/books">
                       Books
                     </NavLink>
-                    {this.state.login ? (
+                    {!this.state.login ? (
                       <NavLink className="nav-item nav-link" to="/requests">
                         Requests
                       </NavLink>
@@ -210,7 +217,7 @@ class BookExchange extends React.Component {
                   </div>
 
                   <div className="navbar-nav ml-auto">
-                    {this.state.login ? (
+                    {!this.state.login ? (
                       <NavLink className="nav-item nav-link" to="/login">
                         Login
                       </NavLink>
