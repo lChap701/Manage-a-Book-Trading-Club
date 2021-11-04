@@ -22,6 +22,33 @@ module.exports = (app) => {
     res.json(books ? books : null);
   });
 
+  // Gets another user's books and clears values
+  app.get("/api/session/books/user", (req, res) => {
+    const { books } = req.session;
+    req.session.books = null;
+
+    const user = books[0].user;
+    console.log(user);
+    console.log(books[0].requests.users);
+
+    // Gets all requests (not including the current user)
+    const requests = books.map((book) =>
+      book.request.users.filter((user) => user != user._id)
+    );
+
+    res.json(
+      books
+        ? {
+            books: books.map((book) => {
+              return { title: book.title, description: book.description };
+            }),
+            user: user,
+            requests: requests,
+          }
+        : null
+    );
+  });
+
   app
     .route("/api/users")
     .get((req, res) => {

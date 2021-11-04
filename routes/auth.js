@@ -1,5 +1,6 @@
 const passport = require("passport");
 const auth = require("../auth");
+const crud = require("../crud");
 
 /**
  * Module that handles routing for OAuth/Passport
@@ -104,6 +105,17 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + "/public/books.html");
     }
   );
+
+  // Displays the Book Exchange - (username)'s Books Page
+  app.get("/users/:id/books", (req, res) => {
+    // Passes books (with user data)
+    crud
+      .getBooks(req.params.id)
+      .populate({ path: "users" })
+      .populate({ path: "requests" })
+      .then((books) => (req.session.books = books));
+    res.sendFile(process.cwd() + "/public/books.html");
+  });
 
   // Logs the user out
   app.get(

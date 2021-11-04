@@ -477,4 +477,13 @@ const MyBooks = (props) => {
   return <h1>My Books</h1>;
 };
 
+/**
+ * Component for displaying content on the (username)'s Books page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const UserBooks = (props) => {
+  return <h1>{props.username}'s Books</h1>;
+};
+
 ReactDOM.render(<BookExchange />, document.querySelector("#root"));
