@@ -106,7 +106,7 @@ app.post("/requests/new/book", (req, res) => {
   //req.session.save();
 });
 
-// Displays the Book Exchange - Trades Page
+// Displays the Book Exchange - All Trades Page
 app.get("/trades", (req, res) => {
   res.sendFile(process.cwd() + "/public/trades.html");
 });
