@@ -91,7 +91,7 @@ module.exports = (app) => {
     loggedOut,
     passport.authenticate("local", { failureRedirect: "/login" }),
     (req, res) => {
-      res.sendFile(process.cwd() + "/public/edit.html");
+      res.sendFile(process.cwd() + "/public/editProfile.html");
     }
   );
 
