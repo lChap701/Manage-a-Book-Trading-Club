@@ -9,7 +9,7 @@ const {
   useParams,
   useRouteMatch,
   useLocation,
-} = window.ReactRouterDOM;
+} = ReactRouterDOM;
 const Router = BrowserRouter;
 
 /**
@@ -19,19 +19,28 @@ class BookExchange extends React.Component {
   constructor(props) {
     super(props);
 
+    // States
     this.state = {
       login: true,
       users: [],
       userId: "",
       username: "",
       books: [],
+      takeBooks: [],
       requests: [],
+      trades: [],
     };
 
+    // Functions
     this.getData = this.getData.bind(this);
+    this.getUsers = this.getUsers.bind(this);
+    this.getBooks = this.getBooks.bind(this);
+    this.getRequests = this.getRequests.bind(this);
+    this.getTrades = this.getTrades.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
     this.getRequestedBooks = this.getRequestedBooks.bind(this);
 
+    // Event Listeners
     window.addEventListener("load", this.getData);
   }
 
@@ -39,17 +48,62 @@ class BookExchange extends React.Component {
    * Gets all users, books, and requests that have been made
    */
   getData() {
-    fetch(`${window.location.origin}/api/users`)
+    this.getUsers();
+    this.getBooks();
+    this.getRequests();
+    this.getTrades();
+    /* console.log(this.state.users); */
+    /* console.log(this.state.books); */
+    /* console.log(this.state.requests); */
+    /* console.log(this.state.trades); */
+  }
+
+  /**
+   * Gets all users
+   */
+  getUsers() {
+    fetch(`${location.origin}/api/users`)
       .then((res) => res.json())
-      .then((data) => {
-        if (data.length > 0) {
-          this.setState({
-            users: data.users,
-            books: data.books,
-            requests: data.requests,
-          });
-        }
-      })
+      .then((data) => this.setState({ users: data }))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  }
+
+  /**
+   * Gets all books
+   */
+  getBooks() {
+    fetch(`${location.origin}/api/books`)
+      .then((res) => res.json())
+      .then((data) => this.setState({ books: data }))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  }
+
+  /**
+   * Gets all requests that have been made
+   */
+  getRequests() {
+    fetch(`${location.origin}/api/requests`)
+      .then((res) => res.json())
+      .then((data) => this.setState({ requests: data }))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  }
+
+  /**
+   * Gets all trades
+   */
+  getTrades() {
+    fetch(`${location.origin}/api/requests?trades=true`)
+      .then((res) => res.json())
+      .then((data) => this.setState({ trades: data }))
       .catch((e) => {
         alert(e);
         console.error(e);
@@ -62,7 +116,7 @@ class BookExchange extends React.Component {
   getRequestedBooks() {
     let books = [];
 
-    fetch(`${window.location.origin}/api/session/books`)
+    fetch(`${location.origin}/api/session/books`)
       .then((res) => res.json())
       .then((data) => {
         if (!data) return;
@@ -82,9 +136,7 @@ class BookExchange extends React.Component {
    * Determines if the user should be logged in or logged out
    */
   isLoggedIn() {
-    this.setState((state) => ({
-      login: !state.login,
-    }));
+    this.setState((state) => ({ login: !state.login }));
   }
 
   /**
@@ -92,9 +144,7 @@ class BookExchange extends React.Component {
    * @param {InputEvent} e    Represents the event that occurred
    */
   saveUsername(e) {
-    this.setState({
-      username: e.target.innerHTML,
-    });
+    this.setState({ username: e.target.innerHTML });
   }
 
   render() {
