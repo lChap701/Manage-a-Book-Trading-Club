@@ -111,6 +111,27 @@ class BookExchange extends React.Component {
   }
 
   /**
+   * Determines if the user should be logged in or logged out
+   */
+  isLoggedIn() {
+    fetch(`${location.origin}/api/session/user`)
+      .then((res) => res.json())
+      .then((data) => this.setState({ login: Boolean(data) }))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  }
+
+  /**
+   * Saves the username while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveUsername(e) {
+    this.setState({ username: e.target.innerHTML });
+  }
+
+  /**
    * Gets the books that were requested for trading from the server
    */
   getRequestedBooks() {
@@ -130,27 +151,6 @@ class BookExchange extends React.Component {
       });
 
     return books;
-  }
-
-  /**
-   * Determines if the user should be logged in or logged out
-   */
-  isLoggedIn() {
-    fetch(`${location.origin}/api/session/user`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ login: Boolean(data) }))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  }
-
-  /**
-   * Saves the username while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
-   */
-  saveUsername(e) {
-    this.setState({ username: e.target.innerHTML });
   }
 
   render() {
