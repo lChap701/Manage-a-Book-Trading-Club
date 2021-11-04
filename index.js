@@ -6,7 +6,6 @@
  */
 
 require("dotenv").config();
-const axios = require("axios").default;
 
 // Express Setup
 const express = require("express");
