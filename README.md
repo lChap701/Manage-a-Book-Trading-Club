@@ -5,6 +5,7 @@ A project that was created to earn a certificate from freeCodeCamp and allows us
 ## Resources
 
 [Favicon Generator](https://favicon.io/favicon-generator/) \
+[React Router Setup](https://newbedev.com/using-react-router-with-cdn-and-without-webpack-or-browserify) \
 [GitHub OAuth](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app) \
 [Facebook OAuth](https://www.twilio.com/blog/facebook-oauth-login-node-js-app-passport-js) \
 [Twitter OAuth](https://medium.com/swlh/setting-up-twitter-oauth-with-node-and-passport-js-2298296b237c) \
