@@ -83,7 +83,7 @@ app.get("/books", (req, res) => {
   res.sendFile(process.cwd() + "/public/index.html");
 });
 
-// Displays the Book Exchange - Requests Page
+// Displays the Book Exchange - All Requests Page
 app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
