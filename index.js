@@ -113,7 +113,7 @@ app.get("/trades", (req, res) => {
 
 // Displays the Book Exchange - Users Page
 app.get("/users", (req, res) => {
-  es.sendFile(process.cwd() + "/public/users.html");
+  res.sendFile(process.cwd() + "/public/users.html");
 });
 
 // Displays the 404 Error Page
