@@ -90,7 +90,6 @@ app.get("/requests", (req, res) => {
 
 // Displays the Book Exchange - Create Requests Page
 app.get("/requests/new", (req, res) => {
-  delete req.session.books;
   res.sendFile(process.cwd() + "/public/createRequests.html");
 });
 
