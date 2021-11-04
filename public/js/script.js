@@ -52,7 +52,6 @@ class BookExchange extends React.Component {
     this.getBooks();
     this.getRequests();
     this.getTrades();
-    this.isLoggedIn();
     /* console.log(this.state.users); */
     /* console.log(this.state.books); */
     /* console.log(this.state.requests); */
