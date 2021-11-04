@@ -1,3 +1,44 @@
 * {
   font-family: "Zen Antique", serif;
 }
+
+.panel {
+  margin: 20px auto 0;
+  max-width: 1200px;
+  height: auto;
+  max-height: 475px;
+  overflow: auto;
+}
+
+.panel-header,
+.panel-footer {
+  background: #3496ff;
+  border: 1px solid #3496ff;
+}
+
+.panel-header {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.panel-body {
+  background: #f9f9f9;
+}
+
+.panel-body .item {
+  margin: 0;
+}
+
+.panel-footer {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.panel-footer .buttons {
+  width: 300px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
