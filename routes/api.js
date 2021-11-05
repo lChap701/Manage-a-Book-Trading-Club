@@ -87,54 +87,70 @@ module.exports = (app) => {
           user[key] = req.body[key];
         });
 
-      crud.addUser(user).then(() => res.redirect("/book"));
+      crud
+        .addUser(user)
+        .then(() => res.redirect("/book"))
+        .catch((e) => res.send(e));
     });
 
-  app.route("/api/books").get((req, res) => {
-    const { bookId } = req.query;
-    let books = [];
+  app
+    .route("/api/books")
+    .get((req, res) => {
+      const { bookId } = req.query;
+      let books = [];
 
-    // For when books are requested for trades
-    if (bookId) {
-      if (Array.isArray(bookId)) {
-        bookId.forEach((id) => {
-          crud.getBook(id).then((book) => books.push(book));
-        });
-      } else {
-        crud.getBook(bookId).then((book) => {
-          books.push(book);
-        });
+      // For when books are requested for trades
+      if (bookId) {
+        if (Array.isArray(bookId)) {
+          bookId.forEach((id) => {
+            crud.getBook(id).then((book) => books.push(book));
+          });
+        } else {
+          crud.getBook(bookId).then((book) => {
+            books.push(book);
+          });
+        }
+
+        res.json(books);
+        return;
       }
 
-      res.json(books);
-      return;
-    }
+      crud
+        .getAllBooks()
+        .populate({ path: "users" })
+        .then((books) =>
+          res.json(
+            books
+              .sort((a, b) => b.bumpedOn - a.bumpedOn)
+              .map((book) => {
+                return {
+                  _id: book._id,
+                  title: book.title,
+                  description: book.description,
+                  user: {
+                    _id: book.user._id,
+                    username: book.user.username,
+                    city: book.user.city,
+                    state: book.user.state,
+                    country: book.user.country,
+                  },
+                  request: book.request,
+                };
+              })
+          )
+        );
+    })
 
-    crud
-      .getAllBooks()
-      .populate({ path: "users" })
-      .then((books) =>
-        res.json(
-          books
-            .sort((a, b) => b.bumpedOn - a.bumpedOn)
-            .map((book) => {
-              return {
-                _id: book._id,
-                title: book.title,
-                description: book.description,
-                user: {
-                  _id: book.user._id,
-                  username: book.user.username,
-                  city: book.user.city,
-                  state: book.user.state,
-                  country: book.user.country,
-                },
-                request: book.request,
-              };
-            })
-        )
-      );
-  });
+    .post((req, res) => {
+      crud
+        .addBook({
+          title: req.body.title,
+          description: req.body.description,
+          user: req.body.user,
+        })
+        .then(() => res.redirect("/books/my"))
+        .catch((e) => res.send(e));
+    });
 
   app.route("/api/users/:id").get((req, res) =>
     crud.getUser(req.body.id).then((user) =>
