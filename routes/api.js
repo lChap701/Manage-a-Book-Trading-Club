@@ -248,6 +248,13 @@ module.exports = (app) => {
     })
 
     .post((req, res) => {
-      crud.addRequest()
+      crud
+        .addRequest({
+          giveBooks: req.body.give,
+          takeBooks: req.body.take,
+          users: req.body.users,
+        })
+        .then((request) => res.json(request))
+        .catch((e) => console.log(e));
     });
 };
