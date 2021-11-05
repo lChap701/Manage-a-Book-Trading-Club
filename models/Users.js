@@ -7,12 +7,7 @@ const userSchema = new Schema({
   password: {
     type: String,
     trim: true,
-    required: [
-      () => {
-        return !this.oauth;
-      },
-      "{PATH} is required",
-    ],
+    required: [() => !this.oauth, "{PATH} is required"],
   },
   oauth: { type: Boolean, default: false },
   name: { type: String, trim: true },
