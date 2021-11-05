@@ -65,17 +65,6 @@ module.exports = (app) => {
         .catch((e) => res.send(e));
     });
 
-  // Routing for retrieving all user's books
-  app.get("/api/users/:id/books", (req, res) => {
-    crud
-      .getBooks(req.params.id)
-      .populate({ path: "users" })
-      .populate({ path: "requests" })
-      .then((books) => {
-        res.json(books);
-      });
-  });
-
   // Routing for all books
   app
     .route("/api/books")
@@ -136,58 +125,72 @@ module.exports = (app) => {
 
   // Routing for displaying a user's profile
   app.get("/api/users/:id", (req, res) =>
-    crud.getUser(req.params.id).then((user) =>
-      res.json({
-        username: user.username,
-        full_name: user.name,
-        address: user.address,
-        city: user.city,
-        state: user.state,
-        country: user.country,
-      })
-    )
+    crud.getUser({ _id: req.params.id }).then((user) => {
+      if (!user) {
+        res.send("Unknown user");
+      } else {
+        res.json({
+          username: user.username,
+          fullName: user.name,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+        });
+      }
+    })
   );
 
   // Routing for getting all user's books
   app.get("/api/users/:id/books", (req, res) => {
-    crud
-      .getBooks(req.params.id)
-      .populate({ path: "users" })
-      .populate({ path: "requests" })
-      .then((books) => {
-        console.log(books);
-        let sorted = books
-          .sort((a, b) => b.bumpedOn - a.bumpedOn)
-          .map((book) => {
-            return {
-              _id: book._id,
-              title: book.title,
-              description: book.description,
-              addedAt: book.addedAt,
-              requests: book.request.users.filter(
-                (user) => user._id != req.params.id
-              ).length,
-              users: book.request.users.map((user) => {
-                if (user._id != req.params.id) {
-                  return {
-                    _id: user._id,
-                    username: user.username,
-                  };
-                }
-              }),
-            };
-          });
+    crud.getUser({ _id: req.params.id }).then((user) => {
+      if (!user) {
+        res.send("Unknown user");
+        return;
+      }
 
-        res.json({
-          books: sorted,
-          user: {
-            username: books[0].user.username,
-            city: books[0].user.city,
-            state: books[0].user.state,
-            country: books[0].user.country,
-          },
+      crud
+        .getBooks(user)
+        .populate({ path: "requests" })
+        .then((books) => {
+          console.log(books);
+
+          if (!books || books.length == 0) {
+            res.send("No books have been added yet");
+            return;
+          }
+
+          books.sort((a, b) => b.bumpedOn - a.bumpedOn);
+
+          res.json({
+            books: books.map((book) => {
+              return {
+                _id: book._id,
+                title: book.title,
+                description: book.description,
+                addedAt: book.addedAt,
+                requests: book.request.users.filter(
+                  (user) => user._id != req.params.id
+                ).length,
+                users: book.request.users.map((user) => {
+                  if (user._id != req.params.id) {
+                    return {
+                      _id: user._id,
+                      username: user.username,
+                    };
+                  }
+                }),
+              };
+            }),
+            user: {
+              username: user.username,
+              city: user.city,
+              state: user.state,
+              country: user.country,
+            },
+          });
         });
-      });
+    });
   });
 
   // Routing for handling requests
@@ -267,7 +270,10 @@ module.exports = (app) => {
       .populate({ path: "users" })
       .populate({ path: "books" })
       .then((book) => {
-        if (!book) res.send("No book was found");
+        if (!book) {
+          res.send("Unknown book");
+          return;
+        }
 
         crud.getRequest(book.request).then((request) => {
           if (
@@ -275,6 +281,7 @@ module.exports = (app) => {
             !request.takeBooks.find((book) => book == req.params.bookId)
           ) {
             res.send("There are currently no requests");
+            return;
           }
 
           res.json({

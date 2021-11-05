@@ -29,6 +29,7 @@ class BookExchange extends React.Component {
       takeBooks: [],
       requests: [],
       trades: [],
+      err: "",
     };
 
     // Functions

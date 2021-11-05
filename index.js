@@ -121,16 +121,9 @@ app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
 });
 
-// Displays the Book Exchange - (username)'s Books Page or an error message
+// Displays the Book Exchange - (username)'s Books Page
 app.get("/users/:id/books", (req, res) => {
-  crud.getUser(req.params.id).then((user) => {
-    // Checks if user exists
-    if (user) {
-      res.sendFile(process.cwd() + "/public/books.html");
-    } else {
-      res.send("User not found");
-    }
-  });
+  res.sendFile(process.cwd() + "/public/books.html");
 });
 
 // Displays the 404 Error Page
