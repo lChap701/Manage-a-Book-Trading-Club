@@ -16,9 +16,9 @@ module.exports = (app) => {
   // Displays and handles POST requests for the Book Exchange - Login Page
   app
     .route("/login")
-    .get(loggedIn, (req, res) =>
-      res.sendFile(process.cwd() + "/public/login.html")
-    )
+    .get(loggedIn, (req, res) => {
+      res.sendFile(process.cwd() + "/public/login.html");
+    })
 
     .post(
       loggedIn,

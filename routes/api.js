@@ -11,9 +11,9 @@ const crud = require("../crud");
  */
 module.exports = (app) => {
   // Will determine if the user is logged in
-  app.get("/api/session/user", (req, res) =>
-    res.json(req.user ? req.user : null)
-  );
+  app.get("/api/session/user", (req, res) => {
+    res.json(req.user ? req.user : null);
+  });
 
   // Gets requested books during trades and clears values
   app.get("/api/session/books", (req, res) => {
@@ -73,6 +73,7 @@ module.exports = (app) => {
           )
         );
     })
+    
     .post((req, res) => {
       crud.addUser();
     });
