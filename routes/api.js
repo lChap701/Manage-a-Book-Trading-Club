@@ -73,9 +73,21 @@ module.exports = (app) => {
           )
         );
     })
-    
+
     .post((req, res) => {
-      crud.addUser();
+      const user = {
+        username: req.body.uname,
+        password: bcrypt.hashSync(req.body.psw, process.env.SALT_ROUNDS),
+      };
+
+      // Gets any optional values
+      Object.keys(req.body)
+        .filter((key) => key != "uname" && key != "psw")
+        .forEach((key) => {
+          user[key] = req.body[key];
+        });
+
+      crud.addUser(user).then(() => res.redirect("/book"));
     });
 
   app.route("/api/books").get((req, res) => {
