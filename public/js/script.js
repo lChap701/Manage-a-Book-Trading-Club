@@ -42,7 +42,8 @@ class BookExchange extends React.Component {
     this.getRequestedBooks = this.getRequestedBooks.bind(this);
 
     // Event Listeners
-    window.addEventListener("load", this.getData);
+    window.addEventListener("load", this.getData, true);
+    window.addEventListener("load", this.isLoggedIn, true);
   }
 
   /**
