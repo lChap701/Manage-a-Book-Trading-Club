@@ -10,44 +10,17 @@ const crud = require("../crud");
  *
  */
 module.exports = (app) => {
-  // Will determine if the user is logged in
+  // Routing for determining if the user is logged in
   app.get("/api/session/user", (req, res) => {
     res.json(req.user ? req.user : null);
   });
 
-  // Gets requested books during trades and clears values
+  // Routing for getting requested books during trades
   app.get("/api/session/books", (req, res) => {
-    const { books } = req.session;
-    res.json(books ? books : null);
+    res.json(req.session.books ? req.session.books : null);
   });
 
-  // Gets another user's books and clears values
-  app.get("/api/session/books/user", (req, res) => {
-    const { books } = req.session;
-    console.log(books);
-
-    const user = books[0].user;
-    console.log(user);
-    console.log(books[0].requests.users);
-
-    // Gets all requests (not including the current user)
-    const requests = books.map((book) =>
-      book.request.users.filter((user) => user != user._id)
-    );
-
-    res.json(
-      books
-        ? {
-            books: books.map((book) => {
-              return { title: book.title, description: book.description };
-            }),
-            user: user,
-            requests: requests,
-          }
-        : null
-    );
-  });
-
+  // Routing for users
   app
     .route("/api/users")
     .get((req, res) => {
@@ -92,6 +65,18 @@ module.exports = (app) => {
         .catch((e) => res.send(e));
     });
 
+  // Routing for retrieving all user's books
+  app.get("/api/users/:id/books", (req, res) => {
+    crud
+      .getBooks(req.params.id)
+      .populate({ path: "users" })
+      .populate({ path: "requests" })
+      .then((books) => {
+        res.json(books);
+      });
+  });
+
+  // Routing for all books
   app
     .route("/api/books")
     .get((req, res) => {
@@ -105,9 +90,7 @@ module.exports = (app) => {
             crud.getBook(id).then((book) => books.push(book));
           });
         } else {
-          crud.getBook(bookId).then((book) => {
-            books.push(book);
-          });
+          crud.getBook(bookId).then((book) => books.push(book));
         }
 
         res.json(books);
@@ -164,83 +147,107 @@ module.exports = (app) => {
     )
   );
 
-  app.route("/api/users/:id/books").get((req, res) => {
+  // Routing for get all books of a single user
+  app.get("/api/users/:id/books", (req, res) => {
     crud
       .getBooks(req.params.id)
       .populate({ path: "users" })
-      .then((books) =>
-        books
+      .populate({ path: "requests" })
+      .then((books) => {
+        console.log(books);
+        let sorted = books
           .sort((a, b) => b.bumpedOn - a.bumpedOn)
-          .map((book) =>
-            res.json({
+          .map((book) => {
+            return {
               _id: book._id,
               title: book.title,
               description: book.description,
               addedAt: book.addedAt,
-              user: {
-                username: book.user.username,
-                city: book.user.city,
-                state: book.user.state,
-                country: book.user.country,
-              },
-            })
-          )
-      );
-  });
+              requests: book.request.users.filter(
+                (user) => user._id != req.params.id
+              ).length,
+              users: book.request.users.map((user) => {
+                if (user._id != req.params.id) {
+                  return {
+                    _id: user._id,
+                    username: user.username,
+                  };
+                }
+              }),
+            };
+          });
 
-  app.route("/api/requests").get((req, res) => {
-    let { traded } = req.query;
-
-    // Set to default value
-    if (!traded) traded = "false";
-
-    crud
-      .getRequests()
-      .populate({ path: "users" })
-      .populate({ path: "books" })
-      .then((requests) => {
-        res.json(
-          requests
-            .filter((request) => request.traded.toString() == traded)
-            .map((request) => {
-              return {
-                give: {
-                  books: request.giveBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  user: {
-                    username: request.user[0].username,
-                    city: request.user[0].city,
-                    state: request.user[0].state,
-                    country: request.user[0].country,
-                    requests: request.user[0].requests.length,
-                  },
-                },
-                take: {
-                  books: request.takeBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  users: request.users
-                    .filter((user) => user._id != request.users[0]._id)
-                    .map((user) => {
-                      return {
-                        username: user.username,
-                        city: user.city,
-                        state: user.state,
-                        country: user.country,
-                        requests: user.requests.length,
-                      };
-                    }),
-                },
-              };
-            })
-        );
+        res.json({
+          books: sorted,
+          user: {
+            username: books[0].user.username,
+            city: books[0].user.city,
+            state: books[0].user.state,
+            country: books[0].user.country,
+          },
+        });
       });
   });
+
+  app
+    .route("/api/requests")
+    .get((req, res) => {
+      let { traded } = req.query;
+
+      // Set to default value
+      if (!traded) traded = "false";
+
+      crud
+        .getRequests()
+        .populate({ path: "users" })
+        .populate({ path: "books" })
+        .then((requests) => {
+          res.json(
+            requests
+              .filter((request) => request.traded.toString() == traded)
+              .map((request) => {
+                return {
+                  give: {
+                    books: request.giveBooks.map((book) => {
+                      return {
+                        title: book.title,
+                        description: book.description,
+                      };
+                    }),
+                    user: {
+                      username: request.user[0].username,
+                      city: request.user[0].city,
+                      state: request.user[0].state,
+                      country: request.user[0].country,
+                      requests: request.user[0].requests.length,
+                    },
+                  },
+                  take: {
+                    books: request.takeBooks.map((book) => {
+                      return {
+                        title: book.title,
+                        description: book.description,
+                      };
+                    }),
+                    users: request.users
+                      .filter((user) => user._id != request.users[0]._id)
+                      .map((user) => {
+                        return {
+                          username: user.username,
+                          city: user.city,
+                          state: user.state,
+                          country: user.country,
+                          requests: user.requests.length,
+                        };
+                      }),
+                  },
+                };
+              })
+          );
+        });
+    })
+
+    .post((req, res) => {
+      crud.addRequest()
+    });
 };
