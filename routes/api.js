@@ -18,14 +18,13 @@ module.exports = (app) => {
   // Gets requested books during trades and clears values
   app.get("/api/session/books", (req, res) => {
     const { books } = req.session;
-    req.session.books = null;
     res.json(books ? books : null);
   });
 
   // Gets another user's books and clears values
   app.get("/api/session/books/user", (req, res) => {
     const { books } = req.session;
-    req.session.books = null;
+    console.log(books);
 
     const user = books[0].user;
     console.log(user);
@@ -153,7 +152,7 @@ module.exports = (app) => {
     });
 
   app.route("/api/users/:id").get((req, res) =>
-    crud.getUser(req.body.id).then((user) =>
+    crud.getUser(req.params.id).then((user) =>
       res.json({
         username: user.username,
         full_name: user.name,
@@ -167,7 +166,7 @@ module.exports = (app) => {
 
   app.route("/api/users/:id/books").get((req, res) => {
     crud
-      .getBooks(req.body.id)
+      .getBooks(req.params.id)
       .populate({ path: "users" })
       .then((books) =>
         books
