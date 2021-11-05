@@ -5,7 +5,11 @@ const bookSchema = new Schema(
   {
     title: { type: String, trim: true, required: "{PATH} is required" },
     description: { type: String, trim: true, required: "{PATH} is required" },
-    user: { type: Schema.Types.ObjectId, ref: "Users" },
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+      required: "{PATH} is required",
+    },
     request: { type: Schema.Types.ObjectId, ref: "Requests" },
   },
   {
