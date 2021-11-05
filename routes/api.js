@@ -148,7 +148,7 @@ module.exports = (app) => {
     )
   );
 
-  // Routing for get all books of a single user
+  // Routing for getting all user's books
   app.get("/api/users/:id/books", (req, res) => {
     crud
       .getBooks(req.params.id)
