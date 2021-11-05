@@ -588,7 +588,11 @@ class Login extends React.Component {
           </div>
         </div>
         <div className="panel-footer px-3 py-2">
-          <input className="btn btn-success w-100" type="submit" value="Login" />
+          <input
+            className="btn btn-success w-100"
+            type="submit"
+            value="Login"
+          />
         </div>
       </form>
     );
