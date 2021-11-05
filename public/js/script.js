@@ -23,13 +23,13 @@ class BookExchange extends React.Component {
     this.state = {
       login: false,
       users: [],
-      userId: "",
-      username: "",
+      user: {
+        username: "",
+      },
       books: [],
       takeBooks: [],
       requests: [],
       trades: [],
-      err: "",
     };
 
     // Functions
@@ -40,6 +40,7 @@ class BookExchange extends React.Component {
     this.getTrades = this.getTrades.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
     this.getRequestedBooks = this.getRequestedBooks.bind(this);
+    this.saveUsername = this.saveUsername.bind(this);
 
     // Event Listeners
     window.addEventListener("load", this.getData, true);
@@ -118,7 +119,13 @@ class BookExchange extends React.Component {
   isLoggedIn() {
     fetch(`${location.origin}/api/session/user`)
       .then((res) => res.json())
-      .then((data) => this.setState({ login: Boolean(data) }))
+      .then((data) => {
+        this.setState({ login: Boolean(data) });
+
+        // Determines if session should be passed to client
+        if (data) this.setState((state) => ({ user: { ...state.user, data } }));
+        console.log(this.state.user);
+      })
       .catch((e) => {
         alert(e);
         console.error(e);
@@ -130,7 +137,11 @@ class BookExchange extends React.Component {
    * @param {InputEvent} e    Represents the event that occurred
    */
   saveUsername(e) {
-    this.setState({ username: e.target.innerHTML });
+    console.log(e.target);
+    console.log(this.state.user);
+    this.setState((state) => ({
+      user: { ...state.user, username: e.target.value },
+    }));
   }
 
   /**
@@ -226,7 +237,7 @@ class BookExchange extends React.Component {
                     ) : (
                       <Dropdown
                         id="userDropdownMenuLink"
-                        dropLinkText={this.state.username}
+                        dropLinkText={this.state.user.username}
                         links={[
                           {
                             path: "/users/:id",
@@ -269,9 +280,7 @@ class BookExchange extends React.Component {
               <Route path="/users">
                 <Users />
               </Route>
-              <Route path="/login">
-                <Login isLoggedIn={this.isLoggedIn} />
-              </Route>
+              <Route path="/login" component={Login} />
             </Switch>
           </div>
         </Router>
@@ -288,13 +297,13 @@ class BookExchange extends React.Component {
 const Books = (props) => {
   return (
     <form action="/requests/new/books" method="POST" className="panel">
-      <div className="panel-header text-white p-1 mx-auto border-bottom-0">
+      <div className="panel-header text-white p-1 mx-auto">
         <h2 className="text-center">Books</h2>
       </div>
 
       <div className="panel-body">
         {props.books.length == 0 ? (
-          <div className="item border border-secondary p-5">
+          <div className="item border border-secondary border-top-0 border-bottom-0 p-5">
             <h4 className="text-muted text-center mt-1">
               No books are available at this time
             </h4>
@@ -302,9 +311,13 @@ const Books = (props) => {
         ) : (
           props.books.map((book) => {
             return (
-              <div className="item border border-secondary">
+              <div className="item border border-secondary border-top-0 border-bottom-0">
                 <div className="form-group">
-                  <input id={`book${book._id}`} name={`book${book._id}`} />
+                  <input
+                    id={`book${book._id}`}
+                    name={`book${book._id}`}
+                    type="checkbox"
+                  />
                   <label for={`book${book._id}`}></label>
                 </div>
               </div>
@@ -313,7 +326,7 @@ const Books = (props) => {
         )}
       </div>
 
-      <div className="panel-footer border-top-0 p-2">
+      <div className="panel-footer p-2">
         {!props.login ? (
           <Link className="btn btn-success" to="/login">
             Login to Add Books and Submit Requests
@@ -342,6 +355,15 @@ const Books = (props) => {
  */
 const Requests = (props) => {
   return <h1>All Requests</h1>;
+};
+
+/**
+ * Component for displaying content on the Request for (book) page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const BookRequests = (props) => {
+  return <h1>Requests for {props.book}</h1>;
 };
 
 /**
@@ -445,12 +467,133 @@ const Users = (props) => {
 
 /**
  * Component for displaying content on the Login page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
  */
-const Login = (props) => {
-  return <h1>Login</h1>;
-};
+class Login extends React.Component {
+  constructor(props) {
+    super(props);
+
+    // States
+    this.state = {
+      username: "",
+      password: "",
+      errs: ["Username is required", "Password is required"],
+    };
+
+    // Functions
+    this.saveUsername = this.saveUsername.bind(this);
+    this.savePassword = this.savePassword.bind(this);
+    this.submitForm = this.submitForm.bind(this);
+  }
+
+  /**
+   * Saves the username while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveUsername(e) {
+    this.setState({ username: e.target.value });
+  }
+
+  /**
+   * Saves the password while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  savePassword(e) {
+    this.setState({ password: e.target.value });
+  }
+
+  /**
+   * Validates and submits the form when valid
+   * @param {SubmitEvent} e   Represents the event that occurred
+   */
+  submitForm(e) {
+    e.preventDefault();
+
+    // Validates username field
+    const uname = document.querySelector("input[name='uname']");
+    if (!uname.checkValidity() || uname.value.trim().length == 0) {
+      uname.classList.add("is-invalid");
+    } else if (uname.classList.contains("is-invalid")) {
+      uname.classList.remove("is-invalid");
+    }
+
+    // Validates password field
+    const psw = document.querySelector("input[name='psw']");
+    if (!psw.checkValidity() || psw.value.trim().length == 0) {
+      psw.classList.add("is-invalid");
+    } else if (psw.classList.contains("is-invalid")) {
+      psw.classList.remove("is-invalid");
+    }
+
+    // Checks form is valid to determine if it should be submitted
+    if (
+      !psw.classList.contains("is-invalid") &&
+      !uname.classList.contains("is-invalid")
+    ) {
+      // Uploads the form
+      fetch("/api/users", {
+        method: "POST",
+        body: JSON.stringify({
+          username: this.state.username,
+          password: this.state.password,
+        }),
+      })
+        .then((res) => res.json())
+        .catch((e) => {
+          alert(e);
+          console.log(e);
+        });
+    }
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.submitForm} className="panel" novalidate="true">
+        <div className="panel-header text-white p-1 mx-auto">
+          <h2 className="text-center">Login</h2>
+        </div>
+
+        <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+          <div className="form-group">
+            <label for="uname">Username</label>
+            <input
+              id="uname"
+              name="uname"
+              type="text"
+              className="form-control"
+              required
+              value={this.state.username}
+              onChange={this.saveUsername}
+              aria-describedby="unameFeedback"
+            />
+            <div id="unameFeedback" className="invalid-feedback">
+              {this.state.errs[0]}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label for="psw">Password</label>
+            <input
+              id="psw"
+              name="psw"
+              type="password"
+              className="form-control"
+              value={this.state.password}
+              required
+              onChange={this.savePassword}
+              aria-describedby="pswFeedback"
+            />
+            <div id="pswFeedback" className="invalid-feedback">
+              {this.state.errs[1]}
+            </div>
+          </div>
+        </div>
+        <div className="panel-footer px-3 py-2">
+          <input className="btn btn-success w-100" type="submit" value="Login" />
+        </div>
+      </form>
+    );
+  }
+}
 
 /**
  * Component for displaying content on the Profile page
