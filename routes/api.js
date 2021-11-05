@@ -55,13 +55,11 @@ module.exports = (app) => {
       // Gets any optional values
       Object.keys(req.body)
         .filter((key) => key != "uname" && key != "psw")
-        .forEach((key) => {
-          user[key] = req.body[key];
-        });
+        .forEach((key) => (user[key] = req.body[key]));
 
       crud
         .addUser(user)
-        .then(() => res.redirect("/book"))
+        .then((newUser) => res.json(newUser))
         .catch((e) => res.send(e));
     });
 
@@ -119,7 +117,7 @@ module.exports = (app) => {
           description: req.body.description,
           user: req.body.user,
         })
-        .then(() => res.redirect("/books/my"))
+        .then((book) => res.json(book))
         .catch((e) => res.send(e));
     });
 
@@ -169,17 +167,19 @@ module.exports = (app) => {
                 title: book.title,
                 description: book.description,
                 addedAt: book.addedAt,
-                requests: book.request.users.filter(
-                  (user) => user._id != req.params.id
-                ).length,
-                users: book.request.users.map((user) => {
-                  if (user._id != req.params.id) {
-                    return {
-                      _id: user._id,
-                      username: user.username,
-                    };
-                  }
-                }),
+                requests: {
+                  count: book.request.users.filter(
+                    (user) => user._id != req.params.id
+                  ).length,
+                  users: book.request.users.map((user) => {
+                    if (user._id != req.params.id) {
+                      return {
+                        _id: user._id,
+                        username: user.username,
+                      };
+                    }
+                  }),
+                },
               };
             }),
             user: {
@@ -260,7 +260,7 @@ module.exports = (app) => {
           users: req.body.users,
         })
         .then((request) => res.json(request))
-        .catch((e) => console.log(e));
+        .catch((e) => res.send(e));
     });
 
   // Routing for displaying all requests for a book
