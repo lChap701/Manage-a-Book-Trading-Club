@@ -6,14 +6,14 @@ const requestSchema = new Schema({
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
-      required: "Request must include at least one book to give",
+      required: "request must include at least one book to give",
     },
   ],
   takeBooks: [
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
-      required: "Request must include at least one book to take",
+      required: "request must include at least one book to take",
     },
   ],
   users: [{ type: Schema.Types.ObjectId, ref: "Users" }],
