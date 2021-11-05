@@ -134,7 +134,8 @@ module.exports = (app) => {
         .catch((e) => res.send(e));
     });
 
-  app.route("/api/users/:id").get((req, res) =>
+  // Routing for displaying a user's profile
+  app.get("/api/users/:id", (req, res) =>
     crud.getUser(req.params.id).then((user) =>
       res.json({
         username: user.username,
@@ -189,6 +190,7 @@ module.exports = (app) => {
       });
   });
 
+  // Routing for handling requests
   app
     .route("/api/requests")
     .get((req, res) => {
