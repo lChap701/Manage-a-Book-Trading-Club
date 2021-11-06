@@ -3,7 +3,12 @@ const { Schema } = mongoose;
 
 const bookSchema = new Schema(
   {
-    title: { type: String, trim: true, required: "{PATH} is required" },
+    title: {
+      type: String,
+      trim: true,
+      required: "{PATH} is required",
+      unique: true,
+    },
     description: { type: String, trim: true, required: "{PATH} is required" },
     user: {
       type: Schema.Types.ObjectId,
