@@ -14,9 +14,10 @@ const Router = BrowserRouter;
 
 /**
  * Validates input fields in the form
- * @returns     Returns nothing or is void
+ * @param {*} data    Represents the data that should be submitted
+ * @returns           Returns nothing or is void
  */
-async function validateForm() {
+async function validateForm(data) {
   let errors = 0;
 
   // Validates input fields
@@ -36,10 +37,7 @@ async function validateForm() {
   try {
     const res = await fetch(location.pathname, {
       method: "POST",
-      body: JSON.stringify({
-        username: this.state.username,
-        password: this.state.password,
-      }),
+      body: JSON.stringify(data),
     });
 
     // Ensures that an error message is displayed
@@ -319,6 +317,7 @@ class BookExchange extends React.Component {
                 <Users />
               </Route>
               <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
             </Switch>
           </div>
         </Router>
@@ -545,7 +544,10 @@ class Login extends React.Component {
    */
   async submitForm(e) {
     e.preventDefault();
-    await validateForm();
+    await validateForm({
+      username: this.state.username,
+      password: this.state.password,
+    });
   }
 
   render() {
@@ -617,6 +619,8 @@ class Signup extends React.Component {
       address: "",
       city: "",
       state: "",
+      country: "",
+      zipPostal: "",
       errs: ["Username is required", "Password is required"],
     };
 
@@ -627,6 +631,8 @@ class Signup extends React.Component {
     this.saveAddress = this.saveAddress.bind(this);
     this.saveCity = this.saveCity.bind(this);
     this.saveState = this.saveState.bind(this);
+    this.saveCountry = this.saveCountry.bind(this);
+    this.saveZipPostalCode = this.saveZipPostalCode.bind(this);
     this.submitForm = this.submitForm.bind(this);
   }
 
@@ -679,12 +685,37 @@ class Signup extends React.Component {
   }
 
   /**
+   * Saves the country that the user lives at enters while they type
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveCountry(e) {
+    this.setState({ country: e.target.value });
+  }
+
+  /**
+   * Saves the zip/postal code of the user's location while they type
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveZipPostalCode(e) {
+    this.setState({ zipPostal: e.target.value });
+  }
+
+  /**
    * Validates and submits the form when valid
    * @param {SubmitEvent} e   Represents the event that occurred
    */
   async submitForm(e) {
     e.preventDefault();
-    await validateForm();
+    await validateForm({
+      username: this.state.username,
+      password: this.state.password,
+      name: this.state.name,
+      address: this.state.address,
+      city: this.state.city,
+      state: this.state.state,
+      country: this.state.country,
+      zipPostal: this.state.zipPostal,
+    });
   }
 
   render() {
@@ -728,54 +759,78 @@ class Signup extends React.Component {
               {this.state.errs[1]}
             </div>
           </div>
-        </div>
 
-        <div className="form-group">
-          <label for="name">Full Name</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            className="form-control"
-            value={this.state.name}
-            onChange={this.saveName}
-          />
-        </div>
+          <div className="form-group">
+            <label for="name">Full Name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              className="form-control"
+              value={this.state.name}
+              onChange={this.saveName}
+            />
+          </div>
 
-        <div className="form-group">
-          <label for="addr">Address</label>
-          <input
-            id="addr"
-            name="addr"
-            type="text"
-            className="form-control"
-            value={this.state.address}
-            onChange={this.saveAddress}
-          />
-        </div>
+          <div className="form-group">
+            <label for="addr">Address</label>
+            <input
+              id="addr"
+              name="addr"
+              type="text"
+              className="form-control"
+              value={this.state.address}
+              onChange={this.saveAddress}
+            />
+          </div>
 
-        <div className="form-group">
-          <label for="city">City</label>
-          <input
-            id="city"
-            name="city"
-            type="text"
-            className="form-control"
-            value={this.state.city}
-            onChange={this.saveCity}
-          />
-        </div>
+          <div className="form-group">
+            <label for="city">City</label>
+            <input
+              id="city"
+              name="city"
+              type="text"
+              className="form-control"
+              value={this.state.city}
+              onChange={this.saveCity}
+            />
+          </div>
 
-        <div className="form-group">
-          <label for="state">State</label>
-          <input
-            id="state"
-            name="state"
-            type="text"
-            className="form-control"
-            value={this.state.state}
-            onChange={this.saveState}
-          />
+          <div className="form-group">
+            <label for="state">State</label>
+            <input
+              id="state"
+              name="state"
+              type="text"
+              className="form-control"
+              value={this.state.state}
+              onChange={this.saveState}
+            />
+          </div>
+
+          <div className="form-group">
+            <label for="country">Country</label>
+            <input
+              id="country"
+              name="country"
+              type="text"
+              className="form-control"
+              value={this.state.country}
+              onChange={this.saveCountry}
+            />
+          </div>
+
+          <div className="form-group">
+            <label for="zipPost">Zip/Postal Code</label>
+            <input
+              id="zipPost"
+              name="zipPost"
+              type="zipPost"
+              className="form-control"
+              value={this.state.zipPostal}
+              onChange={this.saveZipPostalCode}
+            />
+          </div>
         </div>
 
         <div className="panel-footer px-3 py-2">
