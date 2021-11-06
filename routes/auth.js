@@ -92,7 +92,7 @@ module.exports = (app) => {
   app.get(
     "/users/:id",
     loggedOut,
-    passport.authenticate("local", { failureRedirect: "/login" }),
+    passport.authenticate("local-login", { failureRedirect: "/login" }),
     (req, res) => res.sendFile(process.cwd() + "/public/profile.html")
   );
 
@@ -100,7 +100,7 @@ module.exports = (app) => {
   app.get(
     "/users/edit",
     loggedOut,
-    passport.authenticate("local", { failureRedirect: "/login" }),
+    passport.authenticate("local-login", { failureRedirect: "/login" }),
     (req, res) => res.sendFile(process.cwd() + "/public/editProfile.html")
   );
 
@@ -108,7 +108,7 @@ module.exports = (app) => {
   app.get(
     "/books/my",
     loggedOut,
-    passport.authenticate("local", { failureRedirect: "/login" }),
+    passport.authenticate("local-login", { failureRedirect: "/login" }),
     (req, res) => res.sendFile(process.cwd() + "/public/books.html")
   );
 
@@ -116,7 +116,7 @@ module.exports = (app) => {
   app.get(
     "/logout",
     loggedOut,
-    passport.authenticate("local", { failureRedirect: "/login" }),
+    passport.authenticate("local-login", { failureRedirect: "/login" }),
     (req, res) => {
       req.logout();
       req.session.destroy();
