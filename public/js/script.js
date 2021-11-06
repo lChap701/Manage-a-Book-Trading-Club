@@ -507,28 +507,20 @@ class Login extends React.Component {
    */
   submitForm(e) {
     e.preventDefault();
+    let errors = 0;
 
-    // Validates username field
-    const uname = document.querySelector("input[name='uname']");
-    if (!uname.checkValidity() || uname.value.trim().length == 0) {
-      uname.classList.add("is-invalid");
-    } else if (uname.classList.contains("is-invalid")) {
-      uname.classList.remove("is-invalid");
-    }
-
-    // Validates password field
-    const psw = document.querySelector("input[name='psw']");
-    if (!psw.checkValidity() || psw.value.trim().length == 0) {
-      psw.classList.add("is-invalid");
-    } else if (psw.classList.contains("is-invalid")) {
-      psw.classList.remove("is-invalid");
-    }
+    // Validates input fields
+    document.querySelectorAll("input:not([type='submit']").forEach((input) => {
+      if (!input.checkValidity() || input.value.trim().length == 0) {
+        input.classList.add("is-invalid");
+        errors++;
+      } else if (input.classList.contains("is-invalid")) {
+        input.classList.remove("is-invalid");
+      }
+    });
 
     // Checks form is valid to determine if it should be submitted
-    if (
-      !psw.classList.contains("is-invalid") &&
-      !uname.classList.contains("is-invalid")
-    ) {
+    if (errors == 0) {
       // Submits the form
       fetch(location.pathname, {
         method: "POST",
