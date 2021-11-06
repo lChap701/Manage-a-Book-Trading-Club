@@ -21,105 +21,73 @@ module.exports = (app) => {
   });
 
   // Routing for users
-  app
-    .route("/api/users")
-    .get((req, res) => {
-      crud
-        .getUsers()
-        .populate({ path: "requests" })
-        .then((users) =>
-          res.json(
-            users.map((user) => {
-              console.log(user);
-              return {
-                _id: user._id,
-                username: user.username,
-                city: user.city,
-                state: user.state,
-                books: user.books.length,
-                incomingRequests: user.requests.filter(
-                  (request) => !request.traded
-                ).length,
-              };
-            })
-          )
-        );
-    })
-
-    .post((req, res) => {
-      const user = {
-        username: req.body.uname,
-        password: bcrypt.hashSync(req.body.psw, process.env.SALT_ROUNDS),
-      };
-
-      // Gets any optional values
-      Object.keys(req.body)
-        .filter((key) => key != "uname" && key != "psw")
-        .forEach((key) => (user[key] = req.body[key]));
-
-      crud
-        .addUser(user)
-        .then((newUser) => res.json(newUser))
-        .catch((e) => res.status(404).type("text").send(e));
-    });
+  app.get("/api/users", (req, res) => {
+    crud
+      .getUsers()
+      .populate({ path: "requests" })
+      .then((users) =>
+        res.json(
+          users.map((user) => {
+            console.log(user);
+            return {
+              _id: user._id,
+              username: user.username,
+              city: user.city,
+              state: user.state,
+              books: user.books.length,
+              incomingRequests: user.requests.filter(
+                (request) => !request.traded
+              ).length,
+            };
+          })
+        )
+      );
+  });
 
   // Routing for all books
-  app
-    .route("/api/books")
-    .get((req, res) => {
-      const { bookId } = req.query;
-      let books = [];
+  app.get("/api/books", (req, res) => {
+    const { bookId } = req.query;
+    let books = [];
 
-      // For when books are requested for trades
-      if (bookId) {
-        if (Array.isArray(bookId)) {
-          bookId.forEach((id) => {
-            crud.getBook(id).then((book) => books.push(book));
-          });
-        } else {
-          crud.getBook(bookId).then((book) => books.push(book));
-        }
-
-        res.json(books);
-        return;
+    // For when books are requested for trades
+    if (bookId) {
+      if (Array.isArray(bookId)) {
+        bookId.forEach((id) => {
+          crud.getBook(id).then((book) => books.push(book));
+        });
+      } else {
+        crud.getBook(bookId).then((book) => books.push(book));
       }
 
-      crud
-        .getAllBooks()
-        .populate({ path: "users" })
-        .then((books) =>
-          res.json(
-            books
-              .sort((a, b) => b.bumpedOn - a.bumpedOn)
-              .map((book) => {
-                return {
-                  _id: book._id,
-                  title: book.title,
-                  description: book.description,
-                  user: {
-                    _id: book.user._id,
-                    username: book.user.username,
-                    city: book.user.city,
-                    state: book.user.state,
-                    country: book.user.country,
-                  },
-                  request: book.request,
-                };
-              })
-          )
-        );
-    })
+      res.json(books);
+      return;
+    }
 
-    .post((req, res) => {
-      crud
-        .addBook({
-          title: req.body.title,
-          description: req.body.description,
-          user: req.body.user,
-        })
-        .then((book) => res.json(book))
-        .catch((e) => res.status(404).type("text").send(e));
-    });
+    crud
+      .getAllBooks()
+      .populate({ path: "users" })
+      .then((books) =>
+        res.json(
+          books
+            .sort((a, b) => b.bumpedOn - a.bumpedOn)
+            .map((book) => {
+              return {
+                _id: book._id,
+                title: book.title,
+                description: book.description,
+                user: {
+                  _id: book.user._id,
+                  username: book.user.username,
+                  city: book.user.city,
+                  state: book.user.state,
+                  country: book.user.country,
+                },
+                request: book.request,
+              };
+            })
+        )
+      );
+  });
 
   // Routing for displaying a user's profile
   app.get("/api/users/:id", (req, res) =>
@@ -194,74 +162,61 @@ module.exports = (app) => {
   });
 
   // Routing for handling requests
-  app
-    .route("/api/requests")
-    .get((req, res) => {
-      let { traded } = req.query;
+  app.route("/api/requests").get((req, res) => {
+    let { traded } = req.query;
 
-      // Set to default value
-      if (!traded) traded = "false";
+    // Set to default value
+    if (!traded) traded = "false";
 
-      crud
-        .getRequests()
-        .populate({ path: "users" })
-        .populate({ path: "books" })
-        .then((requests) => {
-          res.json(
-            requests
-              .filter((request) => request.traded.toString() == traded)
-              .map((request) => {
-                return {
-                  give: {
-                    books: request.giveBooks.map((book) => {
+    crud
+      .getRequests()
+      .populate({ path: "users" })
+      .populate({ path: "books" })
+      .then((requests) => {
+        res.json(
+          requests
+            .filter((request) => request.traded.toString() == traded)
+            .map((request) => {
+              return {
+                give: {
+                  books: request.giveBooks.map((book) => {
+                    return {
+                      title: book.title,
+                      description: book.description,
+                    };
+                  }),
+                  user: {
+                    username: request.user[0].username,
+                    city: request.user[0].city,
+                    state: request.user[0].state,
+                    country: request.user[0].country,
+                    requests: request.user[0].requests.length,
+                  },
+                },
+                take: {
+                  books: request.takeBooks.map((book) => {
+                    return {
+                      title: book.title,
+                      description: book.description,
+                    };
+                  }),
+                  users: request.users
+                    .filter((user) => user._id != request.users[0]._id)
+                    .map((user) => {
                       return {
-                        title: book.title,
-                        description: book.description,
+                        username: user.username,
+                        city: user.city,
+                        state: user.state,
+                        country: user.country,
+                        requests: user.requests.length,
                       };
                     }),
-                    user: {
-                      username: request.user[0].username,
-                      city: request.user[0].city,
-                      state: request.user[0].state,
-                      country: request.user[0].country,
-                      requests: request.user[0].requests.length,
-                    },
-                  },
-                  take: {
-                    books: request.takeBooks.map((book) => {
-                      return {
-                        title: book.title,
-                        description: book.description,
-                      };
-                    }),
-                    users: request.users
-                      .filter((user) => user._id != request.users[0]._id)
-                      .map((user) => {
-                        return {
-                          username: user.username,
-                          city: user.city,
-                          state: user.state,
-                          country: user.country,
-                          requests: user.requests.length,
-                        };
-                      }),
-                  },
-                };
-              })
-          );
-        });
-    })
-
-    .post((req, res) => {
-      crud
-        .addRequest({
-          giveBooks: req.body.give,
-          takeBooks: req.body.take,
-          users: req.body.users,
-        })
-        .then((request) => res.json(request))
-        .catch((e) => res.status(404).type("text").send(e));
-    });
+                },
+              };
+            })
+        );
+      });
+  });
 
   // Routing for displaying all requests for a book
   app.get("/api/books/:bookId/requests", (req, res) => {

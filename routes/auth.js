@@ -132,7 +132,7 @@ module.exports = (app) => {
    * @returns                 Returns next() or nothing
    */
   function loggedIn(req, res, next) {
-    if (!req.user) return next();
+    if (!req.isAuthenticated()) return next();
     res.redirect("/books");
   }
 
@@ -144,7 +144,7 @@ module.exports = (app) => {
    * @returns                 Returns next() or nothing
    */
   function loggedOut(req, res, next) {
-    if (req.user) return next();
+    if (req.isAuthenticated()) return next();
     res.redirect("/books");
   }
 };

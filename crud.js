@@ -8,9 +8,9 @@ const Requests = require("./models/Requests");
  *
  */
 const crud = {
-  addUser: (data) => new Users.save(data),
-  addBook: (data) => new Books.save(data),
-  addRequest: (data) => new Requests.save(data),
+  addUser: (data) => new Users(data).save(),
+  addBook: (data) => new Books(data).save(),
+  addRequest: (data) => new Requests(data).save(),
   getUsers: () => Users.find(),
   getAllBooks: () => Books.find(),
   getBooks: (user) => Books.find({ user: user }),

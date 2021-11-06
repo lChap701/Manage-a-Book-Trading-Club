@@ -107,7 +107,10 @@ module.exports = () => {
           console.log("User " + username + " attempted to sign up.");
           const user = await crud.addUser({
             username: username,
-            password: bcrypt.hashSync(password, process.env.SALT_ROUNDS),
+            password: bcrypt.hashSync(
+              password,
+              parseInt(process.env.SALT_ROUNDS)
+            ),
             name: req.body.name,
             address: req.body.address,
             city: req.body.city,
@@ -115,7 +118,7 @@ module.exports = () => {
             country: req.body.country,
             zipPostal: req.body.zipPostal,
           });
-          done(null, user);
+          return done(null, user);
         } catch (err) {
           return done(err);
         }
