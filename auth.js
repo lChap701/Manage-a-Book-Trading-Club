@@ -16,19 +16,37 @@ module.exports = () => {
   });
 
   /**
-   *
+   * Checks if the user exists (for accounts created using OAuth)
+   * @param {*} req                 Represents the request
    * @param {String} accessToken    Represents the token used to access an API
    * @param {String} refreshToken   Represents the token used to create a new access token
    * @param {*} profile             Represents the profile of the user
    * @param {Function} cb           Represents the callback function that stores the result
    * @returns                       Returns the result using a callback function
    */
-  const getUser = async (accessToken, refreshToken, profile, cb) => {
+  const getUser = async (req, accessToken, refreshToken, profile, cb) => {
     console.log(profile);
     try {
-      const user = await crud.getUser({
-        $and: [{ username: profile.username }, { name: profile.displayName }],
+      let user = await crud.getUser({
+        $and: [
+          { "accounts.id": profile.id },
+          { "accounts.url": profile.profileUrl },
+          { "accounts.provider": profile.provider },
+        ],
       });
+
+      console.log(req.baseUrl);
+
+      // Checks for duplicate accounts to determine if the user should be able to create an account
+      if (req.baseUrl == "/signup") {
+        if (user) {
+          req.session.duplicateAccount = true;
+          return cb(false);
+        } else {
+          req.session.duplicateAccount = false;
+          user = await createUser(profile);
+        }
+      }
 
       return user ? cb(user) : cb(false);
     } catch (err) {
@@ -36,9 +54,38 @@ module.exports = () => {
     }
   };
 
-  // Local Strategy
+  /**
+   * Creates new accounts using OAuth
+   * @param {*} profile   Represents the profile of the user
+   * @returns             Returns the newly created account
+   */
+  const createUser = async (profile) => {
+    const account = {
+      id: profile.id,
+      username: profile.username,
+      name: profile.displayName,
+      url: profile.profileUrl,
+      photos: profile.photos,
+      provider: profile.provider,
+    };
+
+    return await crud.addUser({
+      username: profile.username,
+      name: profile.displayName,
+      /* address: profile._json.location.split(ADDRESS_REGEX)[0],
+      city: profile._json.location.split(CITY_REGEX)[0],
+      state: profile._json.location.split(STATE_REGEX)[0],
+      country: profile._json.location.split(COUNTRY_REGEX)[0],
+      zipPostal: profile._json.location.split(ZIP_POSTAL_CODE_REGEX)[0], */
+      oauth: true,
+      accounts: [account],
+    });
+  };
+
+  // Local Strategies
   const LocalStrategy = require("passport-local");
   passport.use(
+    "local-login",
     new LocalStrategy(async (username, password, done) => {
       try {
         console.log("User " + username + " attempted to log in.");
@@ -51,6 +98,30 @@ module.exports = () => {
       }
     })
   );
+  passport.use(
+    "local-signup",
+    new LocalStrategy(
+      { passReqToCallback: true },
+      async (req, username, password, done) => {
+        try {
+          console.log("User " + username + " attempted to sign up.");
+          const user = await crud.addUser({
+            username: username,
+            password: bcrypt.hashSync(password, process.env.SALT_ROUNDS),
+            name: req.body.name,
+            address: req.body.address,
+            city: req.body.city,
+            state: req.body.state,
+            country: req.body.country,
+            zipPostal: req.body.zipPostal,
+          });
+          done(null, user);
+        } catch (err) {
+          return done(err);
+        }
+      }
+    )
+  );
 
   // GitHub Strategy
   const GitHubStrategy = require("passport-github").Strategy;
@@ -60,6 +131,7 @@ module.exports = () => {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
         callbackURL: process.env.GITHUB_CALLBACK_URL,
+        passReqToCallback: true,
       },
       getUser
     )
@@ -73,6 +145,7 @@ module.exports = () => {
         clientID: process.env.FACEBOOK_CLIENT_ID,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
         callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+        passReqToCallback: true,
       },
       getUser
     )
@@ -86,6 +159,7 @@ module.exports = () => {
         consumerKey: process.env.TWITTER_CLIENT_ID,
         consumerSecret: process.env.TWITTER_CLIENT_SECRET,
         callbackURL: process.env.TWITTER_CALLBACK_URL,
+        passReqToCallback: true,
       },
       getUser
     )
@@ -99,6 +173,7 @@ module.exports = () => {
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: process.env.GOOGLE_CALLBACK_URL,
+        passReqToCallback: true,
       },
       getUser
     )
@@ -112,6 +187,7 @@ module.exports = () => {
         clientID: process.env.MICROSOFT_CLIENT_ID,
         clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
         callbackURL: process.env.MICROSOFT_CALLBACK_URL,
+        passReqToCallback: true,
       },
       getUser
     )

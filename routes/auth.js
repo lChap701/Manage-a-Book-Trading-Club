@@ -21,7 +21,7 @@ module.exports = (app) => {
 
     .post(
       loggedIn,
-      passport.authenticate("local", { failureRedirect: "/login" }),
+      passport.authenticate("local-login", { failureRedirect: "/login" }),
       (req, res) => res.redirect("/books")
     );
 
@@ -34,7 +34,7 @@ module.exports = (app) => {
 
     .post(
       loggedIn,
-      passport.authenticate("local", { failureRedirect: "/signup" }),
+      passport.authenticate("local-signup", { failureRedirect: "/signup" }),
       (req, res) => res.redirect("/login")
     );
 
