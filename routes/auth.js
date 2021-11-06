@@ -25,6 +25,19 @@ module.exports = (app) => {
       (req, res) => res.redirect("/books")
     );
 
+  // Displays and handles POST requests for the Book Exchange - Sign Up Page
+  app
+    .route("/signup")
+    .get(loggedIn, (req, res) => {
+      res.sendFile(process.cwd() + "/public/signup.html");
+    })
+
+    .post(
+      loggedIn,
+      passport.authenticate("local", { failureRedirect: "/signup" }),
+      (req, res) => res.redirect("/login")
+    );
+
   // Handles GitHub OAuth
   app.get("/auth/github", passport.authenticate("github"));
 
