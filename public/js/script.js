@@ -529,8 +529,8 @@ class Login extends React.Component {
       !psw.classList.contains("is-invalid") &&
       !uname.classList.contains("is-invalid")
     ) {
-      // Uploads the form
-      fetch("/api/users", {
+      // Submits the form
+      fetch(location.pathname, {
         method: "POST",
         body: JSON.stringify({
           username: this.state.username,
