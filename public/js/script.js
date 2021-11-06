@@ -45,8 +45,8 @@ async function validateForm() {
     // Ensures that an error message is displayed
     if (!res.ok) throw new Error(`Request failed: ${res.status}`);
   } catch (err) {
-    alert(err);
-    console.error(err);
+    alert(err.message);
+    console.error(err.message);
   }
 }
 
@@ -595,6 +595,190 @@ class Login extends React.Component {
             className="btn btn-success w-100"
             type="submit"
             value="Login"
+          />
+        </div>
+      </form>
+    );
+  }
+}
+
+/**
+ * Component for displaying content on the Sign Up page
+ */
+class Signup extends React.Component {
+  constructor(props) {
+    super(props);
+
+    // States
+    this.state = {
+      username: "",
+      password: "",
+      name: "",
+      address: "",
+      city: "",
+      state: "",
+      errs: ["Username is required", "Password is required"],
+    };
+
+    // Functions
+    this.saveUsername = this.saveUsername.bind(this);
+    this.savePassword = this.savePassword.bind(this);
+    this.submitForm = this.submitForm.bind(this);
+  }
+
+  /**
+   * Saves the username while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveUsername(e) {
+    this.setState({ username: e.target.value });
+  }
+
+  /**
+   * Saves the password while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  savePassword(e) {
+    this.setState({ password: e.target.value });
+  }
+
+  /**
+   * Saves the user's full name while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveName(e) {
+    this.setState({ name: e.target.value });
+  }
+
+  /**
+   * Saves the user's address while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveAddress(e) {
+    this.setState({ address: e.target.value });
+  }
+
+  /**
+   * Saves the city that the user lives at enters while they type
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveCity(e) {
+    this.setState({ city: e.target.value });
+  }
+
+  /**
+   * Saves the state that the user lives at enters while they type
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveState(e) {
+    this.setState({ state: e.target.value });
+  }
+
+  /**
+   * Validates and submits the form when valid
+   * @param {SubmitEvent} e   Represents the event that occurred
+   */
+  async submitForm(e) {
+    e.preventDefault();
+    await validateForm();
+  }
+
+  render() {
+    return (
+      <form onSubmit={this.submitForm} className="panel" novalidate="true">
+        <div className="panel-header text-white p-1 mx-auto">
+          <h2 className="text-center">Sign Up</h2>
+        </div>
+
+        <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+          <div className="form-group">
+            <label for="uname">Username</label>
+            <input
+              id="uname"
+              name="uname"
+              type="text"
+              className="form-control"
+              required
+              value={this.state.username}
+              onChange={this.saveUsername}
+              aria-describedby="unameFeedback"
+            />
+            <div id="unameFeedback" className="invalid-feedback">
+              {this.state.errs[0]}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label for="psw">Password</label>
+            <input
+              id="psw"
+              name="psw"
+              type="password"
+              className="form-control"
+              value={this.state.password}
+              required
+              onChange={this.savePassword}
+              aria-describedby="pswFeedback"
+            />
+            <div id="pswFeedback" className="invalid-feedback">
+              {this.state.errs[1]}
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label for="name">Full Name</label>
+          <input
+            id="name"
+            name="name"
+            type="text"
+            className="form-control"
+            value={this.state.name}
+            onChange={this.saveName}
+          />
+        </div>
+
+        <div className="form-group">
+          <label for="addr">Address</label>
+          <input
+            id="addr"
+            name="addr"
+            type="text"
+            className="form-control"
+            value={this.state.address}
+            onChange={this.saveAddress}
+          />
+        </div>
+
+        <div className="form-group">
+          <label for="city">City</label>
+          <input
+            id="city"
+            name="city"
+            type="text"
+            className="form-control"
+            value={this.state.city}
+            onChange={this.saveCity}
+          />
+        </div>
+
+        <div className="form-group">
+          <label for="state">State</label>
+          <input
+            id="state"
+            name="state"
+            type="text"
+            className="form-control"
+            value={this.state.state}
+            onChange={this.saveState}
+          />
+        </div>
+
+        <div className="panel-footer px-3 py-2">
+          <input
+            className="btn btn-success w-100"
+            type="submit"
+            value="Sign Up"
           />
         </div>
       </form>
