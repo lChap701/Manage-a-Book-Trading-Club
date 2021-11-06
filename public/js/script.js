@@ -706,6 +706,12 @@ class Signup extends React.Component {
       await postData({
         username: this.state.username,
         password: this.state.password,
+        name: this.state.name,
+        address: this.state.address,
+        city: this.state.city,
+        state: this.state.state,
+        country: this.state.country,
+        zipPostal: this.state.zipPostal,
       });
     }
   }
