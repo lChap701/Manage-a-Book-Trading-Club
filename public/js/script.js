@@ -13,27 +13,30 @@ const {
 const Router = BrowserRouter;
 
 /**
- * Validates input fields in the form
- * @param {*} data    Represents the data that should be submitted
- * @returns           Returns nothing or is void
+ * Validates input fields in the form and determines if the form is valid
+ * @returns     Returns a boolean value that determines if the form should be submitted
  */
-async function validateForm(data) {
-  let errors = 0;
+function validateForm() {
+  let valid = true;
 
   // Validates input fields
   document.querySelectorAll("input:not([type='submit']").forEach((input) => {
     if (!input.checkValidity() || input.value.trim().length == 0) {
       input.classList.add("is-invalid");
-      errors++;
+      valid = false;
     } else if (input.classList.contains("is-invalid")) {
       input.classList.remove("is-invalid");
     }
   });
 
-  // Checks form is valid to determine if it should be submitted
-  if (errors > 0) return;
+  return valid;
+}
 
-  // Submits the form
+/**
+ * Submits the form
+ * @param {*} data    Represents the data that should be submitted
+ */
+async function postData(data) {
   try {
     const res = await fetch(location.pathname, {
       method: "POST",
@@ -76,7 +79,6 @@ class BookExchange extends React.Component {
     this.getTrades = this.getTrades.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
     this.getRequestedBooks = this.getRequestedBooks.bind(this);
-    this.saveUsername = this.saveUsername.bind(this);
 
     // Event Listeners
     window.addEventListener("load", this.getData, true);
@@ -166,18 +168,6 @@ class BookExchange extends React.Component {
         alert(e);
         console.error(e);
       });
-  }
-
-  /**
-   * Saves the username while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
-   */
-  saveUsername(e) {
-    console.log(e.target);
-    console.log(this.state.user);
-    this.setState((state) => ({
-      user: { ...state.user, username: e.target.value },
-    }));
   }
 
   /**
@@ -539,15 +529,19 @@ class Login extends React.Component {
   }
 
   /**
-   * Validates and submits the form when valid
+   * Handles form validation and form submission
    * @param {SubmitEvent} e   Represents the event that occurred
    */
   async submitForm(e) {
     e.preventDefault();
-    await validateForm({
-      username: this.state.username,
-      password: this.state.password,
-    });
+
+    // Checks if form should be submitted
+    if (validateForm()) {
+      await postData({
+        username: this.state.username,
+        password: this.state.password,
+      });
+    }
   }
 
   render() {
@@ -701,21 +695,19 @@ class Signup extends React.Component {
   }
 
   /**
-   * Validates and submits the form when valid
+   * Handles form validation and form submission
    * @param {SubmitEvent} e   Represents the event that occurred
    */
   async submitForm(e) {
     e.preventDefault();
-    await validateForm({
-      username: this.state.username,
-      password: this.state.password,
-      name: this.state.name,
-      address: this.state.address,
-      city: this.state.city,
-      state: this.state.state,
-      country: this.state.country,
-      zipPostal: this.state.zipPostal,
-    });
+
+    // Checks if form should be submitted
+    if (validateForm()) {
+      await postData({
+        username: this.state.username,
+        password: this.state.password,
+      });
+    }
   }
 
   render() {
