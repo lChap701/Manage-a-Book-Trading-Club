@@ -537,10 +537,15 @@ class Login extends React.Component {
           password: this.state.password,
         }),
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            alert(e);
+            console.error(e);
+          }
+        })
         .catch((e) => {
           alert(e);
-          console.log(e);
+          console.error(e);
         });
     }
   }

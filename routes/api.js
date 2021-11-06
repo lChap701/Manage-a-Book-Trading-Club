@@ -60,7 +60,7 @@ module.exports = (app) => {
       crud
         .addUser(user)
         .then((newUser) => res.json(newUser))
-        .catch((e) => res.send(e));
+        .catch((e) => res.status(404).type("text").send(e));
     });
 
   // Routing for all books
@@ -118,7 +118,7 @@ module.exports = (app) => {
           user: req.body.user,
         })
         .then((book) => res.json(book))
-        .catch((e) => res.send(e));
+        .catch((e) => res.status(404).type("text").send(e));
     });
 
   // Routing for displaying a user's profile
@@ -260,7 +260,7 @@ module.exports = (app) => {
           users: req.body.users,
         })
         .then((request) => res.json(request))
-        .catch((e) => res.send(e));
+        .catch((e) => res.status(404).type("text").send(e));
     });
 
   // Routing for displaying all requests for a book
