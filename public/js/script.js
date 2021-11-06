@@ -623,6 +623,10 @@ class Signup extends React.Component {
     // Functions
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
+    this.saveName = this.saveName.bind(this);
+    this.saveAddress = this.saveAddress.bind(this);
+    this.saveCity = this.saveCity.bind(this);
+    this.saveState = this.saveState.bind(this);
     this.submitForm = this.submitForm.bind(this);
   }
 
