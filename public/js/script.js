@@ -13,6 +13,44 @@ const {
 const Router = BrowserRouter;
 
 /**
+ * Validates input fields in the form
+ * @returns     Returns nothing or is void
+ */
+async function validateForm() {
+  let errors = 0;
+
+  // Validates input fields
+  document.querySelectorAll("input:not([type='submit']").forEach((input) => {
+    if (!input.checkValidity() || input.value.trim().length == 0) {
+      input.classList.add("is-invalid");
+      errors++;
+    } else if (input.classList.contains("is-invalid")) {
+      input.classList.remove("is-invalid");
+    }
+  });
+
+  // Checks form is valid to determine if it should be submitted
+  if (errors > 0) return;
+
+  // Submits the form
+  try {
+    const res = await fetch(location.pathname, {
+      method: "POST",
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password,
+      }),
+    });
+
+    // Ensures that an error message is displayed
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  } catch (err) {
+    alert(err);
+    console.error(err);
+  }
+}
+
+/**
  * Main Component
  */
 class BookExchange extends React.Component {
@@ -505,41 +543,9 @@ class Login extends React.Component {
    * Validates and submits the form when valid
    * @param {SubmitEvent} e   Represents the event that occurred
    */
-  submitForm(e) {
+  async submitForm(e) {
     e.preventDefault();
-    let errors = 0;
-
-    // Validates input fields
-    document.querySelectorAll("input:not([type='submit']").forEach((input) => {
-      if (!input.checkValidity() || input.value.trim().length == 0) {
-        input.classList.add("is-invalid");
-        errors++;
-      } else if (input.classList.contains("is-invalid")) {
-        input.classList.remove("is-invalid");
-      }
-    });
-
-    // Checks form is valid to determine if it should be submitted
-    if (errors == 0) {
-      // Submits the form
-      fetch(location.pathname, {
-        method: "POST",
-        body: JSON.stringify({
-          username: this.state.username,
-          password: this.state.password,
-        }),
-      })
-        .then((res) => {
-          if (!res.ok) {
-            alert(e);
-            console.error(e);
-          }
-        })
-        .catch((e) => {
-          alert(e);
-          console.error(e);
-        });
-    }
+    await validateForm();
   }
 
   render() {
