@@ -18,12 +18,15 @@ const userSchema = new Schema({
   oauth: { type: Boolean, default: false },
   accounts: [
     {
-      id: String,
+      id: { type: String, unique: true },
       username: String,
       name: String,
-      url: String,
+      url: { type: String, unique: true },
       photos: [{ value: String }],
-      provider: String,
+      provider: {
+        type: String,
+        enum: ["github", "facebook", "twitter", "google", "microsoft"],
+      },
     },
   ],
   books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
