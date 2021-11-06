@@ -3,18 +3,18 @@ const { Schema } = mongoose;
 
 // Note: Password is only required when OAuth is not used to create an account!!
 const userSchema = new Schema({
-  name: { type: String, trim: true },
-  address: { type: String, trim: true },
-  city: { type: String, trim: true },
-  state: { type: String, trim: true },
-  country: { type: String, trim: true },
-  zipPostal: { type: String, trim: true },
   username: { type: String, trim: true, required: "{PATH} is required" },
   password: {
     type: String,
     trim: true,
     required: [() => !this.oauth, "{PATH} is required"],
   },
+  name: { type: String, trim: true },
+  address: { type: String, trim: true },
+  city: { type: String, trim: true },
+  state: { type: String, trim: true },
+  country: { type: String, trim: true },
+  zipPostal: { type: String, trim: true },
   oauth: { type: Boolean, default: false },
   accounts: [
     {
