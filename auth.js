@@ -122,14 +122,14 @@ module.exports = () => {
             address:
               req.body.address && req.body.address.length > 0
                 ? CryptoJS.AES.encrypt(req.body.address, key).toString()
-                : "",
+                : req.body.address,
             city: req.body.city,
             state: req.body.state,
             country: req.body.country,
             zipPostal:
               req.body.zipPostal && req.body.zipPostal.length > 0
                 ? CryptoJS.AES.encrypt(req.body.zipPostal, key).toString()
-                : "",
+                : req.body.zipPostal,
           });
 
           // Checks if the secret key was saved in keys.xml
