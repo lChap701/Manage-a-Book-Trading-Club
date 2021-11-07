@@ -1,5 +1,7 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
+const cipherKeys = require("./cipherKeys");
+const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const crud = require("./crud");
 
@@ -105,6 +107,11 @@ module.exports = () => {
       async (req, username, password, done) => {
         try {
           console.log("User " + username + " attempted to sign up.");
+
+          // Get Cipher Key for AES Encrypting
+          const key = cipherKeys.genKey();
+
+          // Save user
           const user = await crud.addUser({
             username: username,
             password: bcrypt.hashSync(
@@ -112,12 +119,16 @@ module.exports = () => {
               parseInt(process.env.SALT_ROUNDS)
             ),
             name: req.body.name,
-            address: req.body.address,
+            address: CryptoJS.AES.encrypt(req.body.address, key).toString(),
             city: req.body.city,
             state: req.body.state,
             country: req.body.country,
-            zipPostal: req.body.zipPostal,
+            zipPostal: CryptoJS.AES.encrypt(req.body.zipPostal, key).toString(),
           });
+
+          // Save Cipher Key in keys.xml
+          cipherKeys.saveKey(user._id, key);
+
           return done(null, user);
         } catch (err) {
           return done(err);
