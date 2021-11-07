@@ -1,6 +1,6 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
-const cipherKeys = require("./cipherKeys");
+const secretKeys = require("./secretKeys");
 const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const crud = require("./crud");
@@ -108,8 +108,8 @@ module.exports = () => {
         try {
           console.log("User " + username + " attempted to sign up.");
 
-          // Get Cipher Key for AES Encrypting
-          const key = cipherKeys.genKey();
+          // Get a secret key for AES encrypting
+          const key = secretKeys.genKey();
 
           // Save user
           const user = await crud.addUser({
@@ -119,17 +119,27 @@ module.exports = () => {
               parseInt(process.env.SALT_ROUNDS)
             ),
             name: req.body.name,
-            address: CryptoJS.AES.encrypt(req.body.address, key).toString(),
+            address:
+              req.body.address && req.body.address.length > 0
+                ? CryptoJS.AES.encrypt(req.body.address, key).toString()
+                : "",
             city: req.body.city,
             state: req.body.state,
             country: req.body.country,
-            zipPostal: CryptoJS.AES.encrypt(req.body.zipPostal, key).toString(),
+            zipPostal:
+              req.body.zipPostal && req.body.zipPostal.length > 0
+                ? CryptoJS.AES.encrypt(req.body.zipPostal, key).toString()
+                : "",
           });
 
-          // Save Cipher Key in keys.xml
-          cipherKeys.saveKey(user._id, key);
-
-          return done(null, user);
+          // Checks if the secret key was saved in keys.xml
+          req.session.secretKeyError = !secretKeys.saveKey(
+            key,
+            user._id.toString()
+          );
+          return req.session.secretKeyError
+            ? done(null, false)
+            : done(null, user);
         } catch (err) {
           return done(err);
         }
