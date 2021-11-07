@@ -17,7 +17,7 @@
     "passport",
     "bcrypt",
     "login",
-    "book-trading"a
+    "book-trading"
   ],
   "author": "Lucas Chapman",
   "license": "MIT",
