@@ -16,6 +16,7 @@ const userSchema = new Schema(
     state: { type: String, trim: true },
     country: { type: String, trim: true },
     zipPostal: { type: String, trim: true },
+    preciseLocation: { type: Boolean, default: true },
     oauth: { type: Boolean, default: false },
     accounts: [
       {
