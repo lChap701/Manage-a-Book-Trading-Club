@@ -10,6 +10,7 @@ const userSchema = new Schema(
       trim: true,
       required: [() => !this.oauth, "{PATH} is required"],
     },
+    email: { type: String, trim: true },
     name: { type: String, trim: true },
     address: { type: String, trim: true },
     city: { type: String, trim: true },
