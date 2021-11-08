@@ -9,6 +9,7 @@ const {
   useParams,
   useRouteMatch,
   useLocation,
+  withRouter,
 } = ReactRouterDOM;
 const Router = BrowserRouter;
 
@@ -21,7 +22,10 @@ function validateForm() {
 
   // Validates input fields
   document.querySelectorAll("input:not([type='submit']").forEach((input) => {
-    if (!input.checkValidity() || input.value.trim().length == 0) {
+    if (
+      !input.checkValidity() ||
+      (input.value.trim().length == 0 && input.required)
+    ) {
       input.classList.add("is-invalid");
       valid = false;
     } else if (input.classList.contains("is-invalid")) {
@@ -78,6 +82,7 @@ class BookExchange extends React.Component {
     this.getRequests = this.getRequests.bind(this);
     this.getTrades = this.getTrades.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
+    this.getUser = this.getUser.bind(this);
     this.getRequestedBooks = this.getRequestedBooks.bind(this);
 
     // Event Listeners
@@ -163,6 +168,24 @@ class BookExchange extends React.Component {
         // Determines if session should be passed to client
         if (data) this.setState((state) => ({ user: { ...state.user, data } }));
         console.log(this.state.user);
+      })
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  }
+
+  /**
+   * Gets information for the user's profile
+   * @param {String} id   Represents the user's ID
+   */
+  getUser(id) {
+    fetch(`${location.origin}/users/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        this.setState({
+          user: data,
+        });
       })
       .catch((e) => {
         alert(e);
@@ -323,7 +346,7 @@ class BookExchange extends React.Component {
  */
 const Books = (props) => {
   return (
-    <form action="/requests/new/books" method="POST" className="panel">
+    <form action="/requests/new/books" method="POST" className="panel scroll">
       <div className="panel-header text-white p-1 mx-auto">
         <h2 className="text-center">Books</h2>
       </div>
@@ -434,7 +457,7 @@ const Dropdown = (props) => {
           <CreateRequest takeBooks={props.takeBooks} />
         </Route>
         <Route path="/users/:id">
-          <Profile />
+          <Profile getUser={this.getUser} user={this.state.user} />
         </Route>
         <Route path="/users/edit">
           <EditProfile />
@@ -494,114 +517,16 @@ const Users = (props) => {
 
 /**
  * Component for displaying content on the Login page
+ * @returns     Returns the content that should be displayed
  */
-class Login extends React.Component {
-  constructor(props) {
-    super(props);
-
-    // States
-    this.state = {
-      username: "",
-      password: "",
-      errs: ["Username is required", "Password is required"],
-    };
-
-    // Functions
-    this.saveUsername = this.saveUsername.bind(this);
-    this.savePassword = this.savePassword.bind(this);
-    this.submitForm = this.submitForm.bind(this);
-  }
-
-  /**
-   * Saves the username while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
-   */
-  saveUsername(e) {
-    this.setState({ username: e.target.value });
-  }
-
-  /**
-   * Saves the password while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
-   */
-  savePassword(e) {
-    this.setState({ password: e.target.value });
-  }
-
-  /**
-   * Handles form validation and form submission
-   * @param {SubmitEvent} e   Represents the event that occurred
-   */
-  async submitForm(e) {
-    e.preventDefault();
-
-    // Checks if form should be submitted
-    if (validateForm()) {
-      await postData({
-        username: this.state.username,
-        password: this.state.password,
-      });
-    }
-  }
-
-  render() {
-    return (
-      <form onSubmit={this.submitForm} className="panel" novalidate="true">
-        <div className="panel-header text-white p-1 mx-auto">
-          <h2 className="text-center">Login</h2>
-        </div>
-
-        <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
-          <div className="form-group">
-            <label for="uname">Username</label>
-            <input
-              id="uname"
-              name="uname"
-              type="text"
-              className="form-control"
-              required
-              value={this.state.username}
-              onChange={this.saveUsername}
-              aria-describedby="unameFeedback"
-            />
-            <div id="unameFeedback" className="invalid-feedback">
-              {this.state.errs[0]}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label for="psw">Password</label>
-            <input
-              id="psw"
-              name="psw"
-              type="password"
-              className="form-control"
-              value={this.state.password}
-              required
-              onChange={this.savePassword}
-              aria-describedby="pswFeedback"
-            />
-            <div id="pswFeedback" className="invalid-feedback">
-              {this.state.errs[1]}
-            </div>
-          </div>
-        </div>
-        <div className="panel-footer px-3 py-2">
-          <input
-            className="btn btn-success w-100"
-            type="submit"
-            value="Login"
-          />
-        </div>
-      </form>
-    );
-  }
-}
+const Login = () => {
+  return <AccountForm name="Login" />;
+};
 
 /**
- * Component for displaying content on the Sign Up page
+ * Component for displaying and handling forms on the Login, Sign Up, Profile, and Edit Profile pages
  */
-class Signup extends React.Component {
+class AccountForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -609,6 +534,7 @@ class Signup extends React.Component {
     this.state = {
       username: "",
       password: "",
+      email: "",
       name: "",
       address: "",
       city: "",
@@ -621,6 +547,7 @@ class Signup extends React.Component {
     // Functions
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
+    this.saveEmail = this.saveEmail.bind(this);
     this.saveName = this.saveName.bind(this);
     this.saveAddress = this.saveAddress.bind(this);
     this.saveCity = this.saveCity.bind(this);
@@ -644,6 +571,13 @@ class Signup extends React.Component {
    */
   savePassword(e) {
     this.setState({ password: e.target.value });
+  }
+  /**
+   * Saves the user's email while the user is typing
+   * @param {InputEvent} e    Represents the event that occurred
+   */
+  saveEmail(e) {
+    this.setState({ email: e.target.value });
   }
 
   /**
@@ -703,139 +637,79 @@ class Signup extends React.Component {
 
     // Checks if form should be submitted
     if (validateForm()) {
-      await postData({
+      const data = {
         username: this.state.username,
         password: this.state.password,
-        name: this.state.name,
-        address: this.state.address,
-        city: this.state.city,
-        state: this.state.state,
-        country: this.state.country,
-        zipPostal: this.state.zipPostal,
-      });
+      };
+
+      // For when users try to sign up or update their account
+      if (this.props.name != "Login") {
+        data.email = this.state.email;
+        data.name = this.state.name;
+        data.address = this.state.address;
+        data.city = this.state.city;
+        data.state = this.state.state;
+        data.country = this.state.country;
+        data.zipPostal = this.state.zipPostal;
+      }
+
+      await postData(data);
     }
   }
 
   render() {
     return (
-      <form onSubmit={this.submitForm} className="panel" novalidate="true">
+      <form
+        onSubmit={this.submitForm}
+        className="panel"
+        name={this.props.name}
+        novalidate="true"
+      >
         <div className="panel-header text-white p-1 mx-auto">
-          <h2 className="text-center">Sign Up</h2>
+          <h2 className="text-center">{this.props.name}</h2>
         </div>
 
-        <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
-          <div className="form-group">
-            <label for="uname">Username</label>
-            <input
-              id="uname"
-              name="uname"
-              type="text"
-              className="form-control"
-              required
-              value={this.state.username}
-              onChange={this.saveUsername}
-              aria-describedby="unameFeedback"
-            />
-            <div id="unameFeedback" className="invalid-feedback">
-              {this.state.errs[0]}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label for="psw">Password</label>
-            <input
-              id="psw"
-              name="psw"
-              type="password"
-              className="form-control"
-              value={this.state.password}
-              required
-              onChange={this.savePassword}
-              aria-describedby="pswFeedback"
-            />
-            <div id="pswFeedback" className="invalid-feedback">
-              {this.state.errs[1]}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label for="name">Full Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              className="form-control"
-              value={this.state.name}
-              onChange={this.saveName}
-            />
-          </div>
-
-          <div className="form-group">
-            <label for="addr">Address</label>
-            <input
-              id="addr"
-              name="addr"
-              type="text"
-              className="form-control"
-              value={this.state.address}
-              onChange={this.saveAddress}
-            />
-          </div>
-
-          <div className="form-group">
-            <label for="city">City</label>
-            <input
-              id="city"
-              name="city"
-              type="text"
-              className="form-control"
-              value={this.state.city}
-              onChange={this.saveCity}
-            />
-          </div>
-
-          <div className="form-group">
-            <label for="state">State</label>
-            <input
-              id="state"
-              name="state"
-              type="text"
-              className="form-control"
-              value={this.state.state}
-              onChange={this.saveState}
-            />
-          </div>
-
-          <div className="form-group">
-            <label for="country">Country</label>
-            <input
-              id="country"
-              name="country"
-              type="text"
-              className="form-control"
-              value={this.state.country}
-              onChange={this.saveCountry}
-            />
-          </div>
-
-          <div className="form-group">
-            <label for="zipPost">Zip/Postal Code</label>
-            <input
-              id="zipPost"
-              name="zipPost"
-              type="zipPost"
-              className="form-control"
-              value={this.state.zipPostal}
-              onChange={this.saveZipPostalCode}
-            />
-          </div>
-        </div>
+        {this.props.name == "Login" ? (
+          <LoginFormLayout
+            username={this.state.username}
+            saveUsername={this.saveUsername}
+            password={this.state.password}
+            savePassword={this.savePassword}
+            errs={this.state.errs}
+          />
+        ) : (
+          <AccountFormLayout
+            username={this.state.username}
+            saveUsername={this.saveUsername}
+            password={this.state.password}
+            savePassword={this.savePassword}
+            errs={this.state.errs}
+            email={this.state.email}
+            saveEmail={this.saveEmail}
+            name={this.state.name}
+            saveName={this.saveName}
+            address={this.state.address}
+            saveAddress={this.address}
+            city={this.state.city}
+            saveCity={this.saveCity}
+            state={this.state.state}
+            saveState={this.saveState}
+            country={this.state.country}
+            saveCountry={this.saveCountry}
+            zipPostal={this.state.zipPostal}
+            saveZipPostalCode={this.saveZipPostalCode}
+          />
+        )}
 
         <div className="panel-footer px-3 py-2">
           <input
             className="btn btn-success w-100"
             type="submit"
-            value="Sign Up"
+            value={
+              this.props.name == "Edit Profile"
+                ? "Update Profile"
+                : this.props.name
+            }
           />
         </div>
       </form>
@@ -844,12 +718,241 @@ class Signup extends React.Component {
 }
 
 /**
+ * Component for handling the layout of the Login form
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const LoginFormLayout = (props) => {
+  return (
+    <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+      <InputField
+        containerClass="form-group"
+        id="uname"
+        label="Username"
+        type="text"
+        required={true}
+        value={props.username}
+        onChange={props.saveUsername}
+        validator="unameFeedback"
+        err={props.errs[0]}
+      />
+
+      <InputField
+        containerClass="form-group"
+        id="psw"
+        label="Password"
+        type="password"
+        required={true}
+        value={props.password}
+        onChange={props.savePassword}
+        validator="pswFeedback"
+        err={props.errs[1]}
+      />
+    </div>
+  );
+};
+
+/**
+ * Component for displaying input fields
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const InputField = (props) => {
+  return (
+    <div className={props.containerClass}>
+      <label for={props.id}>
+        {props.label}
+        {!props.required ? <small> (Optional)</small> : ""}
+      </label>
+      <input
+        id={props.id}
+        name={props.id}
+        type={props.type}
+        className="form-control"
+        required={props.required || false}
+        value={props.value}
+        autocomplete="on"
+        onChange={props.onChange || null}
+        aria-describedby={props.validator}
+        readonly={props.readonly || false}
+      />
+      {props.validator ? (
+        <div id={props.validator} className="invalid-feedback">
+          {props.err}
+        </div>
+      ) : (
+        ""
+      )}
+    </div>
+  );
+};
+
+/**
+ * Component for handling the layout of the
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const AccountFormLayout = (props) => {
+  return (
+    <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+      <div className="row">
+        <InputField
+          containerClass="form-group col"
+          id="uname"
+          label="Username"
+          type="text"
+          required={true}
+          value={props.username}
+          onChange={props.saveUsername}
+          validator="unameFeedback"
+          err={props.errs[0]}
+        />
+
+        <InputField
+          containerClass="form-group col"
+          id="psw"
+          label="Password"
+          type="password"
+          required={true || false}
+          readonly={props.readonly || null}
+          value={props.password}
+          onChange={props.savePassword || null}
+          validator="pswFeedback"
+          err={props.errs[1] || null}
+        />
+      </div>
+
+      <div className="row">
+        <InputField
+          containerClass="form-group col"
+          id="email"
+          label="Email"
+          type="email"
+          value={props.email}
+          onChange={props.saveEmail || null}
+          validator=""
+          err=""
+        />
+
+        <InputField
+          containerClass="form-group col"
+          id="name"
+          label="Full Name"
+          type="text"
+          value={props.name}
+          onChange={props.saveName || null}
+          validator=""
+          err=""
+        />
+      </div>
+
+      <div className="row">
+        <InputField
+          containerClass="form-group col-7"
+          id="addr"
+          label="Address"
+          type="text"
+          value={props.address}
+          onChange={props.saveAddress || null}
+          validator=""
+          err=""
+        />
+
+        <InputField
+          containerClass="form-group col"
+          id="city"
+          label="City"
+          type="text"
+          value={props.city}
+          onChange={props.saveCity || null}
+          validator=""
+          err=""
+        />
+      </div>
+
+      <div className="row">
+        <InputField
+          containerClass="form-group col"
+          id="state"
+          label="State"
+          type="text"
+          value={props.state}
+          onChange={props.saveState || null}
+          validator=""
+          err=""
+        />
+
+        <InputField
+          containerClass="form-group col"
+          id="country"
+          label="Country"
+          type="text"
+          value={props.country}
+          onChange={props.saveCountry || null}
+          validator=""
+          err=""
+        />
+
+        <InputField
+          containerClass="form-group col-4"
+          id="zipPostal"
+          label="Zip/Postal"
+          type="text"
+          value={props.zipPostal}
+          onChange={props.saveZipPostalCode || null}
+          validator=""
+          err=""
+        />
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying content on the Sign Up page
+ * @returns     Returns the content that should be displayed
+ */
+const Signup = () => {
+  return <AccountForm name="Sign Up" />;
+};
+
+/**
  * Component for displaying content on the Profile page
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
 const Profile = (props) => {
-  return <h1>Profile</h1>;
+  const params = useParams();
+  window.addEventListener("load", () => props.getUser(params.id), true);
+  return (
+    <form className="panel">
+      <div className="panel-header text-white p-1 mx-auto">
+        <h2 className="text-center">{props.user.username}'s Profile</h2>
+      </div>
+
+      <AccountFormLayout
+        username={props.user.username}
+        password={props.user.password}
+        email={props.user.email || ""}
+        name={props.user.name || ""}
+        address={props.user.address || ""}
+        city={props.user.city || ""}
+        state={props.user.state || ""}
+        country={props.user.country || ""}
+        zipPostal={props.user.zipPostal || ""}
+      />
+
+      <div className="panel-footer px-3 py-2">
+        <Link
+          to={
+            props.user._id == params.id
+              ? "/books/my"
+              : `/users/${params.id}/books`
+          }
+        ></Link>
+      </div>
+    </form>
+  );
 };
 
 /**
@@ -876,7 +979,7 @@ const MyBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const UserBooks = (props) => {
-  return <h1>{props.username}'s Books</h1>;
+  return <h1>{props.user.username}'s Books</h1>;
 };
 
 ReactDOM.render(<BookExchange />, document.querySelector("#root"));
