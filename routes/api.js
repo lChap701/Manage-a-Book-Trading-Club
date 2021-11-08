@@ -1,5 +1,7 @@
 require("dotenv").config();
+const CryptoJS = require("crypto-js");
 const crud = require("../crud");
+const secretKeys = require("../secretKeys");
 
 /**
  * Module that handles routing for the API
@@ -94,14 +96,31 @@ module.exports = (app) => {
       if (!user) {
         res.send("Unknown user");
       } else {
-        res.json({
-          username: user.username,
-          fullName: user.name,
-          address: user.address,
-          city: user.city,
-          state: user.state,
-          country: user.country,
-        });
+        res.json(
+          user.preciseLocation
+            ? {
+                username: user.username,
+                fullName: user.name,
+                address: CryptoJS.AES.decrypt(
+                  user.address,
+                  secretKeys.findKey(user._id.toString())
+                ),
+                city: user.city,
+                state: user.state,
+                country: user.country,
+                zipPostal: CryptoJS.AES.decrypt(
+                  user.zipPostal,
+                  secretKeys.findKey(user._id.toString())
+                ),
+              }
+            : {
+                username: user.username,
+                fullName: user.name,
+                city: user.city,
+                state: user.state,
+                country: user.country,
+              }
+        );
       }
     })
   );
