@@ -1,5 +1,4 @@
 require("dotenv").config();
-const bcrypt = require("bcryptjs");
 const crud = require("../crud");
 
 /**

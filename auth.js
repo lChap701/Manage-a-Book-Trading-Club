@@ -1,8 +1,8 @@
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
-const secretKeys = require("./secretKeys");
 const CryptoJS = require("crypto-js");
 const passport = require("passport");
+const secretKeys = require("./secretKeys");
 const crud = require("./crud");
 
 /**
