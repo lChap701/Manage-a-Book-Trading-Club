@@ -67,7 +67,7 @@ const saveKey = (key, id) => {
  */
 const findKey = (id) => {
   try {
-    let keys = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), {
+    const json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), {
       attributeNamePrefix: "@_",
       attrNodeName: "attr",
       textNodeName: "#text",
@@ -90,8 +90,7 @@ const findKey = (id) => {
       tagValueProcessor: (val, tagName) => he.decode(val),
       alwaysCreateTextNode: false,
     });
-
-    return keys.issues.find((key) => key.includes(id));
+    return json.keys.find((key) => key.includes(id)).value;
   } catch (e) {
     console.log(e);
     return undefined;
@@ -122,15 +121,63 @@ const removeKey = (id) => {
 };
 
 /**
+ * Removes a secret key from keys.xml based on ID
+ * @param {String} id     Represents the ID of the key to update
+ * @returns               Returns a boolean value to indicate the result
+ */
+const updateKey = (id) => {
+  try {
+    let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), {
+      attributeNamePrefix: "@_",
+      attrNodeName: "attr",
+      textNodeName: "#text",
+      ignoreAttributes: true,
+      ignoreNameSpace: false,
+      allowBooleanAttributes: false,
+      parseNodeValue: true,
+      parseAttributeValue: false,
+      trimValues: true,
+      cdataTagName: "__cdata",
+      cdataPositionChar: "\\c",
+      parseTrueNumberOnly: false,
+      numParseOptions: {
+        hex: true,
+        leadingZeros: true,
+      },
+      arrayMode: /keys/,
+      attrValueProcessor: (val, attrName) =>
+        he.decode(val, { isAttributeValue: true }),
+      tagValueProcessor: (val, tagName) => he.decode(val),
+      alwaysCreateTextNode: false,
+    });
+
+    let index = json.keys.findIndex((key) => key.includes(id));
+    if (index < 0) return false;
+    json.keys[index].value = genKey();
+
+    writeXML(
+      json.keys.map(
+        (key) => `<key><id>${key.id}</id><value>${key.value}</value></key>`
+      )
+    );
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+  }
+};
+
+/**
  * Module for retrieving, deleting, and saving cipher keys
- * @module ./cipherKeys
+ * @module ./secretKeys
  *
  */
-const cipherKeys = {
+const secretKeys = {
   genKey: () => genKey(),
   findKey: (id) => findKey(id),
   saveKey: (key, id) => saveKey(key, id),
   removeKey: (id) => removeKey(id),
+  updateKey: (id) => updateKey(id),
 };
 
-module.exports = cipherKeys;
+module.exports = secretKeys;
