@@ -29,12 +29,12 @@ module.exports = (app) => {
       .then((users) =>
         res.json(
           users.map((user) => {
-            console.log(user);
             return {
               _id: user._id,
               username: user.username,
-              city: user.city,
-              state: user.state,
+              city: user.city ? user.city : "null",
+              state: user.state ? user.state : "null",
+              country: user.country ? user.country : "null",
               books: user.books.length,
               incomingRequests: user.requests.filter(
                 (request) => !request.traded
