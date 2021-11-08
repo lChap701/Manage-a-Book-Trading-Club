@@ -105,4 +105,82 @@ suite("Unit Tests", () => {
       });
     });
   });
+
+  suite("Testing /login", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        chai
+          .request(app)
+          .get("/login")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - Login<\/title>/),
+              "response text should contain '<title>Book Exchange - Login</title>'"
+            );
+            done();
+          });
+      });
+    });
+
+    suite("POST Tests", () => {
+      test("1)  All Fields Tests", (done) => {
+        const data = {
+          username: "dummyUser1",
+          password: "test1",
+        };
+
+        chai
+          .request(app)
+          .post("/login")
+          .send(data)
+          .end((req, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - Books<\/title>/),
+              "response text should contain '<title>Book Exchange - Books</title>'"
+            );
+            done();
+          });
+      });
+
+      test("2)  No Password Field Test", (done) => {
+        const data = {
+          username: "shouldn'tBeSeen",
+        };
+
+        chai
+          .request(app)
+          .post("/login")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - Login<\/title>/),
+              "response text should contain '<title>Book Exchange - Login</title>'"
+            );
+            done();
+          });
+      });
+
+      test("3)  No Username Field Test", (done) => {
+        const data = {
+          password: "test4",
+        };
+
+        chai
+          .request(app)
+          .post("/login")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - Login<\/title>/),
+              "response text should contain '<title>Book Exchange - Login</title>'"
+            );
+            done();
+          });
+      });
+    });
+  });
 });
