@@ -118,6 +118,7 @@ module.exports = () => {
               password,
               parseInt(process.env.SALT_ROUNDS)
             ),
+            email: req.body.email,
             name: req.body.name,
             address:
               req.body.address && req.body.address.length > 0
