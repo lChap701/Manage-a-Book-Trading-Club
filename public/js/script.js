@@ -69,6 +69,7 @@ class BookExchange extends React.Component {
       user: {
         username: "",
       },
+      urlUser: {},
       books: [],
       takeBooks: [],
       requests: [],
@@ -184,7 +185,7 @@ class BookExchange extends React.Component {
       .then((res) => res.json())
       .then((data) => {
         this.setState({
-          user: data,
+          urlUser: data,
         });
       })
       .catch((e) => {
@@ -457,7 +458,11 @@ const Dropdown = (props) => {
           <CreateRequest takeBooks={props.takeBooks} />
         </Route>
         <Route path="/users/:id">
-          <Profile getUser={this.getUser} user={this.state.user} />
+          <Profile
+            getUser={this.getUser}
+            user={this.state.urlUser}
+            myId={this.state.user._id}
+          />
         </Route>
         <Route path="/users/edit">
           <EditProfile />
@@ -677,6 +682,19 @@ class AccountForm extends React.Component {
             savePassword={this.savePassword}
             errs={this.state.errs}
           />
+        ) : this.props.name == "Profile" ? (
+          <AccountFormLayout
+            readonly={true}
+            username={this.state.username}
+            password={this.state.password}
+            email={this.state.email}
+            name={this.state.name}
+            address={this.state.address}
+            city={this.city}
+            state={this.state.state}
+            country={this.state.country}
+            zipPostal={this.state.zipPostal}
+          />
         ) : (
           <AccountFormLayout
             username={this.state.username}
@@ -725,7 +743,7 @@ class AccountForm extends React.Component {
 const LoginFormLayout = (props) => {
   return (
     <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
-      <InputField
+      <Input
         containerClass="form-group"
         id="uname"
         label="Username"
@@ -737,7 +755,7 @@ const LoginFormLayout = (props) => {
         err={props.errs[0]}
       />
 
-      <InputField
+      <Input
         containerClass="form-group"
         id="psw"
         label="Password"
@@ -757,7 +775,7 @@ const LoginFormLayout = (props) => {
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
-const InputField = (props) => {
+const Input = (props) => {
   return (
     <div className={props.containerClass}>
       <label for={props.id}>
@@ -768,13 +786,14 @@ const InputField = (props) => {
         id={props.id}
         name={props.id}
         type={props.type}
+        list={props.list || null}
         className="form-control"
         required={props.required || false}
         value={props.value}
-        autocomplete="on"
+        autocomplete={props.list ? "off" : "on"}
         onChange={props.onChange || null}
-        aria-describedby={props.validator}
-        readonly={props.readonly || false}
+        aria-describedby={props.validator || null}
+        readonly={!Boolean(props.readonly)}
       />
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
@@ -788,7 +807,7 @@ const InputField = (props) => {
 };
 
 /**
- * Component for handling the layout of the
+ * Component for handling the layout of the forms on the Sign Up, Profile, and Edit Profile pages
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
@@ -796,25 +815,26 @@ const AccountFormLayout = (props) => {
   return (
     <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
       <div className="row">
-        <InputField
+        <Input
           containerClass="form-group col"
           id="uname"
           label="Username"
           type="text"
-          required={true}
+          required={!Boolean(props.readonly)}
           value={props.username}
-          onChange={props.saveUsername}
+          readonly={!Boolean(props.readonly)}
+          onChange={props.saveUsername || null}
           validator="unameFeedback"
           err={props.errs[0]}
         />
 
-        <InputField
+        <Input
           containerClass="form-group col"
           id="psw"
           label="Password"
           type="password"
-          required={true || false}
-          readonly={props.readonly || null}
+          required={!Boolean(props.readonly)}
+          readonly={!Boolean(props.readonly)}
           value={props.password}
           onChange={props.savePassword || null}
           validator="pswFeedback"
@@ -823,23 +843,25 @@ const AccountFormLayout = (props) => {
       </div>
 
       <div className="row">
-        <InputField
+        <Input
           containerClass="form-group col"
           id="email"
           label="Email"
           type="email"
           value={props.email}
+          readonly={!Boolean(props.readonly)}
           onChange={props.saveEmail || null}
           validator=""
           err=""
         />
 
-        <InputField
+        <Input
           containerClass="form-group col"
           id="name"
           label="Full Name"
           type="text"
           value={props.name}
+          readonly={!Boolean(props.readonly)}
           onChange={props.saveName || null}
           validator=""
           err=""
@@ -847,63 +869,154 @@ const AccountFormLayout = (props) => {
       </div>
 
       <div className="row">
-        <InputField
+        <Input
           containerClass="form-group col-7"
           id="addr"
           label="Address"
+          list={!props.readonly ? "addresses" : null}
           type="text"
           value={props.address}
+          readonly={!Boolean(props.readonly)}
           onChange={props.saveAddress || null}
           validator=""
           err=""
         />
+        {!props.readonly ? <Datalist id="addresses" options={["test"]} /> : ""}
 
-        <InputField
+        <Input
           containerClass="form-group col"
           id="city"
           label="City"
+          list={!props.readonly ? "cities" : null}
           type="text"
           value={props.city}
+          readonly={!Boolean(props.readonly)}
           onChange={props.saveCity || null}
           validator=""
           err=""
         />
+        {!props.readonly ? <Datalist id="cities" options={["test"]} /> : ""}
       </div>
 
       <div className="row">
-        <InputField
-          containerClass="form-group col"
-          id="state"
-          label="State"
-          type="text"
-          value={props.state}
-          onChange={props.saveState || null}
-          validator=""
-          err=""
-        />
+        {props.readonly ? (
+          <Input
+            containerClass="form-group col"
+            id="state"
+            label="State"
+            type="text"
+            value={props.state}
+            readonly={props.readonly}
+            validator=""
+            err=""
+          />
+        ) : (
+          <Select
+            containerClass="form-group col"
+            id="state"
+            label="State"
+            options={[{ text: "Choose a state", value: "" }]}
+            value={props.state}
+            onChange={props.saveState}
+            validator=""
+            err=""
+          />
+        )}
 
-        <InputField
-          containerClass="form-group col"
-          id="country"
-          label="Country"
-          type="text"
-          value={props.country}
-          onChange={props.saveCountry || null}
-          validator=""
-          err=""
-        />
+        {props.readonly ? (
+          <Input
+            containerClass="form-group col"
+            id="country"
+            label="Country"
+            type="text"
+            readonly={props.readonly}
+            value={props.country}
+            validator=""
+            err=""
+          />
+        ) : (
+          <Select
+            containerClass="form-group col"
+            id="country"
+            label="Country"
+            value={props.country}
+            options={[{ text: "Choose a country", value: "" }]}
+            onChange={props.saveState || null}
+            validator=""
+            err=""
+          />
+        )}
 
-        <InputField
+        <Input
           containerClass="form-group col-4"
           id="zipPostal"
           label="Zip/Postal"
+          list={!props.readonly ? "zipPostalCodes" : null}
           type="text"
           value={props.zipPostal}
+          readonly={!Boolean(props.readonly)}
           onChange={props.saveZipPostalCode || null}
           validator=""
           err=""
         />
+        {!props.readonly ? (
+          <Datalist id="zipPostalCodes" options={["test"]} />
+        ) : (
+          ""
+        )}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying datalists
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Datalist = (props) => {
+  return (
+    <datalist id={props.id}>
+      {props.options.map((option) => {
+        return <option value={option} />;
+      })}
+    </datalist>
+  );
+};
+
+/**
+ * Component for displaying select input fields
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Select = (props) => {
+  console.log(props);
+  return (
+    <div className={props.containerClass}>
+      <label for={props.id}>
+        {props.label}
+        {!props.required ? <small> (Optional)</small> : ""}
+      </label>
+      <select
+        id={props.id}
+        name={props.id}
+        className="form-control"
+        required={props.required || false}
+        value={props.value}
+        onChange={props.onChange || null}
+        aria-describedby={props.validator}
+      >
+        {props.options.map((option) => {
+          return <option value={option.value}>{option.text}</option>;
+        })}
+      </select>
+      {props.validator ? (
+        <div id={props.validator} className="invalid-feedback">
+          {props.err}
+        </div>
+      ) : (
+        ""
+      )}
     </div>
   );
 };
@@ -917,13 +1030,20 @@ const Signup = () => {
 };
 
 /**
- * Component for displaying content on the Profile page
+ * Component for displaying content on the (username)'s Profile page
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
 const Profile = (props) => {
   const params = useParams();
-  window.addEventListener("load", () => props.getUser(params.id), true);
+  window.addEventListener(
+    "load",
+    () => {
+      props.getUser(params.id);
+      console.log(props.user);
+    },
+    true
+  );
   return (
     <form className="panel">
       <div className="panel-header text-white p-1 mx-auto">
@@ -944,10 +1064,9 @@ const Profile = (props) => {
 
       <div className="panel-footer px-3 py-2">
         <Link
+          className="btn btn-success w-100"
           to={
-            props.user._id == params.id
-              ? "/books/my"
-              : `/users/${params.id}/books`
+            props.myId == params.id ? "/books/my" : `/users/${params.id}/books`
           }
         ></Link>
       </div>
@@ -971,6 +1090,15 @@ const EditProfile = (props) => {
  */
 const MyBooks = (props) => {
   return <h1>My Books</h1>;
+};
+
+/**
+ * Component for handling the layout of the forms on the My Books and the (username)'s Books pages
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const UserBooksFormLayout = (props) => {
+  return;
 };
 
 /**
