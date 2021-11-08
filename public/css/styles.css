@@ -4,7 +4,9 @@
 
 .panel {
   margin: 20px auto 0;
-  max-width: 1200px;
+}
+
+.panel.scroll {
   height: auto;
   max-height: 475px;
   overflow: auto;
