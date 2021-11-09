@@ -9,6 +9,12 @@ const auth = require("../auth");
  *
  */
 module.exports = (app) => {
+  const oauthOptions = {
+    failureRedirect: "/login",
+    failureFlash: "Unable to authenticate your account",
+    successRedirect: "/books",
+  };
+
   // Finishes setting up Passport
   auth();
 
@@ -16,26 +22,31 @@ module.exports = (app) => {
   app
     .route("/login")
     .get(loggedIn, (req, res) => {
+      console.log(req.flash("error"));
       res.sendFile(process.cwd() + "/public/login.html");
     })
-
     .post(
       loggedIn,
-      passport.authenticate("local-login", { failureRedirect: "/login" }),
-      (req, res) => res.redirect("/books")
+      passport.authenticate("local-login", {
+        failureRedirect: "/login",
+        failureFlash: "Invalid username or password",
+        successRedirect: "/books",
+      })
     );
 
   // Displays and handles POST requests for the Book Exchange - Sign Up Page
   app
     .route("/signup")
     .get(loggedIn, (req, res) => {
+      console.log(req.flash("error"));
       res.sendFile(process.cwd() + "/public/signup.html");
     })
-
     .post(
-      loggedIn,
-      passport.authenticate("local-signup", { failureRedirect: "/signup" }),
-      (req, res) => res.redirect("/login")
+      passport.authenticate("local-signup", {
+        failureRedirect: "/signup",
+        failureFlash: "Unable to create your account",
+        successRedirect: "/books",
+      })
     );
 
   // Handles GitHub OAuth
@@ -44,8 +55,7 @@ module.exports = (app) => {
   // Callback URL for GitHub OAuth
   app.get(
     "/auth/github/callback",
-    passport.authenticate("github", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/books")
+    passport.authenticate("github", oauthOptions)
   );
 
   // Handles Facebook OAuth
@@ -54,8 +64,7 @@ module.exports = (app) => {
   // Callback URL for Facebook OAuth
   app.get(
     "/auth/facebook/callback",
-    passport.authenticate("facebook", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/books")
+    passport.authenticate("facebook", oauthOptions)
   );
 
   // Handles Twitter OAuth
@@ -64,8 +73,7 @@ module.exports = (app) => {
   // Callback URL for Twitter OAuth
   app.get(
     "/auth/twitter/callback",
-    passport.authenticate("twitter", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/books")
+    passport.authenticate("twitter", oauthOptions)
   );
 
   // Handles Google OAuth
@@ -74,8 +82,7 @@ module.exports = (app) => {
   // Callback URL for Google OAuth
   app.get(
     "/auth/google/callback",
-    passport.authenticate("google", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/books")
+    passport.authenticate("google", oauthOptions)
   );
 
   // Handles Microsoft OAuth
@@ -84,45 +91,30 @@ module.exports = (app) => {
   // Callback URL for Microsoft OAuth
   app.get(
     "/auth/microsoft/callback",
-    passport.authenticate("microsoft", { failureRedirect: "/login" }),
-    (req, res) => res.redirect("/books")
+    passport.authenticate("microsoft", oauthOptions)
   );
 
   // Displays the Book Exchange - Profile Page
-  app.get(
-    "/users/:id",
-    loggedOut,
-    passport.authenticate("local-login", { failureRedirect: "/login" }),
-    (req, res) => res.sendFile(process.cwd() + "/public/profile.html")
+  app.get("/users/:id", loggedOut, (req, res) =>
+    res.sendFile(process.cwd() + "/public/profile.html")
   );
 
   // Displays the Book Exchange - Edit Profile Page
-  app.get(
-    "/users/edit",
-    loggedOut,
-    passport.authenticate("local-login", { failureRedirect: "/login" }),
-    (req, res) => res.sendFile(process.cwd() + "/public/editProfile.html")
+  app.get("/users/edit", loggedOut, (req, res) =>
+    res.sendFile(process.cwd() + "/public/editProfile.html")
   );
 
   // Displays the Book Exchange - My Books Page
-  app.get(
-    "/books/my",
-    loggedOut,
-    passport.authenticate("local-login", { failureRedirect: "/login" }),
-    (req, res) => res.sendFile(process.cwd() + "/public/books.html")
+  app.get("/books/my", loggedOut, (req, res) =>
+    res.sendFile(process.cwd() + "/public/books.html")
   );
 
   // Logs the user out
-  app.get(
-    "/logout",
-    loggedOut,
-    passport.authenticate("local-login", { failureRedirect: "/login" }),
-    (req, res) => {
-      req.logout();
-      req.session.destroy();
-      res.redirect("/books");
-    }
-  );
+  app.get("/logout", loggedOut, (req, res) => {
+    req.logout();
+    req.session.destroy();
+    res.redirect("/books");
+  });
 
   /**
    * Checks if the user is logged in and redirects to the home page when logged in

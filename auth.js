@@ -14,7 +14,7 @@ module.exports = () => {
   // Serialization
   passport.serializeUser((user, done) => done(null, user._id));
   passport.deserializeUser((id, done) => {
-    crud.getUser(id).then((user) => done(null, user));
+    crud.getUser({ _id: id }).then((user) => done(null, user));
   });
 
   /**
@@ -42,10 +42,8 @@ module.exports = () => {
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.baseUrl == "/signup") {
         if (user) {
-          req.session.duplicateAccount = true;
           return cb(false);
         } else {
-          req.session.duplicateAccount = false;
           user = await createUser(profile);
         }
       }
@@ -134,11 +132,7 @@ module.exports = () => {
           });
 
           // Checks if the secret key was saved in keys.xml
-          req.session.secretKeyError = !secretKeys.saveKey(
-            key,
-            user._id.toString()
-          );
-          return req.session.secretKeyError
+          return !secretKeys.saveKey(key, user._id.toString())
             ? done(null, false)
             : done(null, user);
         } catch (err) {
