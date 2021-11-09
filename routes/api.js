@@ -101,6 +101,7 @@ module.exports = (app) => {
             ? {
                 username: user.username,
                 fullName: user.name,
+                email: user.email,
                 address: CryptoJS.AES.decrypt(
                   user.address,
                   secretKeys.findKey(user._id.toString())
@@ -116,6 +117,7 @@ module.exports = (app) => {
             : {
                 username: user.username,
                 fullName: user.name,
+                email: user.email,
                 city: user.city,
                 state: user.state,
                 country: user.country,
