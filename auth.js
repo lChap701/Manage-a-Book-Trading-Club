@@ -86,17 +86,20 @@ module.exports = () => {
   const LocalStrategy = require("passport-local");
   passport.use(
     "local-login",
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        console.log("User " + username + " attempted to log in.");
-        const user = await crud.getUser({ username: username });
-        return !user || !bcrypt.compareSync(password, user.password)
-          ? done(null, false)
-          : done(null, user);
-      } catch (err) {
-        return done(err);
+    new LocalStrategy(
+      { passReqToCallback: true },
+      async (req, username, password, done) => {
+        try {
+          console.log("User " + username + " attempted to log in.");
+          const user = await crud.getUser({ username: username });
+          req.session.error =
+            !user || !bcrypt.compareSync(password, user.password);
+          return req.session.error ? done(null, false) : done(null, user);
+        } catch (err) {
+          return done(err);
+        }
       }
-    })
+    )
   );
   passport.use(
     "local-signup",
@@ -132,9 +135,9 @@ module.exports = () => {
           });
 
           // Checks if the secret key was saved in keys.xml
-          return !secretKeys.saveKey(key, user._id.toString())
-            ? done(null, false)
-            : done(null, user);
+          req.session.error = !secretKeys.saveKey(key, user._id.toString());
+
+          return req.session.error ? done(null, false) : done(null, user);
         } catch (err) {
           return done(err);
         }
