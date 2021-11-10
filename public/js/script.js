@@ -174,7 +174,7 @@ class BookExchange extends React.Component {
    * Determines if the user should be logged in or logged out
    */
   isLoggedIn() {
-    fetch(`${location.origin}/api/session/user`)
+    fetch(`${location.origin}/session/user`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({ login: Boolean(data) });
@@ -214,7 +214,7 @@ class BookExchange extends React.Component {
   getRequestedBooks() {
     let books = [];
 
-    fetch(`${location.origin}/api/session/books`)
+    fetch(`${location.origin}/session/books`)
       .then((res) => res.json())
       .then((data) => {
         if (!data) return [];

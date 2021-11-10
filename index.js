@@ -80,6 +80,10 @@ auth(app);
 const api = require("./routes/api");
 api(app);
 
+// Session Routing
+const sessions = require("./routes/sessions");
+sessions(app);
+
 // Redirects to the home page
 app.get("/", (req, res) => {
   res.redirect("/books");
