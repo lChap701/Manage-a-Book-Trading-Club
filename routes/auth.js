@@ -22,8 +22,13 @@ module.exports = (app) => {
   app
     .route("/login")
     .get(loggedIn, (req, res) => {
-      console.log(req.flash("error"));
-      res.sendFile(process.cwd() + "/public/login.html");
+      // Checks if an error message should be displayed
+      if (req.session.error) {
+        req.session.error = false;
+        res.send(req.flash("error")[0]);
+      } else {
+        res.sendFile(process.cwd() + "/public/login.html");
+      }
     })
     .post(
       loggedIn,
@@ -38,7 +43,6 @@ module.exports = (app) => {
   app
     .route("/signup")
     .get(loggedIn, (req, res) => {
-      console.log(req.flash("error"));
       res.sendFile(process.cwd() + "/public/signup.html");
     })
     .post(
