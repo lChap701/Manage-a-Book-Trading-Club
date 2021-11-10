@@ -11,4 +11,4 @@ A project that was created to earn a certificate from freeCodeCamp and allows us
 [Twitter OAuth](https://medium.com/swlh/setting-up-twitter-oauth-with-node-and-passport-js-2298296b237c) \
 [Microsoft/Google OAuth](https://dev.to/asim_ansari7/setting-up-social-logins-with-node-js-and-passport-js-1m16) \
 [Country State City API](https://countrystatecity.in/) \
-[Zippopotamus](https://zippopotam.us/)
+[Zippopotamus API](https://zippopotam.us/)
