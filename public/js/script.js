@@ -6,9 +6,6 @@ const {
   Prompt,
   Switch,
   Redirect,
-  useParams,
-  useRouteMatch,
-  useLocation,
   withRouter,
 } = ReactRouterDOM;
 const Router = BrowserRouter;
@@ -42,13 +39,20 @@ function validateForm() {
  */
 async function postData(data) {
   try {
-    const res = await fetch(location.pathname, {
+    const res = await fetch(location.href, {
       method: "POST",
       body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     // Ensures that an error message is displayed
     if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+    console.log(res);
+
+    return location.href == res.url ? await res.text() : res.url;
   } catch (err) {
     alert(err.message);
     console.error(err.message);
@@ -67,11 +71,12 @@ class BookExchange extends React.Component {
       login: false,
       users: [],
       user: {
+        _id: "",
         username: "",
       },
       urlUser: {},
       books: [],
-      takeBooks: [],
+      //takeBooks: [],
       requests: [],
       trades: [],
     };
@@ -89,6 +94,14 @@ class BookExchange extends React.Component {
     // Event Listeners
     window.addEventListener("load", this.getData, true);
     window.addEventListener("load", this.isLoggedIn, true);
+    window.addEventListener(
+      "load",
+      () => {
+        // Used to get the user's profile (for a specific path)
+        if (location.pathname.match(/\/users\/[\da-z]+/g)) this.getUser();
+      },
+      true
+    );
   }
 
   /**
@@ -178,9 +191,10 @@ class BookExchange extends React.Component {
 
   /**
    * Gets information for the user's profile
-   * @param {String} id   Represents the user's ID
    */
-  getUser(id) {
+  getUser() {
+    const id =
+      location.pathname.split("/")[location.pathname.split("/").length - 1];
     fetch(`${location.origin}/users/${id}`)
       .then((res) => res.json())
       .then((data) => {
@@ -267,8 +281,6 @@ class BookExchange extends React.Component {
                             text: "Create Request",
                           },
                         ]}
-                        requests={this.state.requests}
-                        takeBooks={this.getRequestedBooks()}
                       />
                     )}
                     <NavLink className="nav-item nav-link" to="/trades">
@@ -290,7 +302,7 @@ class BookExchange extends React.Component {
                         dropLinkText={this.state.user.username}
                         links={[
                           {
-                            path: "/users/:id",
+                            path: "/users/" + this.state.user._id,
                             text: "Profile",
                           },
                           {
@@ -306,8 +318,6 @@ class BookExchange extends React.Component {
                             text: "Logout",
                           },
                         ]}
-                        requests={this.state.requests}
-                        takeBooks={this.getRequestedBooks()}
                       />
                     )}
                   </div>
@@ -325,13 +335,31 @@ class BookExchange extends React.Component {
                 <Requests requests={this.state.requests} />
               </Route>
               <Route path="/trades">
-                <Trades />
+                <Trades users={this.state.trades} />
               </Route>
               <Route path="/users">
-                <Users />
+                <Users users={this.state.users} />
               </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
+              <Route path="/requests">
+                <Requests requests={this.state.requests} />
+              </Route>
+              <Route path="/requests/new">
+                <CreateRequest takeBooks={this.getRequestedBooks} />
+              </Route>
+              <Route path="/users/:id">
+                <Profile user={this.state.urlUser} myId={this.state.user._id} />
+              </Route>
+              <Route path="/users/edit">
+                <EditProfile user={this.state.user} />
+              </Route>
+              <Route path="/books/my">
+                <MyBooks />
+              </Route>
+              <Route path="/logout">
+                <Redirect to="/books" />
+              </Route>
             </Switch>
           </div>
         </Router>
@@ -405,7 +433,7 @@ const Books = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Requests = (props) => {
-  return <h1>All Requests</h1>;
+  return <h2>All Requests</h2>;
 };
 
 /**
@@ -414,7 +442,7 @@ const Requests = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const BookRequests = (props) => {
-  return <h1>Requests for {props.book}</h1>;
+  return <h2>Requests for {props.book}</h2>;
 };
 
 /**
@@ -424,7 +452,7 @@ const BookRequests = (props) => {
  */
 const Dropdown = (props) => {
   return (
-    <div className="dropdown">
+    <div className="dropdown text-dark">
       <a
         className="nav-link dropdown-toggle"
         href="#"
@@ -446,34 +474,6 @@ const Dropdown = (props) => {
           );
         })}
       </div>
-
-      <Switch>
-        <Route path="/requests">
-          <Requests requests={props.requests} />
-        </Route>
-        <Route path="/requests/books/new">
-          <Redirect to="/requests/new" />
-        </Route>
-        <Route path="/requests/new">
-          <CreateRequest takeBooks={props.takeBooks} />
-        </Route>
-        <Route path="/users/:id">
-          <Profile
-            getUser={this.getUser}
-            user={this.state.urlUser}
-            myId={this.state.user._id}
-          />
-        </Route>
-        <Route path="/users/edit">
-          <EditProfile />
-        </Route>
-        <Route path="/books/my">
-          <MyBooks />
-        </Route>
-        <Route path="/logout">
-          <Redirect to="/books" />
-        </Route>
-      </Switch>
     </div>
   );
 };
@@ -486,17 +486,19 @@ const Dropdown = (props) => {
 const CreateRequest = (props) => {
   console.log(props.takeBooks);
   return (
-    <div className="panel">
-      <div className="panel-header text-center">
-        <h2>Create Request</h2>
-      </div>
+    <div>
+      <div className="panel">
+        <div className="panel-header text-center">
+          <h2>Create Request</h2>
+        </div>
 
-      <div className="panel-body">
-        {props.takeBooks.map((book) => {
-          <div className="item" id={book._id}>
-            {book.name}
-          </div>;
-        })}
+        <div className="panel-body">
+          {props.takeBooks.map((book) => {
+            <div className="item" id={book._id}>
+              {book.name}
+            </div>;
+          })}
+        </div>
       </div>
     </div>
   );
@@ -508,7 +510,7 @@ const CreateRequest = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Trades = (props) => {
-  return <h1>Trades</h1>;
+  return <h2>Trades</h2>;
 };
 
 /**
@@ -517,7 +519,7 @@ const Trades = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Users = (props) => {
-  return <h1>Users</h1>;
+  return <h2>Users</h2>;
 };
 
 /**
@@ -546,7 +548,7 @@ class AccountForm extends React.Component {
       state: "",
       country: "",
       zipPostal: "",
-      errs: ["Username is required", "Password is required"],
+      errs: ["Username is required", "Password is required", ""],
     };
 
     // Functions
@@ -658,7 +660,19 @@ class AccountForm extends React.Component {
         data.zipPostal = this.state.zipPostal;
       }
 
-      await postData(data);
+      // Gets the result
+      let res = await postData(data);
+
+      // Checks if a new page should be displayed or if an error occurred
+      if (res.includes("http")) {
+        location.reload(res);
+      } else {
+        let { errs } = this.state;
+        errs[2] = res;
+        this.setState({
+          errs: errs,
+        });
+      }
     }
   }
 
@@ -670,6 +684,8 @@ class AccountForm extends React.Component {
         name={this.props.name}
         novalidate="true"
       >
+        {this.state.errs[2] != "" ? <Alert msg={this.state.errs[2]} /> : ""}
+
         <div className="panel-header text-white p-1 mx-auto">
           <h2 className="text-center">{this.props.name}</h2>
         </div>
@@ -707,7 +723,7 @@ class AccountForm extends React.Component {
             name={this.state.name}
             saveName={this.saveName}
             address={this.state.address}
-            saveAddress={this.address}
+            saveAddress={this.saveAddress}
             city={this.state.city}
             saveCity={this.saveCity}
             state={this.state.state}
@@ -723,17 +739,26 @@ class AccountForm extends React.Component {
           <input
             className="btn btn-success w-100"
             type="submit"
-            value={
-              this.props.name == "Edit Profile"
-                ? "Update Profile"
-                : this.props.name
-            }
+            value={this.props.name}
           />
         </div>
       </form>
     );
   }
 }
+
+/**
+ * Component for displaying alerts
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Alert = (props) => {
+  return (
+    <div class="alert alert-danger" role="alert">
+      {props.msg}
+    </div>
+  );
+};
 
 /**
  * Component for handling the layout of the Login form
@@ -990,7 +1015,6 @@ const Datalist = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Select = (props) => {
-  console.log(props);
   return (
     <div className={props.containerClass}>
       <label for={props.id}>
@@ -1035,15 +1059,9 @@ const Signup = () => {
  * @returns             Returns the content that should be displayed
  */
 const Profile = (props) => {
-  const params = useParams();
-  window.addEventListener(
-    "load",
-    () => {
-      props.getUser(params.id);
-      console.log(props.user);
-    },
-    true
-  );
+  const id =
+    location.pathname.split("/")[location.pathname.split("/").length - 1];
+
   return (
     <form className="panel">
       <div className="panel-header text-white p-1 mx-auto">
@@ -1065,9 +1083,7 @@ const Profile = (props) => {
       <div className="panel-footer px-3 py-2">
         <Link
           className="btn btn-success w-100"
-          to={
-            props.myId == params.id ? "/books/my" : `/users/${params.id}/books`
-          }
+          to={props.myId == id ? "/books/my" : `${location.pathname}/books`}
         ></Link>
       </div>
     </form>
@@ -1080,7 +1096,7 @@ const Profile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const EditProfile = (props) => {
-  return <h1>Edit Profile</h1>;
+  return <h2>Edit Profile</h2>;
 };
 
 /**
@@ -1089,7 +1105,7 @@ const EditProfile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const MyBooks = (props) => {
-  return <h1>My Books</h1>;
+  return <h2>My Books</h2>;
 };
 
 /**
@@ -1107,7 +1123,7 @@ const UserBooksFormLayout = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const UserBooks = (props) => {
-  return <h1>{props.user.username}'s Books</h1>;
+  return <h2>{props.user.username}'s Books</h2>;
 };
 
 ReactDOM.render(<BookExchange />, document.querySelector("#root"));
