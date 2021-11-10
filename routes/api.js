@@ -86,23 +86,19 @@ module.exports = (app) => {
       if (!user) {
         res.send("Unknown user");
       } else {
+        let key = secretKeys.findKey(user._id.toString());
+        console.log(key);
         res.json(
           user.preciseLocation
             ? {
                 username: user.username,
                 fullName: user.name,
                 email: user.email,
-                address: CryptoJS.AES.decrypt(
-                  user.address,
-                  secretKeys.findKey(user._id.toString())
-                ),
+                address: CryptoJS.AES.decrypt(user.address, key),
                 city: user.city,
                 state: user.state,
                 country: user.country,
-                zipPostal: CryptoJS.AES.decrypt(
-                  user.zipPostal,
-                  secretKeys.findKey(user._id.toString())
-                ),
+                zipPostal: CryptoJS.AES.decrypt(user.zipPostal, key),
               }
             : {
                 username: user.username,
@@ -117,7 +113,7 @@ module.exports = (app) => {
     })
   );
 
-  // Routing for getting all user's books
+  // Routing for getting all of a user's books
   app.get("/api/users/:id/books", (req, res) => {
     crud.getUser({ _id: req.params.id }).then((user) => {
       if (!user) {
