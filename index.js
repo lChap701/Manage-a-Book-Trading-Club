@@ -44,7 +44,10 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 1000 * 60 * 60 * 24, secure: true },
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24,
+      secure: process.env.HOST_PROTOCOL.includes("https"),
+    },
     store: new MemoryStore({
       checkPeriod: 1000 * 60 * 60 * 24,
       stale: true,
@@ -52,10 +55,13 @@ app.use(
   })
 );
 
+// Connect-Flash Setup
+const flash = require("connect-flash");
+app.use(flash());
+
 // DB Setup
 const connectDB = require("./db.config");
 connectDB();
-const crud = require("./crud");
 
 // Allows stylesheets, JS scripts, and other files to be loaded
 app.use("/css", express.static(process.cwd() + "/public/css"));
@@ -100,7 +106,7 @@ app.get("/requests/new", (req, res) => {
 });
 
 // Form Handler for the form on the home page
-app.post("/requests/new/book", (req, res) => {
+app.post("/requests/new/books", (req, res) => {
   if (!req.body) return;
   console.log(req.body);
   let ids = [];
@@ -108,7 +114,7 @@ app.post("/requests/new/book", (req, res) => {
   keys.forEach((bookId) => ids.push(bookId.replace("book", "")));
   req.session.books = ids;
   console.log(req.session.books);
-  //req.session.save();
+  res.redirect("..");
 });
 
 // Displays the Book Exchange - All Trades Page
