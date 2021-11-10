@@ -3,6 +3,29 @@ const fs = require("fs");
 // Fast-XML-Parser Setup
 const parser = require("fast-xml-parser");
 const he = require("he");
+const options = {
+  attributeNamePrefix: "@_",
+  attrNodeName: "attr",
+  textNodeName: "#text",
+  ignoreAttributes: true,
+  ignoreNameSpace: false,
+  allowBooleanAttributes: false,
+  parseNodeValue: true,
+  parseAttributeValue: false,
+  trimValues: true,
+  cdataTagName: "__cdata",
+  cdataPositionChar: "\\c",
+  parseTrueNumberOnly: false,
+  numParseOptions: {
+    hex: true,
+    leadingZeros: true,
+  },
+  arrayMode: /keys/,
+  attrValueProcessor: (val, attrName) =>
+    he.decode(val, { isAttributeValue: true }),
+  tagValueProcessor: (val, tagName) => he.decode(val),
+  alwaysCreateTextNode: false,
+};
 
 /**
  * Returns a key that is 32 characters long
@@ -67,29 +90,7 @@ const saveKey = (key, id) => {
  */
 const findKey = (id) => {
   try {
-    const json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), {
-      attributeNamePrefix: "@_",
-      attrNodeName: "attr",
-      textNodeName: "#text",
-      ignoreAttributes: true,
-      ignoreNameSpace: false,
-      allowBooleanAttributes: false,
-      parseNodeValue: true,
-      parseAttributeValue: false,
-      trimValues: true,
-      cdataTagName: "__cdata",
-      cdataPositionChar: "\\c",
-      parseTrueNumberOnly: false,
-      numParseOptions: {
-        hex: true,
-        leadingZeros: true,
-      },
-      arrayMode: /keys/,
-      attrValueProcessor: (val, attrName) =>
-        he.decode(val, { isAttributeValue: true }),
-      tagValueProcessor: (val, tagName) => he.decode(val),
-      alwaysCreateTextNode: false,
-    });
+    const json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
     return json.keys.find((key) => key.includes(id)).value;
   } catch (e) {
     console.log(e);
@@ -127,29 +128,7 @@ const removeKey = (id) => {
  */
 const updateKey = (id) => {
   try {
-    let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), {
-      attributeNamePrefix: "@_",
-      attrNodeName: "attr",
-      textNodeName: "#text",
-      ignoreAttributes: true,
-      ignoreNameSpace: false,
-      allowBooleanAttributes: false,
-      parseNodeValue: true,
-      parseAttributeValue: false,
-      trimValues: true,
-      cdataTagName: "__cdata",
-      cdataPositionChar: "\\c",
-      parseTrueNumberOnly: false,
-      numParseOptions: {
-        hex: true,
-        leadingZeros: true,
-      },
-      arrayMode: /keys/,
-      attrValueProcessor: (val, attrName) =>
-        he.decode(val, { isAttributeValue: true }),
-      tagValueProcessor: (val, tagName) => he.decode(val),
-      alwaysCreateTextNode: false,
-    });
+    let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
 
     let index = json.keys.findIndex((key) => key.includes(id));
     if (index < 0) return false;
