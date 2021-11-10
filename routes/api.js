@@ -11,16 +11,6 @@ const secretKeys = require("../secretKeys");
  *
  */
 module.exports = (app) => {
-  // Routing for determining if the user is logged in
-  app.get("/api/session/user", (req, res) => {
-    res.json(req.user ? req.user : null);
-  });
-
-  // Routing for getting requested books during trades
-  app.get("/api/session/books", (req, res) => {
-    res.json(req.session.books ? req.session.books : null);
-  });
-
   // Routing for users
   app.get("/api/users", (req, res) => {
     crud
