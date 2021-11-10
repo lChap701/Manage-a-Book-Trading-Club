@@ -14,7 +14,14 @@
   "keywords": [
     "MERN",
     "Stack",
-    "passport",
+    "Passport",
+    "Sessions",
+    "Cookies",
+    "GitHub OAuth",
+    "Facebook OAuth",
+    "Twitter OAuth",
+    "Google OAuth",
+    "Microsoft OAuth",
     "bcrypt",
     "AES",
     "login",
@@ -26,6 +33,7 @@
     "url": "https://github.com/lChap701/Manage-a-Book-Trading-Club/issues"
   },
   "homepage": "https://github.com/lChap701/Manage-a-Book-Trading-Club#readme",
+  "website": "https://Manage-a-Book-Trading-Club.lchap701.repl.co",
   "dependencies": {
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
