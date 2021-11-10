@@ -20,6 +20,7 @@ const crud = {
   getRequest: (id) => Requests.findOne({ _id: id }),
   updateUser: (id, data) => Users.updateOne({ _id: id }, data),
   updateRequest: (id) => Requests.updateOne({ _id: id }, { traded: true }),
+  deleteUser: (id) => Users.deleteOne({ _id: id }),
   deleteBook: (id) => Books.deleteOne({ _id: id }),
   deleteRequest: (id) => Requests.deleteOne({ _id: id }),
 };
