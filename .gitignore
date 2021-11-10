@@ -1,3 +1,10 @@
+# Cloned Countries States Cities Database Repo
+countries-states-cities-database/.github
+countries-states-cities-database/docs
+countries-states-cities-database/scripts
+countries-states-cities-database/.gitignore
+countries-states-cities-database/index.php
+
 # AES Cipher Keys
 keys.xml
 
