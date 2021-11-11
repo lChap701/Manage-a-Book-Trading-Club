@@ -143,7 +143,12 @@ module.exports = (app) => {
         })
         .then(() => {
           req.session.error = !secretKeys.updateKey(key, user._id.toString());
-          if (!req.session.error) res.redirect("../" + req.body._id);
+
+          if (req.session.error) {
+            req.flash("error", "Unable to update your account");
+          } else {
+            res.redirect("../" + req.body._id);
+          }
         })
         .catch((err) => {
           req.flash("error", err);
