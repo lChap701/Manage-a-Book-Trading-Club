@@ -1,5 +1,6 @@
 const passport = require("passport");
 const auth = require("../auth");
+const crud = require("../crud");
 
 /**
  * Module that handles routing for OAuth/Passport
@@ -98,20 +99,46 @@ module.exports = (app) => {
     passport.authenticate("microsoft", oauthOptions)
   );
 
-  // Displays the Book Exchange - Profile Page
+  // Displays the Book Exchange - (username)'s Profile Page
   app.get("/users/:id", loggedOut, (req, res) =>
     res.sendFile(process.cwd() + "/public/profile.html")
   );
 
-  // Displays the Book Exchange - Edit Profile Page
-  app.get("/users/edit", loggedOut, (req, res) =>
-    res.sendFile(process.cwd() + "/public/editProfile.html")
-  );
+  // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
+  app
+    .route("/users/edit")
+    .get(loggedOut, (req, res) => {
+      if (req.session.error) {
+        res.send(req.flash("error")[0]);
+        req.session.error = false;
+      } else {
+        res.sendFile(process.cwd() + "/public/editProfile.html");
+      }
+    })
+    .put((req, res) => {
+      crud
+        .updateUser(req.body._id, {
+          username: req.body.username,
+          email: req.body.email,
+          name: req.body.name,
+          address: req.body.address,
+          city: req.body.city,
+          state: req.body.state,
+          country: req.body.country,
+          zipPostal: req.body.zipPostal,
+          preciseLocation: req.body.preciseLocation == "false" ? false : true,
+        })
+        .then(() => res.redirect("../" + req.body._id))
+        .catch((err) => {
+          req.flash("error", err.message);
+          req.session.error = true;
+        });
+    });
 
   // Displays the Book Exchange - My Books Page
-  app.get("/books/my", loggedOut, (req, res) =>
-    res.sendFile(process.cwd() + "/public/books.html")
-  );
+  app.get("/books/my", loggedOut, (req, res) => {
+    res.sendFile(process.cwd() + "/public/books.html");
+  });
 
   // Logs the user out
   app.get("/logout", loggedOut, (req, res) => {
