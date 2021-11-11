@@ -147,7 +147,7 @@ const updateKey = (id) => {
 };
 
 /**
- * Module for retrieving, deleting, updating, and saving cipher keys
+ * Module for generating, retrieving, deleting, updating, and saving cipher keys
  * @module ./secretKeys
  *
  */
