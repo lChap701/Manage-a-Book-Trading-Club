@@ -12,7 +12,7 @@ const locations = require("./locations");
  *
  */
 module.exports = (app) => {
-  // Routing for users
+  // Routing for retrieving all users
   app.get("/api/users", (req, res) => {
     crud
       .getUsers()
@@ -36,7 +36,7 @@ module.exports = (app) => {
       );
   });
 
-  // Routing for all books
+  // Routing for retrieving all books
   app.get("/api/books", (req, res) => {
     const { bookId } = req.query;
     let books = [];
@@ -114,7 +114,7 @@ module.exports = (app) => {
     })
   );
 
-  // Routing for getting all of a user's books
+  // Routing for retrieving all of a user's books
   app.get("/api/users/:id/books", (req, res) => {
     crud.getUser({ _id: req.params.id }).then((user) => {
       if (!user) {
@@ -168,7 +168,7 @@ module.exports = (app) => {
     });
   });
 
-  // Routing for handling requests
+  // Routing for handling and retrieving requests
   app.route("/api/requests").get((req, res) => {
     let { traded } = req.query;
 
@@ -225,7 +225,7 @@ module.exports = (app) => {
       });
   });
 
-  // Routing for displaying all requests for a book
+  // Routing for retrieving all requests for a book
   app.get("/api/books/:bookId/requests", (req, res) => {
     crud.getBook(req.params.bookId).then((book) => {
       if (!book) {
