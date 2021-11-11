@@ -294,8 +294,8 @@ module.exports = (app) => {
   });
 
   // Routing for retrieving a country
-  app.get("/api/countries/:abbr", (req, res) => {
-    const data = locations.getCountry(req.params.abbr);
+  app.get("/api/countries/:cntry", (req, res) => {
+    const data = locations.getCountry(req.params.cntry);
     console.log(JSON.stringify(data));
     res.json(data);
   });
