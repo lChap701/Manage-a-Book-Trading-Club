@@ -2,6 +2,7 @@ require("dotenv").config();
 const CryptoJS = require("crypto-js");
 const crud = require("../crud");
 const secretKeys = require("../secretKeys");
+const locations = require("./locations");
 
 /**
  * Module that handles routing for the API
@@ -284,4 +285,86 @@ module.exports = (app) => {
         });
     });
   });
+
+  // Routing for retrieving countries from around the world
+  app.get("/api/countries", (req, res) => {
+    const data = locations.getAllCountries();
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving a country
+  app.get("/api/countries/:abbr", (req, res) => {
+    const data = locations.getCountry(req.params.abbr);
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving states from around the world
+  app.get("/api/states", (req, res) => {
+    const data = locations.getAllStates();
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving states from a country
+  app.get("/api/countries/:cntry/states", (req, res) => {
+    const data = locations.getStatesByCountry(req.params.cntry);
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving cities in a country
+  app.get("/api/countries/:cntry/cities", (req, res) => {
+    const data = locations.getCitiesByCountry(req.params.cntry);
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving cities in a state
+  app.get("/api/countries/:cntry/states/:st/cities", (req, res) => {
+    const data = locations.getCitiesByState(req.params.cntry, req.params.st);
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving states based on the country and the zip/postal code
+  app.get(
+    "/api/countries/:cntry/zipPostalCodes/:zipPostal/states",
+    (req, res) => {
+      const data = locations.getStatesByZipPostalCode(
+        req.params.cntry,
+        req.params.zipPostal
+      );
+      console.log(JSON.stringify(data));
+      res.json(data);
+    }
+  );
+
+  // Routing for retrieving cities based on the country and the zip/postal code
+  app.get(
+    "/api/countries/:cntry/zipPostalCodes/:zipPostal/cities",
+    (req, res) => {
+      const data = locations.getCitiesByZipPostalCode(
+        req.params.cntry,
+        req.params.zipPostal
+      );
+      console.log(JSON.stringify(data));
+      res.json(data);
+    }
+  );
+
+  // Routing for retrieving zip/postal codes based on the country and the state
+  app.get(
+    "/api/countries/:cntry/states/:st/cities/:city/zipPostalCodes",
+    (req, res) => {
+      const data = locations.getZipPostalCodes(
+        req.params.cntry,
+        req.params.st,
+        req.params.city
+      );
+      console.log(JSON.stringify(data));
+      res.json(data);
+    }
+  );
 };
