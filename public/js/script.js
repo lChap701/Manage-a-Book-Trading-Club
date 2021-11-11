@@ -34,13 +34,15 @@ function validateForm() {
 }
 
 /**
- * Submits the form
- * @param {*} data    Represents the data that should be submitted
+ * Submits the form using the specified HTTP method
+ * @param {*} data            Represents the data that should be submitted
+ * @param {String} method     Represents the HTTP method to use (defaults to 'POST')
+ * @returns                   Returns the new URL to redirect to or an error message
  */
-async function postData(data) {
+async function sendData(data, method = "POST") {
   try {
     const res = await fetch(location.href, {
-      method: "POST",
+      method: method,
       body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
@@ -52,6 +54,7 @@ async function postData(data) {
 
     console.log(res);
 
+    // Determines if an error message or a new URL was returned
     return location.href == res.url ? await res.text() : res.url;
   } catch (err) {
     alert(err.message);
@@ -446,39 +449,6 @@ const BookRequests = (props) => {
 };
 
 /**
- * Component for creating dropdown menus in the navbar
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the dropdown menu that should be displayed
- */
-const Dropdown = (props) => {
-  return (
-    <div className="dropdown text-dark">
-      <a
-        className="nav-link dropdown-toggle"
-        href="#"
-        id={props.id}
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        {props.dropLinkText}
-      </a>
-
-      <div className="dropdown-menu" aria-labelledby={props.id}>
-        {props.links.map((link) => {
-          return (
-            <NavLink className="dropdown-item nav-item nav-link" to={link.path}>
-              {link.text}
-            </NavLink>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-/**
  * Component for displaying content on the Create Request page
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -528,6 +498,78 @@ const Users = (props) => {
  */
 const Login = () => {
   return <AccountForm name="Login" />;
+};
+
+/**
+ * Component for displaying content on the Sign Up page
+ * @returns     Returns the content that should be displayed
+ */
+const Signup = () => {
+  return <AccountForm name="Sign Up" />;
+};
+
+/**
+ * Component for displaying content on the (username)'s Profile page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Profile = (props) => {
+  const id =
+    location.pathname.split("/")[location.pathname.split("/").length - 1];
+
+  return (
+    <form className="panel">
+      <div className="panel-header text-white p-1 mx-auto">
+        <h2 className="text-center">{props.user.username}'s Profile</h2>
+      </div>
+
+      <AccountFormLayout
+        username={props.user.username}
+        password={props.user.password}
+        email={props.user.email || ""}
+        name={props.user.name || ""}
+        address={props.user.address || ""}
+        city={props.user.city || ""}
+        state={props.user.state || ""}
+        country={props.user.country || ""}
+        zipPostal={props.user.zipPostal || ""}
+      />
+
+      <div className="panel-footer px-3 py-2">
+        <Link
+          className="btn btn-success w-100"
+          to={props.myId == id ? "/books/my" : `${location.pathname}/books`}
+        ></Link>
+      </div>
+    </form>
+  );
+};
+
+/**
+ * Component for displaying content on the Edit Profile page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const EditProfile = (props) => {
+  return <h2>Edit Profile</h2>;
+};
+
+/**
+ * Component for displaying content on the My Books page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const MyBooks = (props) => {
+  return <h2>My Books</h2>;
+};
+
+/**
+ * Component for displaying content on the (username)'s Books page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const UserBooks = (props) => {
+  return <h2>{props.user.username}'s Books</h2>;
 };
 
 /**
@@ -638,41 +680,40 @@ class AccountForm extends React.Component {
   /**
    * Handles form validation and form submission
    * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
    */
   async submitForm(e) {
     e.preventDefault();
 
-    // Checks if form should be submitted
-    if (validateForm()) {
-      const data = {
-        username: this.state.username,
-        password: this.state.password,
-      };
+    // Determines if form should be submitted
+    if (!validateForm()) return;
 
-      // For when users try to sign up or update their account
-      if (this.props.name != "Login") {
-        data.email = this.state.email;
-        data.name = this.state.name;
-        data.address = this.state.address;
-        data.city = this.state.city;
-        data.state = this.state.state;
-        data.country = this.state.country;
-        data.zipPostal = this.state.zipPostal;
-      }
+    const data = {
+      username: this.state.username,
+      password: this.state.password,
+    };
 
-      // Gets the result
-      let res = await postData(data);
+    // For when users try to sign up or update their account
+    if (this.props.name != "Login") {
+      data.email = this.state.email;
+      data.name = this.state.name;
+      data.address = this.state.address;
+      data.city = this.state.city;
+      data.state = this.state.state;
+      data.country = this.state.country;
+      data.zipPostal = this.state.zipPostal;
+    }
 
-      // Checks if a new page should be displayed or if an error occurred
-      if (res.includes("http")) {
-        location.reload(res);
-      } else {
-        let { errs } = this.state;
-        errs[2] = res;
-        this.setState({
-          errs: errs,
-        });
-      }
+    // Submits the form and gets the result
+    let res = await sendData(data);
+
+    // Checks if a new page should be displayed or if an error occurred
+    if (res.includes("http")) {
+      location.reload(res);
+    } else {
+      let { errs } = this.state;
+      errs[2] = res;
+      this.setState({ errs: errs });
     }
   }
 
@@ -684,7 +725,11 @@ class AccountForm extends React.Component {
         name={this.props.name}
         novalidate="true"
       >
-        {this.state.errs[2] != "" ? <Alert msg={this.state.errs[2]} /> : ""}
+        {this.state.errs[2] != "" ? (
+          <Alert class="alert alert-danger" msg={this.state.errs[2]} />
+        ) : (
+          ""
+        )}
 
         <div className="panel-header text-white p-1 mx-auto">
           <h2 className="text-center">{this.props.name}</h2>
@@ -748,19 +793,6 @@ class AccountForm extends React.Component {
 }
 
 /**
- * Component for displaying alerts
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const Alert = (props) => {
-  return (
-    <div class="alert alert-danger" role="alert">
-      {props.msg}
-    </div>
-  );
-};
-
-/**
  * Component for handling the layout of the Login form
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -791,42 +823,6 @@ const LoginFormLayout = (props) => {
         validator="pswFeedback"
         err={props.errs[1]}
       />
-    </div>
-  );
-};
-
-/**
- * Component for displaying input fields
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const Input = (props) => {
-  return (
-    <div className={props.containerClass}>
-      <label for={props.id}>
-        {props.label}
-        {!props.required ? <small> (Optional)</small> : ""}
-      </label>
-      <input
-        id={props.id}
-        name={props.id}
-        type={props.type}
-        list={props.list || null}
-        className="form-control"
-        required={props.required || false}
-        value={props.value}
-        autocomplete={props.list ? "off" : "on"}
-        onChange={props.onChange || null}
-        aria-describedby={props.validator || null}
-        readonly={!Boolean(props.readonly)}
-      />
-      {props.validator ? (
-        <div id={props.validator} className="invalid-feedback">
-          {props.err}
-        </div>
-      ) : (
-        ""
-      )}
     </div>
   );
 };
@@ -995,6 +991,97 @@ const AccountFormLayout = (props) => {
 };
 
 /**
+ * Component for handling the layout of the forms on the My Books and the (username)'s Books pages
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const UserBooksFormLayout = (props) => {
+  return;
+};
+
+/**
+ * Component for creating dropdown menus in the navbar
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the dropdown menu that should be displayed
+ */
+const Dropdown = (props) => {
+  return (
+    <div className="dropdown text-dark">
+      <a
+        className="nav-link dropdown-toggle"
+        href="#"
+        id={props.id}
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        {props.dropLinkText}
+      </a>
+
+      <div className="dropdown-menu" aria-labelledby={props.id}>
+        {props.links.map((link) => {
+          return (
+            <NavLink className="dropdown-item nav-item" to={link.path}>
+              {link.text}
+            </NavLink>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying alerts
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Alert = (props) => {
+  return (
+    <div className={props.class} role="alert">
+      {props.msg}
+    </div>
+  );
+};
+
+/**
+ * Component for displaying input fields
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Input = (props) => {
+  return (
+    <div className={props.containerClass}>
+      <label for={props.id}>
+        {props.label}
+        {!props.required ? <small> (Optional)</small> : ""}
+      </label>
+      <input
+        id={props.id}
+        name={props.id}
+        type={props.type}
+        list={props.list || null}
+        className="form-control"
+        required={props.required || false}
+        value={props.value}
+        autocomplete={props.list ? "off" : "on"}
+        onChange={props.onChange || null}
+        aria-describedby={props.validator || null}
+        readonly={!Boolean(props.readonly)}
+      />
+      {props.validator ? (
+        <div id={props.validator} className="invalid-feedback">
+          {props.err}
+        </div>
+      ) : (
+        ""
+      )}
+    </div>
+  );
+};
+
+/**
  * Component for displaying datalists
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -1043,87 +1130,6 @@ const Select = (props) => {
       )}
     </div>
   );
-};
-
-/**
- * Component for displaying content on the Sign Up page
- * @returns     Returns the content that should be displayed
- */
-const Signup = () => {
-  return <AccountForm name="Sign Up" />;
-};
-
-/**
- * Component for displaying content on the (username)'s Profile page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const Profile = (props) => {
-  const id =
-    location.pathname.split("/")[location.pathname.split("/").length - 1];
-
-  return (
-    <form className="panel">
-      <div className="panel-header text-white p-1 mx-auto">
-        <h2 className="text-center">{props.user.username}'s Profile</h2>
-      </div>
-
-      <AccountFormLayout
-        username={props.user.username}
-        password={props.user.password}
-        email={props.user.email || ""}
-        name={props.user.name || ""}
-        address={props.user.address || ""}
-        city={props.user.city || ""}
-        state={props.user.state || ""}
-        country={props.user.country || ""}
-        zipPostal={props.user.zipPostal || ""}
-      />
-
-      <div className="panel-footer px-3 py-2">
-        <Link
-          className="btn btn-success w-100"
-          to={props.myId == id ? "/books/my" : `${location.pathname}/books`}
-        ></Link>
-      </div>
-    </form>
-  );
-};
-
-/**
- * Component for displaying content on the Edit Profile page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const EditProfile = (props) => {
-  return <h2>Edit Profile</h2>;
-};
-
-/**
- * Component for displaying content on the My Books page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const MyBooks = (props) => {
-  return <h2>My Books</h2>;
-};
-
-/**
- * Component for handling the layout of the forms on the My Books and the (username)'s Books pages
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const UserBooksFormLayout = (props) => {
-  return;
-};
-
-/**
- * Component for displaying content on the (username)'s Books page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const UserBooks = (props) => {
-  return <h2>{props.user.username}'s Books</h2>;
 };
 
 ReactDOM.render(<BookExchange />, document.querySelector("#root"));
