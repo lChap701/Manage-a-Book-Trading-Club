@@ -1,5 +1,8 @@
+const bcrypt = require("bcryptjs");
+const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const auth = require("../auth");
+const secretKeys = require("../secretKeys");
 const crud = require("../crud");
 
 /**
@@ -100,9 +103,9 @@ module.exports = (app) => {
   );
 
   // Displays the Book Exchange - (username)'s Profile Page
-  app.get("/users/:id", loggedOut, (req, res) =>
-    res.sendFile(process.cwd() + "/public/profile.html")
-  );
+  app.get("/users/:id", loggedOut, (req, res) => {
+    res.sendFile(process.cwd() + "/public/profile.html");
+  });
 
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
   app
@@ -116,21 +119,34 @@ module.exports = (app) => {
       }
     })
     .put((req, res) => {
+      // Get a secret key for AES encrypting
+      const key = secretKeys.genKey();
+
+      // Updates the user
       crud
         .updateUser(req.body._id, {
           username: req.body.username,
           email: req.body.email,
           name: req.body.name,
-          address: req.body.address,
+          address:
+            req.body.address && req.body.address.length > 0
+              ? CryptoJS.AES.encrypt(req.body.address, key).toString()
+              : req.body.address,
           city: req.body.city,
           state: req.body.state,
           country: req.body.country,
-          zipPostal: req.body.zipPostal,
+          zipPostal:
+            req.body.zipPostal && req.body.zipPostal.length > 0
+              ? CryptoJS.AES.encrypt(req.body.zipPostal, key).toString()
+              : req.body.zipPostal,
           preciseLocation: req.body.preciseLocation == "false" ? false : true,
         })
-        .then(() => res.redirect("../" + req.body._id))
+        .then(() => {
+          req.session.error = !secretKeys.updateKey(key, user._id.toString());
+          if (req.session.error) res.redirect("../" + req.body._id);
+        })
         .catch((err) => {
-          req.flash("error", err.message);
+          req.flash("error", err);
           req.session.error = true;
         });
     });

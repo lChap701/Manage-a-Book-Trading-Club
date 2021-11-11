@@ -123,16 +123,17 @@ const removeKey = (id) => {
 
 /**
  * Removes a secret key from keys.xml based on ID
- * @param {String} id     Represents the ID of the key to update
- * @returns               Returns a boolean value to indicate the result
+ * @param {String} id         Represents the ID of the key to update
+ * @param {String} newKey     Represents the new key
+ * @returns                   Returns a boolean value to indicate the result
  */
-const updateKey = (id) => {
+const updateKey = (newKey, id) => {
   try {
     let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
 
     let index = json.keys.findIndex((key) => key.includes(id));
     if (index < 0) return false;
-    json.keys[index].value = genKey();
+    json.keys[index].value = newKey;
 
     writeXML(
       json.keys.map(
