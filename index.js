@@ -94,13 +94,13 @@ app.get("/books", (req, res) => {
   res.sendFile(process.cwd() + "/public/index.html");
 });
 
-// Displays the Book Exchange - All Requests Page
-app.get("/requests", (req, res) => {
+// Displays the Book Exchange - Requests for (book) Page
+app.get("/books/:bookId/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
-// Displays the Book Exchange - Requests for (book) Page
-app.get("/books/:bookId/requests", (req, res) => {
+// Displays the Book Exchange - All Requests Page
+app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
