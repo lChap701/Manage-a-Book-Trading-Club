@@ -250,9 +250,9 @@ class BookExchange extends React.Component {
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
               <div className="container">
-                <a className="navbar-brand" href="/books">
+                <Link className="navbar-brand" to="/books">
                   Book Exchange
-                </a>
+                </Link>
 
                 <button
                   className="navbar-toggler"
@@ -863,7 +863,7 @@ const AccountFormLayout = (props) => {
           type="text"
           required={!Boolean(props.readonly)}
           value={props.username}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveUsername || null}
           validator="unameFeedback"
           err={props.errs[0]}
@@ -875,7 +875,7 @@ const AccountFormLayout = (props) => {
           label="Password"
           type="password"
           required={!Boolean(props.readonly)}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           value={props.password}
           onChange={props.savePassword || null}
           validator="pswFeedback"
@@ -890,10 +890,10 @@ const AccountFormLayout = (props) => {
           label="Email"
           type="email"
           value={props.email}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveEmail || null}
-          validator=""
-          err=""
+          validator="emailFeedback"
+          err={props.errs[2] || null}
         />
 
         <Input
@@ -902,7 +902,7 @@ const AccountFormLayout = (props) => {
           label="Full Name"
           type="text"
           value={props.name}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveName || null}
           validator=""
           err=""
@@ -917,7 +917,7 @@ const AccountFormLayout = (props) => {
           list={!props.readonly ? "addresses" : null}
           type="text"
           value={props.address}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveAddress || null}
           validator=""
           err=""
@@ -931,7 +931,7 @@ const AccountFormLayout = (props) => {
           list={!props.readonly ? "cities" : null}
           type="text"
           value={props.city}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveCity || null}
           validator=""
           err=""
@@ -995,7 +995,7 @@ const AccountFormLayout = (props) => {
           list={!props.readonly ? "zipPostalCodes" : null}
           type="text"
           value={props.zipPostal}
-          readonly={!Boolean(props.readonly)}
+          readonly={Boolean(props.readonly)}
           onChange={props.saveZipPostalCode || null}
           validator=""
           err=""
@@ -1083,12 +1083,12 @@ const Input = (props) => {
         type={props.type}
         list={props.list || null}
         className="form-control"
-        required={props.required || false}
+        required={Boolean(props.required)}
         value={props.value}
         autocomplete={props.list ? "off" : "on"}
         onChange={props.onChange || null}
         aria-describedby={props.validator || null}
-        readonly={!Boolean(props.readonly)}
+        readonly={Boolean(props.readonly)}
       />
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
