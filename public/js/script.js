@@ -6,7 +6,7 @@ const {
   Prompt,
   Switch,
   Redirect,
-  withRouter,
+  useParams,
 } = ReactRouterDOM;
 const Router = BrowserRouter;
 
@@ -97,14 +97,6 @@ class BookExchange extends React.Component {
     // Event Listeners
     window.addEventListener("load", this.getData, true);
     window.addEventListener("load", this.isLoggedIn, true);
-    window.addEventListener(
-      "load",
-      () => {
-        // Used to get the user's profile (for a specific path)
-        if (location.pathname.match(/\/users\/[\da-z]+/g)) this.getUser();
-      },
-      true
-    );
   }
 
   /**
@@ -305,7 +297,7 @@ class BookExchange extends React.Component {
                         dropLinkText={this.state.user.username}
                         links={[
                           {
-                            path: "/users/" + this.state.user._id,
+                            path: "/users/:id",
                             text: "Profile",
                           },
                           {
@@ -331,35 +323,35 @@ class BookExchange extends React.Component {
 
           <div className="container">
             <Switch>
-              <Route path="/books">
+              <Route exact path="/books">
                 <Books books={this.state.books} login={this.state.login} />
               </Route>
-              <Route path="/requests">
-                <Requests requests={this.state.requests} />
+              <Route path="/books/my">
+                <MyBooks />
               </Route>
-              <Route path="/trades">
-                <Trades users={this.state.trades} />
-              </Route>
-              <Route path="/users">
-                <Users users={this.state.users} />
-              </Route>
-              <Route path="/login" component={Login} />
-              <Route path="/signup" component={Signup} />
-              <Route path="/requests">
+              <Route exact path="/requests">
                 <Requests requests={this.state.requests} />
               </Route>
               <Route path="/requests/new">
                 <CreateRequest takeBooks={this.getRequestedBooks} />
               </Route>
-              <Route path="/users/:id">
-                <Profile user={this.state.urlUser} myId={this.state.user._id} />
+              <Route path="/trades">
+                <Trades users={this.state.trades} />
+              </Route>
+              <Route exact path="/users">
+                <Users users={this.state.users} />
+              </Route>
+              <Route exact path="/users/:id">
+                <Profile users={this.state.users} myId={this.state.user._id} />
+              </Route>
+              <Route path="/users/:id/books">
+                <UserBooks />
               </Route>
               <Route path="/users/edit">
                 <EditProfile user={this.state.user} />
               </Route>
-              <Route path="/books/my">
-                <MyBooks />
-              </Route>
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
               <Route path="/logout">
                 <Redirect to="/books" />
               </Route>
@@ -514,25 +506,25 @@ const Signup = () => {
  * @returns             Returns the content that should be displayed
  */
 const Profile = (props) => {
-  const id =
-    location.pathname.split("/")[location.pathname.split("/").length - 1];
+  const { id } = useParams();
+  const user = props.users.find((user) => user._id == id);
 
   return (
     <form className="panel">
       <div className="panel-header text-white p-1 mx-auto">
-        <h2 className="text-center">{props.user.username}'s Profile</h2>
+        <h2 className="text-center">{user.username}'s Profile</h2>
       </div>
 
       <AccountFormLayout
-        username={props.user.username}
-        password={props.user.password}
-        email={props.user.email || ""}
-        name={props.user.name || ""}
-        address={props.user.address || ""}
-        city={props.user.city || ""}
-        state={props.user.state || ""}
-        country={props.user.country || ""}
-        zipPostal={props.user.zipPostal || ""}
+        username={user.username}
+        password={user.password}
+        email={user.email || ""}
+        name={user.name || ""}
+        address={user.address || ""}
+        city={user.city || ""}
+        state={user.state || ""}
+        country={user.country || ""}
+        zipPostal={user.zipPostal || ""}
       />
 
       <div className="panel-footer px-3 py-2">
