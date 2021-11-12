@@ -63,6 +63,22 @@ async function sendData(data, method = "POST") {
 }
 
 /**
+ * Updates a document's title and the description, og:title, and og:url meta tags
+ * @param {String} title          Represents the new title and content for the og:title meta tag
+ * @param {String} description    Represents the new description meta tag's content
+ * @param {String} url            Represents the new og:url meta tag's content
+ */
+function updateTitleAndMetaTags(title, description, url) {
+  // Updates the document's title
+  document.title = title;
+
+  // Updates the document's meta tags
+  document.querySelector("meta[name='description'").content = description;
+  document.querySelector("meta[property='og:title'").content = document.title;
+  document.querySelector("meta[property='og:url'").content = url;
+}
+
+/**
  * Main Component
  */
 class BookExchange extends React.Component {
@@ -508,6 +524,13 @@ const Signup = () => {
 const Profile = (props) => {
   const { id } = useParams();
   const user = props.users.find((user) => user._id == id);
+
+  // Updates the document
+  updateTitleAndMetaTags(
+    `Book Exchange - ${user.username}'s Profile`,
+    `View user's ${user.username} profile`,
+    `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
+  );
 
   return (
     <form className="panel">
