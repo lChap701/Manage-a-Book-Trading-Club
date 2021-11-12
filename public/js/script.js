@@ -313,7 +313,7 @@ class BookExchange extends React.Component {
                         dropLinkText={this.state.user.username}
                         links={[
                           {
-                            path: "/users/:id",
+                            path: "/users/" + this.state.user._id,
                             text: "Profile",
                           },
                           {
@@ -1026,7 +1026,7 @@ const UserBooksFormLayout = (props) => {
  */
 const Dropdown = (props) => {
   return (
-    <div className="dropdown text-dark">
+    <div className="dropdown">
       <a
         className="nav-link dropdown-toggle"
         href="#"
