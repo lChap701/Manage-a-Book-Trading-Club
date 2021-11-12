@@ -157,7 +157,7 @@ const secretKeys = {
   findKey: (id) => findKey(id),
   saveKey: (key, id) => saveKey(key, id),
   removeKey: (id) => removeKey(id),
-  updateKey: (id) => updateKey(id),
+  updateKey: (key, id) => updateKey(key, id),
 };
 
 module.exports = secretKeys;

@@ -288,6 +288,8 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /api/users/:id", () => {});
+
   suite("Testing /session/user", () => {
     test("1)  GET Test", (done) => {
       chai
