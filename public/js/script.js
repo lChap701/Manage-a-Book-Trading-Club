@@ -596,16 +596,21 @@ class AccountForm extends React.Component {
 
     // States
     this.state = {
-      username: "",
-      password: "",
-      email: "",
-      name: "",
-      address: "",
-      city: "",
-      state: "",
-      country: "",
-      zipPostal: "",
-      errs: ["Username is required", "Password is required", ""],
+      username: props.username || "",
+      password: props.password || "",
+      email: props.email || "",
+      name: props.email || "",
+      address: props.address || "",
+      city: props.city || "",
+      state: props.state || "",
+      country: props.country || "",
+      zipPostal: props.zipPostal || "",
+      errs: [
+        "Username is required",
+        "Password is required",
+        "Invalid email address",
+        "",
+      ],
     };
 
     // Functions
@@ -740,8 +745,8 @@ class AccountForm extends React.Component {
         name={this.props.name}
         novalidate="true"
       >
-        {this.state.errs[2] != "" ? (
-          <Alert class="alert alert-danger" msg={this.state.errs[2]} />
+        {this.state.errs[3] != "" ? (
+          <Alert class="alert alert-danger" msg={this.state.errs[3]} />
         ) : (
           ""
         )}
