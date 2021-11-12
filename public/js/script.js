@@ -64,7 +64,7 @@ async function sendData(data, method = "POST") {
 
 /**
  * Updates a document's title and the description, og:title, and og:url meta tags
- * @param {String} title          Represents the new title and content for the og:title meta tag
+ * @param {String} title          Represents the new document title and content for the og:title meta tag
  * @param {String} description    Represents the new description meta tag's content
  * @param {String} url            Represents the new og:url meta tag's content
  */
