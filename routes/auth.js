@@ -102,11 +102,6 @@ module.exports = (app) => {
     passport.authenticate("microsoft", oauthOptions)
   );
 
-  // Displays the Book Exchange - (username)'s Profile Page
-  app.get("/users/:id", loggedOut, (req, res) => {
-    res.sendFile(process.cwd() + "/public/profile.html");
-  });
-
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
   app
     .route("/users/edit")
@@ -126,6 +121,10 @@ module.exports = (app) => {
       crud
         .updateUser(req.body._id, {
           username: req.body.username,
+          password: bcrypt.hashAsync(
+            req.body.password,
+            parseInt(process.env.SALT_ROUNDS)
+          ),
           email: req.body.email,
           name: req.body.name,
           address:

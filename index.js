@@ -131,6 +131,11 @@ app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
 });
 
+// Displays the Book Exchange - (username)'s Profile Page
+app.get("/users/:id", (req, res) => {
+  res.sendFile(process.cwd() + "/public/profile.html");
+});
+
 // Displays the Book Exchange - (username)'s Books Page
 app.get("/users/:id/books", (req, res) => {
   res.sendFile(process.cwd() + "/public/books.html");
