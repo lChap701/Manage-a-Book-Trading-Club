@@ -36,51 +36,6 @@ module.exports = (app) => {
       );
   });
 
-  // Routing for retrieving all books
-  app.get("/api/books", (req, res) => {
-    const { bookId } = req.query;
-    let books = [];
-
-    // For when books are requested for trades
-    if (bookId) {
-      if (Array.isArray(bookId)) {
-        bookId.forEach((id) => {
-          crud.getBook(id).then((book) => books.push(book));
-        });
-      } else {
-        crud.getBook(bookId).then((book) => books.push(book));
-      }
-
-      res.json(books);
-      return;
-    }
-
-    crud
-      .getAllBooks()
-      .populate({ path: "users" })
-      .then((books) =>
-        res.json(
-          books
-            .sort((a, b) => b.bumpedOn - a.bumpedOn)
-            .map((book) => {
-              return {
-                _id: book._id,
-                title: book.title,
-                description: book.description,
-                user: {
-                  _id: book.user._id,
-                  username: book.user.username,
-                  city: book.user.city,
-                  state: book.user.state,
-                  country: book.user.country,
-                },
-                request: book.request,
-              };
-            })
-        )
-      );
-  });
-
   // Routing for displaying a user's profile
   app.get("/api/users/:id", (req, res) =>
     crud.getUser({ _id: req.params.id }).then((user) => {
@@ -168,61 +123,49 @@ module.exports = (app) => {
     });
   });
 
-  // Routing for handling and retrieving requests
-  app.route("/api/requests").get((req, res) => {
-    let { traded } = req.query;
+  // Routing for retrieving all books
+  app.get("/api/books", (req, res) => {
+    const { bookId } = req.query;
+    let books = [];
 
-    // Set to default value
-    if (!traded) traded = "false";
+    // For when books are requested for trades
+    if (bookId) {
+      if (Array.isArray(bookId)) {
+        bookId.forEach((id) => {
+          crud.getBook(id).then((book) => books.push(book));
+        });
+      } else {
+        crud.getBook(bookId).then((book) => books.push(book));
+      }
+
+      res.json(books);
+      return;
+    }
 
     crud
-      .getRequests()
+      .getAllBooks()
       .populate({ path: "users" })
-      .populate({ path: "books" })
-      .then((requests) => {
+      .then((books) =>
         res.json(
-          requests
-            .filter((request) => request.traded.toString() == traded)
-            .map((request) => {
+          books
+            .sort((a, b) => b.bumpedOn - a.bumpedOn)
+            .map((book) => {
               return {
-                give: {
-                  books: request.giveBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  user: {
-                    username: request.user[0].username,
-                    city: request.user[0].city,
-                    state: request.user[0].state,
-                    country: request.user[0].country,
-                    requests: request.user[0].requests.length,
-                  },
+                _id: book._id,
+                title: book.title,
+                description: book.description,
+                user: {
+                  _id: book.user._id,
+                  username: book.user.username,
+                  city: book.user.city,
+                  state: book.user.state,
+                  country: book.user.country,
                 },
-                take: {
-                  books: request.takeBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  users: request.users
-                    .filter((user) => user._id != request.users[0]._id)
-                    .map((user) => {
-                      return {
-                        username: user.username,
-                        city: user.city,
-                        state: user.state,
-                        country: user.country,
-                        requests: user.requests.length,
-                      };
-                    }),
-                },
+                request: book.request,
               };
             })
-        );
-      });
+        )
+      );
   });
 
   // Routing for retrieving all requests for a book
@@ -286,6 +229,63 @@ module.exports = (app) => {
     });
   });
 
+  // Routing for handling and retrieving requests
+  app.route("/api/requests").get((req, res) => {
+    let { traded } = req.query;
+
+    // Set to default value
+    if (!traded) traded = "false";
+
+    crud
+      .getRequests()
+      .populate({ path: "users" })
+      .populate({ path: "books" })
+      .then((requests) => {
+        res.json(
+          requests
+            .filter((request) => request.traded.toString() == traded)
+            .map((request) => {
+              return {
+                give: {
+                  books: request.giveBooks.map((book) => {
+                    return {
+                      title: book.title,
+                      description: book.description,
+                    };
+                  }),
+                  user: {
+                    username: request.user[0].username,
+                    city: request.user[0].city,
+                    state: request.user[0].state,
+                    country: request.user[0].country,
+                    requests: request.user[0].requests.length,
+                  },
+                },
+                take: {
+                  books: request.takeBooks.map((book) => {
+                    return {
+                      title: book.title,
+                      description: book.description,
+                    };
+                  }),
+                  users: request.users
+                    .filter((user) => user._id != request.users[0]._id)
+                    .map((user) => {
+                      return {
+                        username: user.username,
+                        city: user.city,
+                        state: user.state,
+                        country: user.country,
+                        requests: user.requests.length,
+                      };
+                    }),
+                },
+              };
+            })
+        );
+      });
+  });
+
   // Routing for retrieving countries from around the world
   app.get("/api/countries", (req, res) => {
     const data = locations.getAllCountries();
@@ -296,13 +296,6 @@ module.exports = (app) => {
   // Routing for retrieving a country
   app.get("/api/countries/:cntry", (req, res) => {
     const data = locations.getCountry(req.params.cntry);
-    console.log(JSON.stringify(data));
-    res.json(data);
-  });
-
-  // Routing for retrieving states from around the world
-  app.get("/api/states", (req, res) => {
-    const data = locations.getAllStates();
     console.log(JSON.stringify(data));
     res.json(data);
   });
@@ -367,4 +360,11 @@ module.exports = (app) => {
       res.json(data);
     }
   );
+
+  // Routing for retrieving states from around the world
+  app.get("/api/states", (req, res) => {
+    const data = locations.getAllStates();
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
 };
