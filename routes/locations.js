@@ -22,193 +22,166 @@ const locationIq = axios.create({
  *
  */
 const locations = {
-  getAllAddresses: (q, cntyAbbr = null) => {
-    let addresses = [];
+  getAllAddresses: (res, q, cntyAbbr = null) => {
     const TAGS = "building:house,building:apartment,building:dormitory";
     let url = `?key=${process.env.LOCATIONIQ_ACCESS_TOKEN}&q=${q}&limit=20&tag=${TAGS}`;
 
-    if (cntyAbbr) {
-      url += `&countrycodes=${cntyAbbr}`;
-    }
+    if (cntyAbbr) url += `&countrycodes=${cntyAbbr}`;
 
-    locationIq.get(url).then((res) => {
-      console.log(JSON.stringify(res.data));
-      addresses = res.data.map((obj) => {
-        if (obj.hasOwnProperty("house_number")) {
-          return `${obj.house_number} ${obj.road}`;
-        } else if (obj.type == "apartment") {
-          return `${obj.name} ${obj.road}`;
-        }
-      });
-    });
-
-    return addresses;
+    locationIq
+      .get(url)
+      .then((resp) => {
+        console.log(JSON.stringify(resp.data));
+        res.json(
+          resp.data.map((obj) => {
+            if (obj.hasOwnProperty("house_number")) {
+              return `${obj.house_number} ${obj.road}`;
+            } else if (obj.type == "apartment") {
+              return `${obj.name} ${obj.road}`;
+            }
+          })
+        );
+      })
+      .catch((err) => console.log(err));
   },
-  getAllCountries: () => {
-    let countries = [];
-
-    countryStateCity.get("/countries").then((res) => {
-      countries = res.data
-        .map((country) => {
-          return {
-            name: country.name,
-            abbr: country.iso2,
-          };
-        })
-        .catch((err) => console.log(err));
-    });
-
-    return countries;
+  getAllCountries: (res) => {
+    countryStateCity
+      .get("/countries")
+      .then((resp) => {
+        res.json(
+          resp.data.map((country) => {
+            return {
+              name: country.name,
+              abbr: country.iso2,
+            };
+          })
+        );
+      })
+      .catch((err) => console.log(err));
   },
-  getCountry: (abbr) => {
-    let country = {};
-
+  getCountry: (res, abbr) => {
     countryStateCity
       .get(`/countries/${abbr}`)
-      .then((res) => {
-        country = {
-          name: res.data.name,
-          abbr: res.data.iso2,
-        };
+      .then((resp) => {
+        res.json({
+          name: resp.data.name,
+          abbr: resp.data.iso2,
+        });
       })
       .catch((err) => console.log(err));
-
-    return country;
   },
-  getAllStates: () => {
-    let states = [];
-
+  getAllStates: (res) => {
     countryStateCity
       .get("/states")
-      .then((res) => {
-        states = res.data.map((state) => {
-          return {
-            name: state.name,
-            abbr: state.iso2,
-          };
-        });
+      .then((resp) => {
+        res.json(
+          resp.data.map((state) => {
+            return {
+              name: state.name,
+              abbr: state.iso2,
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
-
-    return states;
   },
-  getStatesByCountry: (cntyAbbr) => {
-    let states = [];
-
+  getStatesByCountry: (res, cntyAbbr) => {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states`)
-      .then((res) => {
-        states = res.data.map((state) => {
-          return {
-            name: state.name,
-            abbr: state.iso2,
-            country: state.country_code,
-          };
-        });
+      .then((resp) => {
+        res.json(
+          resp.data.map((state) => {
+            return {
+              name: state.name,
+              abbr: state.iso2,
+              country: state.country_code,
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
-
-    return states;
   },
-  getStatesByZipPostalCode: (cntyAbbr, zipPostal) => {
-    let states = [];
-
+  getStatesByZipPostalCode: (res, cntyAbbr, zipPostal) => {
     zippopotam
       .get(`/${cntyAbbr}/${zipPostal}`)
-      .then((res) => {
-        states = res.data.places.map((place) => {
-          return {
+      .then((resp) => {
+        resp.data.places.map((place) => {
+          res.json({
             state: place.state,
             abbr: place["state abbreviation"],
-            country: res.data["country abbreviation"],
-          };
+            country: resp.data["country abbreviation"],
+          });
         });
       })
       .catch((err) => console.log(err));
-
-    return states;
   },
-  getState: (cntyAbbr, stAbbr) => {
-    let state = {};
-
+  getState: (res, cntyAbbr, stAbbr) => {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states/${stAbbr}`)
-      .then((res) => {
-        state = {
-          name: res.data.name,
-          abbr: res.data.iso2,
-          country: res.data.country_code,
-        };
+      .then((resp) => {
+        res.json({
+          name: resp.data.name,
+          abbr: resp.data.iso2,
+          country: resp.data.country_code,
+        });
       })
       .catch((err) => console.log(err));
-
-    return state;
   },
-  getCitiesByCountry: (cntyAbbr) => {
-    let cities = [];
-
+  getCitiesByCountry: (res, cntyAbbr) => {
     countryStateCity
       .get(`/countries/${cntyAbbr}/cities`)
-      .then((res) => {
-        cities = res.data.map((city) => {
-          return {
-            name: city.name,
-            state: city.state_code,
-            country: city.country_code,
-          };
-        });
+      .then((resp) => {
+        res.json(
+          resp.data.map((city) => {
+            return {
+              name: city.name,
+              state: city.state_code,
+              country: city.country_code,
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
-
-    return cities;
   },
-  getCitiesByState: (cntyAbbr, stAbbr) => {
-    let cities = [];
-
+  getCitiesByState: (res, cntyAbbr, stAbbr) => {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states/${stAbbr}/cities`)
-      .then((res) => {
-        cities = res.data.map((city) => {
-          return {
-            name: city.name,
-            state: city.state_code,
-            country: city.country_code,
-          };
-        });
+      .then((resp) => {
+        res.json(
+          resp.data.map((city) => {
+            return {
+              name: city.name,
+              state: city.state_code,
+              country: city.country_code,
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
-
-    return cities;
   },
-  getCitiesByZipPostalCode: (cntyAbbr, zipPostal) => {
-    let cities = [];
-
+  getCitiesByZipPostalCode: (res, cntyAbbr, zipPostal) => {
     zippopotam
       .get(`/${cntyAbbr}/${zipPostal}`)
-      .then((res) => {
-        cities = res.data.places.map((place) => {
-          return {
-            name: place["place name"],
-            state: place["state abbreviation"],
-            country: res.data["country abbreviation"],
-          };
-        });
+      .then((resp) => {
+        res.json(
+          resp.data.places.map((place) => {
+            return {
+              name: place["place name"],
+              state: place["state abbreviation"],
+              country: res.data["country abbreviation"],
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
-
-    return cities;
   },
-  getZipPostalCodes: (cntyAbbr, stAbbr, city) => {
-    let zipPostal = [];
-
+  getZipPostalCodes: (res, cntyAbbr, stAbbr, city) => {
     zippopotam
       .get(`/${cntyAbbr}/${stAbbr}/${city}`)
-      .then((res) => {
-        zipPostal = res.data.places.map((place) => place["post code"]);
+      .then((resp) => {
+        res.json(resp.data.places.map((place) => place["post code"]));
       })
       .catch((err) => console.log(err));
-
-    return zipPostal;
   },
 };
 
