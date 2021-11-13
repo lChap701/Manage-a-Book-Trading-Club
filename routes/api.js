@@ -355,7 +355,7 @@ module.exports = (app) => {
   app.get("/api/states", (req, res) => locations.getAllStates(res));
 
   // Routing for retrieving address from around the world
-  app.get("/api/addresses/:text", (req, res) =>
-    locations.getAllAddresses(res, req.params.text)
-  );
+  app.get("/api/addresses/:text", (req, res) => {
+    locations.getAllAddresses(res, req.params.text);
+  });
 };
