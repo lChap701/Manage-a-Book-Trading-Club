@@ -287,9 +287,7 @@ module.exports = (app) => {
   });
 
   // Routing for retrieving countries from around the world
-  app.get("/api/countries", (req, res) => {
-    locations.getAllCountries(res);
-  });
+  app.get("/api/countries", (req, res) => locations.getAllCountries(res));
 
   // Routing for retrieving a country
   app.get("/api/countries/:cntry", (req, res) => {
@@ -354,12 +352,10 @@ module.exports = (app) => {
   );
 
   // Routing for retrieving states from around the world
-  app.get("/api/states", (req, res) => {
-    locations.getAllStates(res);
-  });
+  app.get("/api/states", (req, res) => locations.getAllStates(res));
 
   // Routing for retrieving address from around the world
-  app.get("/api/addresses/:text", (req, res) => {
-    locations.getAllAddresses(res, req.params.text);
-  });
+  app.get("/api/addresses/:text", (req, res) =>
+    locations.getAllAddresses(res, req.params.text)
+  );
 };
