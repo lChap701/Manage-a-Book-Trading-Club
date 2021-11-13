@@ -611,9 +611,22 @@ class AccountForm extends React.Component {
         "Invalid email address",
         "",
       ],
+      options: {
+        addresses: [],
+        cities: [],
+        states: [],
+        countries: [],
+        zipPostalCodes: [],
+      },
     };
 
     // Functions
+    this.getAddresses = this.getAddresses.bind(this);
+    this.getCities = this.getCities.bind(this);
+    this.getStates = this.getStates.bind(this);
+    this.getState = this.getState.bind(this);
+    this.getCountries = this.getCountries.bind(this);
+    this.getCountry = this.getCountry.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
     this.saveEmail = this.saveEmail.bind(this);
@@ -624,6 +637,125 @@ class AccountForm extends React.Component {
     this.saveCountry = this.saveCountry.bind(this);
     this.saveZipPostalCode = this.saveZipPostalCode.bind(this);
     this.submitForm = this.submitForm.bind(this);
+  }
+
+  /**
+   * Gets all possible addresses based on user input
+   * @param {String} text     Represents the value of the address input field
+   * @param {String} cntry    Represents a country (defaults to an empty string)
+   */
+  getAddresses(text, cntry = "") {
+    const { options } = this.state;
+    const URL =
+      cntry.length > 0
+        ? `${location.origin}/api/countries/${cntry}/addresses/${text}`
+        : `${location.origin}/api/addresses/${text}`;
+
+    fetch(URL)
+      .then((res) => res.json())
+      .then((data) => {
+        options.addresses = data;
+        this.setState({ options: options });
+      });
+  }
+
+  /**
+   * Gets all possible cities based on user input
+   * @param {String} cntry        Represents a country (defaults to an empty string)
+   * @param {String} st           Represents a state (defaults to an empty string)
+   * @param {String} zipPostal    Represents a zip/postal code (defaults to an empty string)
+   */
+  getCities(cntry, st = "", zipPostal = "") {
+    const { options } = this.state;
+    const URL =
+      zipPostal.length > 0
+        ? `${location.origin}/api/countries/${cntry}zipPostalCodes/${zipPostal}/cities`
+        : st.length > 0
+        ? `${location.origin}/api/countries/${cntry}/states/${st}/cities`
+        : `${location.origin}/api/countries/${cntry}/cities`;
+
+    fetch(URL)
+      .then((res) => res.json())
+      .then((data) => {
+        options.cities = data;
+        this.setState({ options: options });
+      });
+  }
+
+  /**
+   * Gets all possible states based on user input
+   * @param {String} cntry        Represents a country (defaults to an empty string)
+   * @param {String} zipPostal    Represents a zip/postal code (defaults to an empty string)
+   */
+  getStates(cntry = "", zipPostal = "") {
+    const { options } = this.state;
+    const URL =
+      cntry.length > 0
+        ? zipPostal.length > 0
+          ? `${location.origin}/api/countries/${cntry}/zipPostalCodes/${zipPostal}/states`
+          : `${location.origin}/api/countries/${cntry}/states`
+        : `${location.origin}/api/states`;
+
+    fetch(URL)
+      .then((res) => res.json())
+      .then((data) => {
+        options.states.push({ text: "Choose a state", value: "" });
+        options.states = data.map((state) => {
+          return {
+            text: state.name,
+            value: state.abbr,
+          };
+        });
+        this.setState({ options: options });
+      });
+  }
+
+  /**
+   * Gets the full name of a state
+   */
+  getState() {
+    const { state, country } = this.state;
+    let fullState = "";
+
+    fetch(`${location.origin}/api/countries/${country}/states/${state}`)
+      .then((res) => res.json())
+      .then((data) => (fullState = data.name));
+
+    return fullState;
+  }
+
+  /**
+   * Gets all possible countries
+   */
+  getCountries() {
+    const { options } = this.state;
+
+    fetch(`${location.origin}/api/countries`)
+      .then((res) => res.json())
+      .then((data) => {
+        options.countries.push({ text: "Choose a country", value: "" });
+        options.countries = data.map((country) => {
+          return {
+            text: country.name,
+            value: country.abbr,
+          };
+        });
+        this.setState({ options: options });
+      });
+  }
+
+  /**
+   * Gets the full name of a country
+   */
+  getCountry() {
+    const { country } = this.state;
+    let fullCountry = "";
+
+    fetch(`${location.origin}/api/countries/${country}`)
+      .then((res) => res.json())
+      .then((data) => (fullCountry = data.name));
+
+    return fullCountry;
   }
 
   /**
@@ -922,7 +1054,11 @@ const AccountFormLayout = (props) => {
           validator=""
           err=""
         />
-        {!props.readonly ? <Datalist id="addresses" options={["test"]} /> : ""}
+        {!props.readonly ? (
+          <Datalist id="addresses" options={props.addressOpts} />
+        ) : (
+          ""
+        )}
 
         <Input
           containerClass="form-group col"
@@ -936,7 +1072,11 @@ const AccountFormLayout = (props) => {
           validator=""
           err=""
         />
-        {!props.readonly ? <Datalist id="cities" options={["test"]} /> : ""}
+        {!props.readonly ? (
+          <Datalist id="cities" options={props.cityOpts} />
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="row">
@@ -956,7 +1096,7 @@ const AccountFormLayout = (props) => {
             containerClass="form-group col"
             id="state"
             label="State"
-            options={[{ text: "Choose a state", value: "" }]}
+            options={props.stateOpts}
             value={props.state}
             onChange={props.saveState}
             validator=""
@@ -981,7 +1121,7 @@ const AccountFormLayout = (props) => {
             id="country"
             label="Country"
             value={props.country}
-            options={[{ text: "Choose a country", value: "" }]}
+            options={props.cntryOpts}
             onChange={props.saveState || null}
             validator=""
             err=""
@@ -1001,7 +1141,7 @@ const AccountFormLayout = (props) => {
           err=""
         />
         {!props.readonly ? (
-          <Datalist id="zipPostalCodes" options={["test"]} />
+          <Datalist id="zipPostalCodes" options={props.zipPostalOpts} />
         ) : (
           ""
         )}
