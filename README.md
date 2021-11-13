@@ -1,10 +1,14 @@
 # [Manage-a-Book-Trading-Club](https://www.freecodecamp.org/learn/coding-interview-prep/take-home-projects/manage-a-book-trading-club)
 
-A project that was created to earn a certificate from freeCodeCamp and allows users to trade books when they have an account. It also uses OAuth for the following: GitHub, Facebook, Twitter, Microsoft, and Google.
+A project that was created to earn a certificate from freeCodeCamp and allows users to trade books when they have an account.
 
-## External APIs
+## OAuth
 
-Three APIs are used which are Country State City API, Zippopotamus, and LocationIQ's Autocomplete API. These APIs are used to add autocomplete to forms.
+This uses the following OAuth: GitHub, Facebook, Twitter, Microsoft, and Google.
+
+## Location APIs
+
+Three location APIs are used which are Country State City API, Zippopotamus, and LocationIQ's Autocomplete API. These APIs are used to add autocomplete to forms.
 
 ## Resources
 
