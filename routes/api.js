@@ -288,56 +288,43 @@ module.exports = (app) => {
 
   // Routing for retrieving countries from around the world
   app.get("/api/countries", (req, res) => {
-    const data = locations.getAllCountries();
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getAllCountries(res);
   });
 
   // Routing for retrieving a country
   app.get("/api/countries/:cntry", (req, res) => {
-    const data = locations.getCountry(req.params.cntry);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getCountry(res, req.params.cntry);
   });
 
   // Routing for retrieving addresses in a country
   app.get("/api/countries/:cntry/addresses/:text", (req, res) => {
-    const data = locations.getAllAddresses(req.params.text, req.params.cntry);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getAllAddresses(res, req.params.text, req.params.cntry);
   });
 
   // Routing for retrieving states from a country
   app.get("/api/countries/:cntry/states", (req, res) => {
-    const data = locations.getStatesByCountry(req.params.cntry);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getStatesByCountry(res, req.params.cntry);
   });
 
   // Routing for retrieving cities in a country
   app.get("/api/countries/:cntry/cities", (req, res) => {
-    const data = locations.getCitiesByCountry(req.params.cntry);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getCitiesByCountry(res, req.params.cntry);
   });
 
   // Routing for retrieving cities in a state
   app.get("/api/countries/:cntry/states/:st/cities", (req, res) => {
-    const data = locations.getCitiesByState(req.params.cntry, req.params.st);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getCitiesByState(res, req.params.cntry, req.params.st);
   });
 
   // Routing for retrieving states based on the country and the zip/postal code
   app.get(
     "/api/countries/:cntry/zipPostalCodes/:zipPostal/states",
     (req, res) => {
-      const data = locations.getStatesByZipPostalCode(
+      locations.getStatesByZipPostalCode(
+        res,
         req.params.cntry,
         req.params.zipPostal
       );
-      console.log(JSON.stringify(data));
-      res.json(data);
     }
   );
 
@@ -345,12 +332,11 @@ module.exports = (app) => {
   app.get(
     "/api/countries/:cntry/zipPostalCodes/:zipPostal/cities",
     (req, res) => {
-      const data = locations.getCitiesByZipPostalCode(
+      locations.getCitiesByZipPostalCode(
+        res,
         req.params.cntry,
         req.params.zipPostal
       );
-      console.log(JSON.stringify(data));
-      res.json(data);
     }
   );
 
@@ -358,27 +344,22 @@ module.exports = (app) => {
   app.get(
     "/api/countries/:cntry/states/:st/cities/:city/zipPostalCodes",
     (req, res) => {
-      const data = locations.getZipPostalCodes(
+      locations.getZipPostalCodes(
+        res,
         req.params.cntry,
         req.params.st,
         req.params.city
       );
-      console.log(JSON.stringify(data));
-      res.json(data);
     }
   );
 
   // Routing for retrieving states from around the world
   app.get("/api/states", (req, res) => {
-    const data = locations.getAllStates();
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getAllStates(res);
   });
 
   // Routing for retrieving address from around the world
   app.get("/api/addresses/:text", (req, res) => {
-    const data = locations.getAllAddresses(req.params.text);
-    console.log(JSON.stringify(data));
-    res.json(data);
+    locations.getAllAddresses(res, req.params.text);
   });
 };
