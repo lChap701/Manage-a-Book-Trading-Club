@@ -300,6 +300,13 @@ module.exports = (app) => {
     res.json(data);
   });
 
+  // Routing for retrieving addresses in a country
+  app.get("/api/countries/:cntry/addresses/:text", (req, res) => {
+    const data = locations.getAllAddresses(req.params.text, req.params.cntry);
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
   // Routing for retrieving states from a country
   app.get("/api/countries/:cntry/states", (req, res) => {
     const data = locations.getStatesByCountry(req.params.cntry);
@@ -364,6 +371,13 @@ module.exports = (app) => {
   // Routing for retrieving states from around the world
   app.get("/api/states", (req, res) => {
     const data = locations.getAllStates();
+    console.log(JSON.stringify(data));
+    res.json(data);
+  });
+
+  // Routing for retrieving address from around the world
+  app.get("/api/addresses/:text", (req, res) => {
+    const data = locations.getAllAddresses(req.params.text);
     console.log(JSON.stringify(data));
     res.json(data);
   });

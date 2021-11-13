@@ -22,7 +22,7 @@ const locationIq = axios.create({
  *
  */
 const locations = {
-  getAllAddresses: (q, cntyAbbr) => {
+  getAllAddresses: (q, cntyAbbr = null) => {
     let addresses = [];
     const TAGS = "building:house,building:apartment,building:dormitory";
     let url = `?key=${process.env.LOCATIONIQ_ACCESS_TOKEN}&q=${q}&limit=20&tag=${TAGS}`;
