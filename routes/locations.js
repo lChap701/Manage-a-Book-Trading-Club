@@ -79,6 +79,7 @@ const locations = {
             return {
               name: state.name,
               abbr: state.iso2,
+              country: state.country_code,
             };
           })
         );
@@ -94,7 +95,7 @@ const locations = {
             return {
               name: state.name,
               abbr: state.iso2,
-              country: state.country_code,
+              country: cntyAbbr.toUpperCase(),
             };
           })
         );
@@ -105,13 +106,15 @@ const locations = {
     zippopotam
       .get(`/${cntyAbbr}/${zipPostal}`)
       .then((resp) => {
-        resp.data.places.map((place) => {
-          res.json({
-            state: place.state,
-            abbr: place["state abbreviation"],
-            country: resp.data["country abbreviation"],
-          });
-        });
+        res.json(
+          resp.data.places.map((place) => {
+            return {
+              name: place.state,
+              abbr: place["state abbreviation"],
+              country: resp.data["country abbreviation"],
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
   },
@@ -135,8 +138,7 @@ const locations = {
           resp.data.map((city) => {
             return {
               name: city.name,
-              state: city.state_code,
-              country: city.country_code,
+              country: cntyAbbr.toUpperCase(),
             };
           })
         );
@@ -151,8 +153,8 @@ const locations = {
           resp.data.map((city) => {
             return {
               name: city.name,
-              state: city.state_code,
-              country: city.country_code,
+              state: stAbbr.toUpperCase(),
+              country: cntyAbbr.toUpperCase(),
             };
           })
         );
@@ -168,7 +170,7 @@ const locations = {
             return {
               name: place["place name"],
               state: place["state abbreviation"],
-              country: res.data["country abbreviation"],
+              country: cntyAbbr.toUpperCase(),
             };
           })
         );
@@ -179,7 +181,13 @@ const locations = {
     zippopotam
       .get(`/${cntyAbbr}/${stAbbr}/${city}`)
       .then((resp) => {
-        res.json(resp.data.places.map((place) => place["post code"]));
+        res.json(
+          resp.data.places.map((place) => {
+            return {
+              zipPostal: place["post code"],
+            };
+          })
+        );
       })
       .catch((err) => console.log(err));
   },
