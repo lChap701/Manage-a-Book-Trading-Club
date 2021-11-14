@@ -43,8 +43,8 @@ suite("Unit Tests", () => {
           name: "John Smith",
           address: "123 6th Street",
           city: "Big City",
-          state: "Iowa",
-          country: "United States",
+          state: "IA",
+          country: "US",
           zipPostal: "52061",
         };
 
@@ -247,7 +247,7 @@ suite("Unit Tests", () => {
           assert.propertyVal(
             json[0],
             "state",
-            "Iowa",
+            "IA",
             "response should return an array containing an object with a property of 'state' that equals 'Iowa'"
           );
           assert.propertyVal(
@@ -259,7 +259,7 @@ suite("Unit Tests", () => {
           assert.propertyVal(
             json[0],
             "country",
-            "United States",
+            "US",
             "response should return an array containing an object with a property of 'country' that equals 'United States'"
           );
           assert.propertyVal(
@@ -301,6 +301,314 @@ suite("Unit Tests", () => {
         });
     });
   });
+
+  suite("Testing /api/countries", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/countries")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          //console.log(res.text);
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.notEqual(
+            JSON.parse(res.text).length,
+            0,
+            "response should return an array that contains countries"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "name",
+            "response should contain objects with a property of 'name'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "abbr",
+            "response should contain objects with a property of 'abbr'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite("Testing /api/countries/:cntry", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/countries/us")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isObject(
+            JSON.parse(res.text),
+            "response should return an object"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "name",
+            "United States",
+            "response should return an object with a property of 'name' that equals 'United States'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "abbr",
+            "US",
+            "response should return an object with a property of 'abbr' that equals 'US'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite("Testing /api/states", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/states")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          //console.log(res.text);
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.notEqual(
+            JSON.parse(res.text).length,
+            0,
+            "response should return an array that contains states"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "name",
+            "response should contain objects with a property of 'name'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "abbr",
+            "response should contain objects with a property of 'abbr'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "country",
+            "response should contain objects with a property of 'country'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite("Testing /api/countries/:cntry/states", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/countries/us/states")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          //console.log(res.text);
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.notEqual(
+            JSON.parse(res.text).length,
+            0,
+            "response should return an array that contains states"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "name",
+            "response should contain objects with a property of 'name'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "abbr",
+            "response should contain objects with a property of 'abbr'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "country",
+            "response should contain objects with a property of 'country'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite(
+    "Testing /api/countries/:cntry/zipPostalCodes/:zipPostal/states",
+    () => {
+      test("1)  GET Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/countries/us/zipPostalCodes/52531/states")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.notEqual(
+              JSON.parse(res.text).length,
+              0,
+              "response should return an array that contains states"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "name",
+              "response should contain objects with a property of 'name'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "abbr",
+              "response should contain objects with a property of 'abbr'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "country",
+              "response should contain objects with a property of 'country'"
+            );
+            done();
+          });
+      });
+    }
+  );
+
+  suite("Testing /api/countries/:cntry/cities", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/countries/us/cities")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.notEqual(
+            JSON.parse(res.text).length,
+            0,
+            "response should return an array that contains cities"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "name",
+            "response should contain objects with a property of 'name'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "country",
+            "response should contain objects with a property of 'country'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite("Testing /api/countries/:cntry/states/:st/cities", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/countries/us/states/ia/cities")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.notEqual(
+            JSON.parse(res.text).length,
+            0,
+            "response should return an array that contains cities"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "name",
+            "response should contain objects with a property of 'name'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "state",
+            "response should contain objects with a property of 'state'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "country",
+            "response should contain objects with a property of 'country'"
+          );
+          done();
+        });
+    });
+  });
+
+  suite(
+    "Testing /api/countries/:cntry/zipPostalCodes/:zipPostal/cities",
+    () => {
+      test("1)  GET Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/countries/us/zipPostalCodes/52531/cities")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.notEqual(
+              JSON.parse(res.text).length,
+              0,
+              "response should return an array that contains cities"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "name",
+              "response should contain objects with a property of 'name'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "state",
+              "response should contain objects with a property of 'state'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "country",
+              "response should contain objects with a property of 'country'"
+            );
+            done();
+          });
+      });
+    }
+  );
+
+  suite(
+    "Testing /api/countries/:cntry/states/:st/cities/:city/zipPostalCodes",
+    () => {
+      test("1)  GET Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/countries/us/states/ia/cities/Albia/zipPostalCodes")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.notEqual(
+              JSON.parse(res.text).length,
+              0,
+              "response should return an array that contains zip/postal codes"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "zipPostal",
+              "response should contain objects with a property of 'zipPostal'"
+            );
+            done();
+          });
+      });
+    }
+  );
 
   // Done after all tests have been ran
   suiteTeardown((done) => {
