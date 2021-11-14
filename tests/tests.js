@@ -248,7 +248,7 @@ suite("Unit Tests", () => {
             json[0],
             "state",
             "IA",
-            "response should return an array containing an object with a property of 'state' that equals 'Iowa'"
+            "response should return an array containing an object with a property of 'state' that equals 'IA'"
           );
           assert.propertyVal(
             json[1],
@@ -260,7 +260,7 @@ suite("Unit Tests", () => {
             json[0],
             "country",
             "US",
-            "response should return an array containing an object with a property of 'country' that equals 'United States'"
+            "response should return an array containing an object with a property of 'country' that equals 'US'"
           );
           assert.propertyVal(
             json[1],
@@ -288,7 +288,56 @@ suite("Unit Tests", () => {
     });
   });
 
-  suite("Testing /api/users/:id", () => {});
+  suite("Testing /api/users/:id", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/users/" + ids.users[0]._id)
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.property(
+            JSON.parse(res.text),
+            "_id",
+            "response should return an object with the '_id' property"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "username",
+            "dummyUser1",
+            "response should return an array containing an object with a property of 'name' that equals 'dummyUser1'"
+          );
+          assert.property(
+            JSON.parse(res.text),
+            "address",
+            "response should return an array containing an object with a property of 'address'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "city",
+            "Big City",
+            "response should return an array containing an object with a property of 'city' that equals 'Big City'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "state",
+            "IA",
+            "response should return an array containing an object with a property of 'state' that equals 'Iowa'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "country",
+            "US",
+            "response should return an array containing an object with a property of 'country' that equals 'United States'"
+          );
+          assert.property(
+            JSON.parse(res.text),
+            "zipPostalCode",
+            "response should return an array containing an object with a property of 'zipPostalCode'"
+          );
+          done();
+        });
+    });
+  });
 
   suite("Testing /session/user", () => {
     test("1)  GET Test", (done) => {
