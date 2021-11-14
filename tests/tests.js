@@ -312,6 +312,12 @@ suite("Unit Tests", () => {
             "John Smith",
             "response should return an array containing an object with a property of 'name' that equals 'John Smith'"
           );
+          assert.propertyVal(
+            JSON.parse(res.text),
+            "email",
+            "abc123@gmail.com",
+            "response should return an array containing an object with a property of 'email' that equals 'abc123@gmail.com'"
+          );
           assert.property(
             JSON.parse(res.text),
             "address",
