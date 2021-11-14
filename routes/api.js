@@ -44,27 +44,21 @@ module.exports = (app) => {
       } else {
         let key = secretKeys.findKey(user._id.toString());
         console.log(key);
-        res.json(
-          user.preciseLocation
-            ? {
-                username: user.username,
-                fullName: user.name,
-                email: user.email,
-                address: CryptoJS.AES.decrypt(user.address, key),
-                city: user.city,
-                state: user.state,
-                country: user.country,
-                zipPostal: CryptoJS.AES.decrypt(user.zipPostal, key),
-              }
-            : {
-                username: user.username,
-                fullName: user.name,
-                email: user.email,
-                city: user.city,
-                state: user.state,
-                country: user.country,
-              }
-        );
+        const data = {
+          username: user.username,
+          fullName: user.name,
+          email: user.email,
+          city: user.city,
+          state: user.state,
+          country: user.country,
+        };
+
+        if (user.preciseLocation) {
+          data.address = CryptoJS.AES.decrypt(user.address, key);
+          data.zipPostal = CryptoJS.AES.decrypt(user.zipPostal, key);
+        }
+
+        res.json(data);
       }
     })
   );
