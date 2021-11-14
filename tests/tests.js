@@ -304,47 +304,47 @@ suite("Unit Tests", () => {
             JSON.parse(res.text),
             "username",
             "dummyUser1",
-            "response should return an array containing an object with a property of 'username' that equals 'dummyUser1'"
+            "response should return an object with a property of 'username' that equals 'dummyUser1'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
             "name",
             "John Smith",
-            "response should return an array containing an object with a property of 'name' that equals 'John Smith'"
+            "response should return an object with a property of 'name' that equals 'John Smith'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
             "email",
             "abc123@gmail.com",
-            "response should return an array containing an object with a property of 'email' that equals 'abc123@gmail.com'"
+            "response should return an object with a property of 'email' that equals 'abc123@gmail.com'"
           );
           assert.property(
             JSON.parse(res.text),
             "address",
-            "response should return an array containing an object with a property of 'address'"
+            "response should return an object with a property of 'address'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
             "city",
             "Big City",
-            "response should return an array containing an object with a property of 'city' that equals 'Big City'"
+            "response should return an object with a property of 'city' that equals 'Big City'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
             "state",
             "IA",
-            "response should return an array containing an object with a property of 'state' that equals 'Iowa'"
+            "response should return an object with a property of 'state' that equals 'IA'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
             "country",
             "US",
-            "response should return an array containing an object with a property of 'country' that equals 'United States'"
+            "response should return an object with a property of 'country' that equals 'US'"
           );
           assert.property(
             JSON.parse(res.text),
             "zipPostalCode",
-            "response should return an array containing an object with a property of 'zipPostalCode'"
+            "response should return an object with a property of 'zipPostalCode'"
           );
           done();
         });
