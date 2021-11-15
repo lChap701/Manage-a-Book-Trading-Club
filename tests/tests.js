@@ -283,7 +283,6 @@ suite("Unit Tests", () => {
           // Saves user IDS
           ids.users.push(json[0]._id);
           ids.users.push(json[1]._id);
-          console.log(ids);
         });
     });
   });
