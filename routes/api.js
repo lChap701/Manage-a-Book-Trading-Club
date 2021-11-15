@@ -42,9 +42,9 @@ module.exports = (app) => {
       if (!user) {
         res.send("Unknown user");
       } else {
-        let key = secretKeys.findKey(user._id.toString());
-        console.log(key);
+        const KEY = secretKeys.findKey(user._id.toString());
         const data = {
+          _id: user._id,
           username: user.username,
           fullName: user.name,
           email: user.email,
@@ -53,9 +53,15 @@ module.exports = (app) => {
           country: user.country,
         };
 
+        // Displays encrypted fields
         if (user.preciseLocation) {
-          data.address = CryptoJS.AES.decrypt(user.address, key);
-          data.zipPostal = CryptoJS.AES.decrypt(user.zipPostal, key);
+          data.address = CryptoJS.AES.decrypt(user.address, KEY).toString(
+            CryptoJS.enc.Utf8
+          );
+          data.zipPostalCode = CryptoJS.AES.decrypt(
+            user.zipPostal,
+            KEY
+          ).toString(CryptoJS.enc.Utf8);
         }
 
         res.json(data);

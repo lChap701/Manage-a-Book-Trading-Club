@@ -20,7 +20,7 @@ const options = {
     hex: true,
     leadingZeros: true,
   },
-  arrayMode: /keys/,
+  arrayMode: (tagName) => tagName === "key",
   attrValueProcessor: (val, attrName) =>
     he.decode(val, { isAttributeValue: true }),
   tagValueProcessor: (val, tagName) => he.decode(val),
@@ -91,7 +91,7 @@ const saveKey = (key, id) => {
 const findKey = (id) => {
   try {
     const json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
-    return json.keys.find((key) => key.includes(id)).value;
+    return json.keys.key.find((key) => key.id == id).value;
   } catch (e) {
     console.log(e);
     return undefined;
@@ -131,12 +131,12 @@ const updateKey = (newKey, id) => {
   try {
     let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
 
-    let index = json.keys.findIndex((key) => key.includes(id));
+    let index = json.keys.key.findIndex((key) => key.includes(id));
     if (index < 0) return false;
-    json.keys[index].value = newKey;
+    json.keys.key[index].value = newKey;
 
     writeXML(
-      json.keys.map(
+      json.keys.key.map(
         (key) => `<key><id>${key.id}</id><value>${key.value}</value></key>`
       )
     );
