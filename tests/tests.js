@@ -352,6 +352,20 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /users/:id", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        chai
+          .request(app)
+          .get("/users/" + ids.users[1]._id)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            done();
+          });
+      });
+    });
+  });
+
   suite("Testing /session/user", () => {
     test("1)  GET Test", (done) => {
       chai
