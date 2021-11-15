@@ -292,7 +292,7 @@ suite("Unit Tests", () => {
     test("1)  GET Test", (done) => {
       chai
         .request(app)
-        .get("/api/users/" + ids.users[0]._id)
+        .get("/api/users/" + ids.users[0])
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
           assert.property(
@@ -308,9 +308,9 @@ suite("Unit Tests", () => {
           );
           assert.propertyVal(
             JSON.parse(res.text),
-            "name",
+            "fullName",
             "John Smith",
-            "response should return an object with a property of 'name' that equals 'John Smith'"
+            "response should return an object with a property of 'fullName' that equals 'John Smith'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
@@ -318,10 +318,11 @@ suite("Unit Tests", () => {
             "abc123@gmail.com",
             "response should return an object with a property of 'email' that equals 'abc123@gmail.com'"
           );
-          assert.property(
+          assert.propertyVal(
             JSON.parse(res.text),
             "address",
-            "response should return an object with a property of 'address'"
+            "123 6th Street",
+            "response should return an object with a property of 'address' that equals '123 6th Street'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
@@ -341,10 +342,11 @@ suite("Unit Tests", () => {
             "US",
             "response should return an object with a property of 'country' that equals 'US'"
           );
-          assert.property(
+          assert.propertyVal(
             JSON.parse(res.text),
             "zipPostalCode",
-            "response should return an object with a property of 'zipPostalCode'"
+            "52061",
+            "response should return an object with a property of 'zipPostalCode' that equals '52061'"
           );
           done();
         });
