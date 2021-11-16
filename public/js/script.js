@@ -654,13 +654,18 @@ class AccountForm extends React.Component {
   /**
    * Gets all possible addresses based on user input
    * @param {String} text     Represents the value of the address input field
-   * @param {String} cntry    Represents a country (defaults to an empty string)
    */
-  getAddresses(text, cntry = "") {
-    const { options } = this.state;
+  getAddresses(text) {
+    const { options, country, state, city } = this.state;
+    text +=
+      city.length > 0
+        ? state.length > 0
+          ? " " + city + ", " + state
+          : " " + city
+        : "";
     const URL =
-      cntry.length > 0
-        ? `${location.origin}/api/countries/${cntry}/addresses/${text}`
+      country.length > 0
+        ? `${location.origin}/api/countries/${country}/addresses/${text}`
         : `${location.origin}/api/addresses/${text}`;
 
     fetch(URL)
@@ -673,22 +678,20 @@ class AccountForm extends React.Component {
 
   /**
    * Gets all possible cities based on user input
-   * @param {String} cntry        Represents a country (defaults to an empty string)
-   * @param {String} st           Represents a state (defaults to an empty string)
-   * @param {String} zipPostal    Represents a zip/postal code (defaults to an empty string)
    */
-  getCities(cntry, st = "", zipPostal = "") {
-    const { options } = this.state;
+  getCities() {
+    const { options, country, state, zipPostal } = this.state;
     const URL =
       zipPostal.length > 0
-        ? `${location.origin}/api/countries/${cntry}zipPostalCodes/${zipPostal}/cities`
-        : st.length > 0
-        ? `${location.origin}/api/countries/${cntry}/states/${st}/cities`
-        : `${location.origin}/api/countries/${cntry}/cities`;
+        ? `${location.origin}/api/countries/${country}zipPostalCodes/${zipPostal}/cities`
+        : state.length > 0
+        ? `${location.origin}/api/countries/${country}/states/${state}/cities`
+        : `${location.origin}/api/countries/${country}/cities`;
 
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         options.cities = data;
         this.setState({ options: options });
       });
@@ -696,28 +699,27 @@ class AccountForm extends React.Component {
 
   /**
    * Gets all possible states based on user input
-   * @param {String} cntry        Represents a country (defaults to an empty string)
-   * @param {String} zipPostal    Represents a zip/postal code (defaults to an empty string)
    */
-  getStates(cntry = "", zipPostal = "") {
-    const { options } = this.state;
+  getStates() {
+    const { options, country, zipPostal } = this.state;
     const URL =
-      cntry.length > 0
+      country.length > 0
         ? zipPostal.length > 0
-          ? `${location.origin}/api/countries/${cntry}/zipPostalCodes/${zipPostal}/states`
-          : `${location.origin}/api/countries/${cntry}/states`
+          ? `${location.origin}/api/countries/${country}/zipPostalCodes/${zipPostal}/states`
+          : `${location.origin}/api/countries/${country}/states`
         : `${location.origin}/api/states`;
 
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
         options.states.push({ text: "Choose a state", value: "" });
-        options.states = data.map((state) => {
+        const states = data.map((state) => {
           return {
             text: state.name,
             value: state.abbr,
           };
         });
+        options.states.push(...states);
         this.setState({ options: options });
       });
   }
@@ -746,12 +748,13 @@ class AccountForm extends React.Component {
       .then((res) => res.json())
       .then((data) => {
         options.countries.push({ text: "Choose a country", value: "" });
-        options.countries = data.map((country) => {
+        const countries = data.map((country) => {
           return {
             text: country.name,
             value: country.abbr,
           };
         });
+        options.countries.push(...countries);
         this.setState({ options: options });
       });
   }
@@ -760,14 +763,21 @@ class AccountForm extends React.Component {
    * Gets the full name of a country
    */
   getCountry() {
-    const { country } = this.state;
-    let fullCountry = "";
-
-    fetch(`${location.origin}/api/countries/${country}`)
+    fetch(`${location.origin}/api/countries/${this.state.country}`)
       .then((res) => res.json())
-      .then((data) => (fullCountry = data.name));
+      .then((data) => this.setState({ country: data.name }));
+  }
+  getZipPostalCodes() {
+    const { options, country, state, city } = this.state;
 
-    return fullCountry;
+    fetch(
+      `${location.origin}/api/countries/${country}/states/${state}/cities/${city}/zipPostalCodes`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        options.zipPostalCodes = data;
+        this.setState({ options: options });
+      });
   }
 
   /**
@@ -807,6 +817,7 @@ class AccountForm extends React.Component {
    */
   saveAddress(e) {
     this.setState({ address: e.target.value });
+    this.getAddresses(e.target.value);
   }
 
   /**
@@ -831,6 +842,7 @@ class AccountForm extends React.Component {
    */
   saveCountry(e) {
     this.setState({ country: e.target.value });
+    setTimeout(this.getStates, 100);
   }
 
   /**
@@ -932,14 +944,19 @@ class AccountForm extends React.Component {
             name={this.state.name}
             saveName={this.saveName}
             address={this.state.address}
+            addressOpts={this.state.options.addresses}
             saveAddress={this.saveAddress}
             city={this.state.city}
+            cityOpts={this.state.options.cities}
             saveCity={this.saveCity}
             state={this.state.state}
+            stateOpts={this.state.options.states}
             saveState={this.saveState}
             country={this.state.country}
+            countryOpts={this.state.options.countries}
             saveCountry={this.saveCountry}
             zipPostal={this.state.zipPostal}
+            zipPostalOpts={this.state.options.zipPostalCodes}
             saveZipPostalCode={this.saveZipPostalCode}
           />
         )}
@@ -950,6 +967,16 @@ class AccountForm extends React.Component {
             type="submit"
             value={this.props.name}
           />
+
+          {this.props.name == "Login" ? (
+            <div className="mt-2">
+              <Link className="text-white" to="/signup">
+                Sign Up
+              </Link>
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       </form>
     );
@@ -1133,7 +1160,7 @@ const AccountFormLayout = (props) => {
             id="country"
             label="Country"
             value={props.country}
-            options={props.cntryOpts}
+            options={props.countryOpts}
             onChange={props.saveState || null}
             validator=""
             err=""
