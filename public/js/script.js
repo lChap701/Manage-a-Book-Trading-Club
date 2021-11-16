@@ -621,6 +621,7 @@ class AccountForm extends React.Component {
     };
 
     // Functions
+    this.getLocData = this.getLocData.bind(this);
     this.getAddresses = this.getAddresses.bind(this);
     this.getCities = this.getCities.bind(this);
     this.getStates = this.getStates.bind(this);
@@ -637,6 +638,17 @@ class AccountForm extends React.Component {
     this.saveCountry = this.saveCountry.bind(this);
     this.saveZipPostalCode = this.saveZipPostalCode.bind(this);
     this.submitForm = this.submitForm.bind(this);
+
+    // Event Listeners
+    window.addEventListener("load", this.getLocData, true);
+  }
+
+  /**
+   * Gets data for location input fields
+   */
+  getLocData() {
+    this.getStates();
+    this.getCountries();
   }
 
   /**
