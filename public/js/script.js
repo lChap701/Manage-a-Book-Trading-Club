@@ -678,9 +678,13 @@ class AccountForm extends React.Component {
 
   /**
    * Gets all possible cities based on user input
+   * @returns   Returns nothing or is void
    */
   getCities() {
     const { options, country, state, zipPostal } = this.state;
+
+    if (!country) return;
+
     const URL =
       zipPostal.length > 0
         ? `${location.origin}/api/countries/${country}zipPostalCodes/${zipPostal}/cities`
@@ -691,7 +695,6 @@ class AccountForm extends React.Component {
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         options.cities = data;
         this.setState({ options: options });
       });
@@ -729,13 +732,10 @@ class AccountForm extends React.Component {
    */
   getState() {
     const { state, country } = this.state;
-    let fullState = "";
 
     fetch(`${location.origin}/api/countries/${country}/states/${state}`)
       .then((res) => res.json())
-      .then((data) => (fullState = data.name));
-
-    return fullState;
+      .then((data) => this.setState({ state: data.name }));
   }
 
   /**
@@ -767,8 +767,15 @@ class AccountForm extends React.Component {
       .then((res) => res.json())
       .then((data) => this.setState({ country: data.name }));
   }
+
+  /**
+   * Gets all possible zip/postal codes based on country, state, and city
+   * @returns   Returns nothing or is void
+   */
   getZipPostalCodes() {
     const { options, country, state, city } = this.state;
+
+    if (!country || !state || !city) return;
 
     fetch(
       `${location.origin}/api/countries/${country}/states/${state}/cities/${city}/zipPostalCodes`
