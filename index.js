@@ -85,9 +85,7 @@ const sessions = require("./routes/sessions");
 sessions(app);
 
 // Redirects to the home page
-app.get("/", (req, res) => {
-  res.redirect("/books");
-});
+app.get("/", (req, res) => res.redirect("/books"));
 
 // Displays the home page
 app.get("/books", (req, res) => {
@@ -142,9 +140,7 @@ app.get("/users/:id/books", (req, res) => {
 });
 
 // Displays the 404 Error Page
-app.use((req, res, next) => {
-  res.status(404).type("text").send("Not Found");
-});
+app.use((req, res, next) => res.status(404).type("text").send("Not Found"));
 
 // Displays the port being used to host the app
 const listener = app.listen(process.env.PORT || 8080, () => {
