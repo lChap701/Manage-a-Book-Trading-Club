@@ -621,13 +621,14 @@ class AccountForm extends React.Component {
     };
 
     // Functions
-    this.getLocData = this.getLocData.bind(this);
+    this.loadLocData = this.loadLocData.bind(this);
     this.getAddresses = this.getAddresses.bind(this);
     this.getCities = this.getCities.bind(this);
     this.getStates = this.getStates.bind(this);
     this.getState = this.getState.bind(this);
     this.getCountries = this.getCountries.bind(this);
     this.getCountry = this.getCountry.bind(this);
+    this.getZipPostalCodes = this.getZipPostalCodes.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
     this.saveEmail = this.saveEmail.bind(this);
@@ -640,13 +641,13 @@ class AccountForm extends React.Component {
     this.submitForm = this.submitForm.bind(this);
 
     // Event Listeners
-    window.addEventListener("load", this.getLocData, true);
+    window.addEventListener("load", this.loadLocData, true);
   }
 
   /**
-   * Gets data for location input fields
+   * Gets initial data for country and state input fields
    */
-  getLocData() {
+  loadLocData() {
     this.getStates();
     this.getCountries();
   }
@@ -657,12 +658,18 @@ class AccountForm extends React.Component {
    */
   getAddresses(text) {
     const { options, country, state, city } = this.state;
+
+    if (text.length == 0) return;
+
     text +=
       city.length > 0
         ? state.length > 0
           ? " " + city + ", " + state
           : " " + city
         : "";
+
+    console.log(text);
+
     const URL =
       country.length > 0
         ? `${location.origin}/api/countries/${country}/addresses/${text}`
@@ -695,7 +702,7 @@ class AccountForm extends React.Component {
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
-        options.cities = data;
+        options.cities = data.map((obj) => obj.name);
         this.setState({ options: options });
       });
   }
@@ -715,6 +722,7 @@ class AccountForm extends React.Component {
     fetch(URL)
       .then((res) => res.json())
       .then((data) => {
+        options.states = [];
         options.states.push({ text: "Choose a state", value: "" });
         const states = data.map((state) => {
           return {
@@ -775,7 +783,7 @@ class AccountForm extends React.Component {
   getZipPostalCodes() {
     const { options, country, state, city } = this.state;
 
-    if (!country || !state || !city) return;
+    if (country.length == 0 || state.length == 0 || city.length == 0) return;
 
     fetch(
       `${location.origin}/api/countries/${country}/states/${state}/cities/${city}/zipPostalCodes`
@@ -833,6 +841,10 @@ class AccountForm extends React.Component {
    */
   saveCity(e) {
     this.setState({ city: e.target.value });
+    setTimeout(() => {
+      this.getAddresses(this.state.address);
+      this.getZipPostalCodes();
+    }, 100);
   }
 
   /**
@@ -841,6 +853,11 @@ class AccountForm extends React.Component {
    */
   saveState(e) {
     this.setState({ state: e.target.value });
+    setTimeout(() => {
+      this.getAddresses(this.state.address);
+      this.getCities();
+      this.getZipPostalCodes();
+    }, 100);
   }
 
   /**
@@ -849,7 +866,12 @@ class AccountForm extends React.Component {
    */
   saveCountry(e) {
     this.setState({ country: e.target.value });
-    setTimeout(this.getStates, 100);
+    setTimeout(() => {
+      this.getAddresses(this.state.address);
+      this.getCities();
+      this.getStates();
+      this.getZipPostalCodes();
+    }, 100);
   }
 
   /**
@@ -858,6 +880,11 @@ class AccountForm extends React.Component {
    */
   saveZipPostalCode(e) {
     this.setState({ zipPostal: e.target.value });
+    setTimeout(() => {
+      this.getAddresses(this.state.address);
+      this.getCities();
+      this.getStates();
+    }, 100);
   }
 
   /**
@@ -1168,7 +1195,7 @@ const AccountFormLayout = (props) => {
             label="Country"
             value={props.country}
             options={props.countryOpts}
-            onChange={props.saveState || null}
+            onChange={props.saveCountry || null}
             validator=""
             err=""
           />
