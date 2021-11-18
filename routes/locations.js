@@ -31,7 +31,6 @@ const locations = {
     locationIq
       .get(url)
       .then((resp) => {
-        console.log(JSON.stringify(resp.data));
         res.json(
           resp.data.map((obj) => {
             if (obj.hasOwnProperty("house_number")) {
@@ -181,13 +180,7 @@ const locations = {
     zippopotam
       .get(`/${cntyAbbr}/${stAbbr}/${city}`)
       .then((resp) => {
-        res.json(
-          resp.data.places.map((place) => {
-            return {
-              zipPostal: place["post code"],
-            };
-          })
-        );
+        res.json(resp.data.places.map((place) => place["post code"]));
       })
       .catch((err) => console.log(err));
   },
