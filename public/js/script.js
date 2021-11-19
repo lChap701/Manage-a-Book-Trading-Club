@@ -386,14 +386,18 @@ class BookExchange extends React.Component {
  */
 const Books = (props) => {
   return (
-    <form action="/requests/new/books" method="POST" className="panel scroll">
+    <form
+      action="/requests/new/books"
+      method="POST"
+      className="panel scroll shadow-lg"
+    >
       <div className="panel-header text-white p-1 mx-auto">
         <h2 className="text-center">Books</h2>
       </div>
 
       <div className="panel-body">
         {props.books.length == 0 ? (
-          <div className="item border border-secondary border-top-0 border-bottom-0 p-5">
+          <div className="item border-top-0 border-bottom-0 p-5">
             <h4 className="text-muted text-center mt-1">
               No books are available at this time
             </h4>
@@ -401,7 +405,7 @@ const Books = (props) => {
         ) : (
           props.books.map((book) => {
             return (
-              <div className="item border border-secondary border-top-0 border-bottom-0">
+              <div className="item border-top-0 border-bottom-0">
                 <div className="form-group">
                   <input
                     id={`book${book._id}`}
@@ -465,7 +469,7 @@ const CreateRequest = (props) => {
   console.log(props.takeBooks);
   return (
     <div>
-      <div className="panel">
+      <div className="panel shadow-lg">
         <div className="panel-header text-center">
           <h2>Create Request</h2>
         </div>
@@ -533,7 +537,7 @@ const Profile = (props) => {
   );
 
   return (
-    <form className="panel">
+    <form className="panel shadow-lg">
       <div className="panel-header text-white p-1 mx-auto">
         <h2 className="text-center">{user.username}'s Profile</h2>
       </div>
@@ -931,7 +935,7 @@ class AccountForm extends React.Component {
     return (
       <form
         onSubmit={this.submitForm}
-        className="panel"
+        className="panel shadow-lg"
         name={this.props.name}
         novalidate="true"
       >
@@ -1024,7 +1028,7 @@ class AccountForm extends React.Component {
  */
 const LoginFormLayout = (props) => {
   return (
-    <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+    <div className="panel-body border-top-0 border-bottom-0 p-3">
       <Input
         containerClass="form-group"
         id="uname"
@@ -1059,7 +1063,7 @@ const LoginFormLayout = (props) => {
  */
 const AccountFormLayout = (props) => {
   return (
-    <div className="panel-body border border-secondary border-top-0 border-bottom-0 p-3">
+    <div className="panel-body border-top-0 border-bottom-0 p-3">
       <div className="row">
         <Input
           containerClass="form-group col"

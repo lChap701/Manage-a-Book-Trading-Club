@@ -15,6 +15,11 @@
 .panel-header,
 .panel-footer {
   background: #3496ff;
+}
+
+.panel-header,
+.panel-body,
+.panel-footer {
   border: 1px solid #3496ff;
 }
 
