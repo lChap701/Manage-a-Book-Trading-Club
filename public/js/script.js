@@ -125,10 +125,12 @@ class BookExchange extends React.Component {
 
   /**
    * Gets information for the user's profile
+   * @returns   Returns nothing or is void
    */
   getUser() {
     const id =
       location.pathname.split("/")[location.pathname.split("/").length - 1];
+    if (!id.match(/\da-z/)) return;
     fetch(`${location.origin}/users/${id}`)
       .then((res) => res.json())
       .then((data) => {
