@@ -88,97 +88,20 @@ class BookExchange extends React.Component {
     // States
     this.state = {
       login: false,
-      users: [],
       user: {
         _id: "",
         username: "",
       },
       urlUser: {},
-      books: [],
-      //takeBooks: [],
-      requests: [],
-      trades: [],
     };
 
     // Functions
-    this.getData = this.getData.bind(this);
-    this.getUsers = this.getUsers.bind(this);
-    this.getBooks = this.getBooks.bind(this);
-    this.getRequests = this.getRequests.bind(this);
-    this.getTrades = this.getTrades.bind(this);
     this.isLoggedIn = this.isLoggedIn.bind(this);
     this.getUser = this.getUser.bind(this);
-    this.getRequestedBooks = this.getRequestedBooks.bind(this);
 
     // Event Listeners
-    window.addEventListener("load", this.getData, true);
     window.addEventListener("load", this.isLoggedIn, true);
-  }
-
-  /**
-   * Gets all users, books, and requests that have been made
-   */
-  getData() {
-    this.getUsers();
-    this.getBooks();
-    this.getRequests();
-    this.getTrades();
-    /* console.log(this.state.users); */
-    /* console.log(this.state.books); */
-    /* console.log(this.state.requests); */
-    /* console.log(this.state.trades); */
-  }
-
-  /**
-   * Gets all users
-   */
-  getUsers() {
-    fetch(`${location.origin}/api/users`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ users: data }))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  }
-
-  /**
-   * Gets all books
-   */
-  getBooks() {
-    fetch(`${location.origin}/api/books`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ books: data }))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  }
-
-  /**
-   * Gets all requests that have been made
-   */
-  getRequests() {
-    fetch(`${location.origin}/api/requests`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ requests: data }))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  }
-
-  /**
-   * Gets all trades
-   */
-  getTrades() {
-    fetch(`${location.origin}/api/requests?trades=true`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ trades: data }))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
+    window.addEventListener("load", this.getUser, true);
   }
 
   /**
@@ -217,29 +140,6 @@ class BookExchange extends React.Component {
         alert(e);
         console.error(e);
       });
-  }
-
-  /**
-   * Gets the books that were requested for trading from the server
-   */
-  getRequestedBooks() {
-    let books = [];
-
-    fetch(`${location.origin}/session/books`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data) return [];
-        data.forEach((id) => {
-          let el = this.state.books.find((book) => book._id == id);
-          if (el) books.push(el);
-        });
-      })
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-
-    return books;
   }
 
   render() {
@@ -340,25 +240,17 @@ class BookExchange extends React.Component {
           <div className="container">
             <Switch>
               <Route exact path="/books">
-                <Books books={this.state.books} login={this.state.login} />
+                <Books login={this.state.login} />
               </Route>
               <Route path="/books/my">
                 <MyBooks />
               </Route>
-              <Route exact path="/requests">
-                <Requests requests={this.state.requests} />
-              </Route>
-              <Route path="/requests/new">
-                <CreateRequest takeBooks={this.getRequestedBooks} />
-              </Route>
-              <Route path="/trades">
-                <Trades users={this.state.trades} />
-              </Route>
-              <Route exact path="/users">
-                <Users users={this.state.users} />
-              </Route>
+              <Route exact path="/requests" component={Requests} />
+              <Route path="/requests/new" component={CreateRequest} />
+              <Route path="/trades" component={Trades} />
+              <Route exact path="/users" component={Users} />
               <Route exact path="/users/:id">
-                <Profile users={this.state.users} myId={this.state.user._id} />
+                <Profile myId={this.state.user._id} />
               </Route>
               <Route path="/users/:id/books">
                 <UserBooks />
@@ -385,6 +277,19 @@ class BookExchange extends React.Component {
  * @returns             Returns the content that should be displayed
  */
 const Books = (props) => {
+  let books = [];
+
+  /* Gets all books */
+  window.onload = () => {
+    fetch(`${location.origin}/api/books`)
+      .then((res) => res.json())
+      .then((data) => (books = data))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  };
+
   return (
     <form
       action="/requests/new/books"
@@ -396,14 +301,14 @@ const Books = (props) => {
       </div>
 
       <div className="panel-body">
-        {props.books.length == 0 ? (
+        {books.length == 0 ? (
           <div className="item border-top-0 border-bottom-0 p-5">
             <h4 className="text-muted text-center mt-1">
               No books are available at this time
             </h4>
           </div>
         ) : (
-          props.books.map((book) => {
+          books.map((book) => {
             return (
               <div className="item border-top-0 border-bottom-0">
                 <div className="form-group">
@@ -444,10 +349,22 @@ const Books = (props) => {
 
 /**
  * Component for displaying content on the Requests page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
-const Requests = (props) => {
+const Requests = () => {
+  let requests = [];
+
+  /* Gets all requests that have been made */
+  window.onload = () => {
+    fetch(`${location.origin}/api/requests`)
+      .then((res) => res.json())
+      .then((data) => (requests = data))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  };
+
   return <h2>All Requests</h2>;
 };
 
@@ -462,11 +379,22 @@ const BookRequests = (props) => {
 
 /**
  * Component for displaying content on the Create Request page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
-const CreateRequest = (props) => {
-  console.log(props.takeBooks);
+const CreateRequest = () => {
+  let takeBooks = [];
+
+  /* Gets the books that were requested for trading from the server */
+  window.onload = () => {
+    fetch(`${location.origin}/session/books`)
+      .then((res) => res.json())
+      .then((data) => (takeBooks = data))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  };
+
   return (
     <div>
       <div className="panel shadow-lg">
@@ -475,7 +403,7 @@ const CreateRequest = (props) => {
         </div>
 
         <div className="panel-body">
-          {props.takeBooks.map((book) => {
+          {takeBooks.map((book) => {
             <div className="item" id={book._id}>
               {book.name}
             </div>;
@@ -488,10 +416,22 @@ const CreateRequest = (props) => {
 
 /**
  * Component for displaying content on the Trades page
- * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
-const Trades = (props) => {
+const Trades = () => {
+  let trades = [];
+
+  /* Gets all trades */
+  window.onload = () => {
+    fetch(`${location.origin}/api/requests?trades=true`)
+      .then((res) => res.json())
+      .then((data) => (trades = data))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  };
+
   return <h2>Trades</h2>;
 };
 
@@ -501,7 +441,20 @@ const Trades = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Users = (props) => {
-  return <h2>Users</h2>;
+  let users = [];
+
+  /* Gets all users */
+  window.onload = () => {
+    fetch(`${location.origin}/api/users`)
+      .then((res) => res.json())
+      .then((data) => (users = data))
+      .catch((e) => {
+        alert(e);
+        console.error(e);
+      });
+  };
+
+  return <h2>All Users</h2>;
 };
 
 /**
@@ -531,27 +484,27 @@ const Profile = (props) => {
 
   // Updates the document
   updateTitleAndMetaTags(
-    `Book Exchange - ${user.username}'s Profile`,
-    `View user's ${user.username} profile`,
+    `Book Exchange - ${props.user.username}'s Profile`,
+    `View user's ${props.user.username} profile`,
     `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
   );
 
   return (
     <form className="panel shadow-lg">
       <div className="panel-header text-white p-1 mx-auto">
-        <h2 className="text-center">{user.username}'s Profile</h2>
+        <h2 className="text-center">{props.user.username}'s Profile</h2>
       </div>
 
       <AccountFormLayout
-        username={user.username}
-        password={user.password}
-        email={user.email || ""}
-        name={user.name || ""}
-        address={user.address || ""}
-        city={user.city || ""}
-        state={user.state || ""}
-        country={user.country || ""}
-        zipPostal={user.zipPostal || ""}
+        username={props.user.username}
+        password={props.user.password}
+        email={props.user.email || ""}
+        name={props.user.name || ""}
+        address={props.user.address || ""}
+        city={props.user.city || ""}
+        state={props.user.state || ""}
+        country={props.user.country || ""}
+        zipPostal={props.user.zipPostal || ""}
       />
 
       <div className="panel-footer px-3 py-2">
