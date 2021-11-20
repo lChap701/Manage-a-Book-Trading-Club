@@ -48,7 +48,7 @@ All URL paths part of this project.
 - **/logout** - Allows users to logout
   - Redirects to **/books**
 
-#### Books Path
+### Books Path
 
 - **/books** - Shows all books
   - Displays the _index.html_ file
