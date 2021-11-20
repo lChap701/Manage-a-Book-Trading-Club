@@ -115,7 +115,7 @@ module.exports = (app) => {
     })
     .put((req, res) => {
       // Get a secret key for AES encrypting
-      const key = secretKeys.genKey();
+      const KEY = secretKeys.genKey();
 
       // Updates the user
       crud
@@ -129,19 +129,19 @@ module.exports = (app) => {
           name: req.body.name,
           address:
             req.body.address && req.body.address.length > 0
-              ? CryptoJS.AES.encrypt(req.body.address, key).toString()
+              ? CryptoJS.AES.encrypt(req.body.address, KEY).toString()
               : req.body.address,
           city: req.body.city,
           state: req.body.state,
           country: req.body.country,
           zipPostal:
             req.body.zipPostal && req.body.zipPostal.length > 0
-              ? CryptoJS.AES.encrypt(req.body.zipPostal, key).toString()
+              ? CryptoJS.AES.encrypt(req.body.zipPostal, KEY).toString()
               : req.body.zipPostal,
           preciseLocation: req.body.preciseLocation == "false" ? false : true,
         })
         .then(() => {
-          req.session.error = !secretKeys.updateKey(key, user._id.toString());
+          req.session.error = !secretKeys.updateKey(KEY, user._id.toString());
 
           if (req.session.error) {
             req.flash("error", "Unable to update your account");
