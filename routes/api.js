@@ -16,7 +16,7 @@ module.exports = (app) => {
   app.get("/api/users", (req, res) => {
     crud
       .getUsers()
-      .populate({ path: "requests" })
+      .populate({ path: "books" })
       .then((users) =>
         res.json(
           users.map((user) => {
@@ -27,9 +27,12 @@ module.exports = (app) => {
               state: user.state ? user.state : "null",
               country: user.country ? user.country : "null",
               books: user.books.length,
-              incomingRequests: user.requests.filter(
-                (request) => !request.traded
-              ).length,
+              incomingRequests:
+                user.books.length > 0
+                  ? user.books.reduce(
+                      (b1, b2) => b1.numOfRequests + b2.numOfRequests
+                    )
+                  : 0,
             };
           })
         )
