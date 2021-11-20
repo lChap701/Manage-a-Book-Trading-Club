@@ -135,7 +135,7 @@ module.exports = () => {
           });
 
           // Checks if the secret key was saved in keys.xml
-          req.session.error = !secretKeys.saveKey(key, user._id.toString());
+          req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
 
           return req.session.error ? done(null, false) : done(null, user);
         } catch (err) {

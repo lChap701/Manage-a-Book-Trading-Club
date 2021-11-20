@@ -107,8 +107,9 @@ const removeKey = (id) => {
   try {
     let keys = fs
       .readFileSync("./keys.xml", "utf-8")
-      .split(/<\/?keys>/)
-      .filter((str) => str.length);
+      .split(/<\/?keys?>/)
+      .filter((str) => str.length)
+      .map((key) => `<key>${key}</key>`);
 
     if (!keys.find((key) => key.includes(id))) return false;
     keys = keys.filter((key) => !key.includes(id));
