@@ -4,7 +4,7 @@ A project that was created to earn a certificate from freeCodeCamp and allows us
 
 ## OAuth
 
-This uses the following OAuth for logging in/creating accounts: GitHub, Facebook, Twitter, Microsoft, and Google.
+OAuth for GitHub, Facebook, Twitter, Microsoft, and Google are used for logging in and creating accounts.
 
 ## Location APIs
 
