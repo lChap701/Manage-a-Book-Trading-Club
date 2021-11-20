@@ -41,31 +41,31 @@ module.exports = (app) => {
     crud.getUser({ _id: req.params.id }).then((user) => {
       if (!user) {
         res.send("Unknown user");
-      } else {
-        const KEY = secretKeys.findKey(user._id.toString());
-        const data = {
-          _id: user._id,
-          username: user.username,
-          fullName: user.name,
-          email: user.email,
-          city: user.city,
-          state: user.state,
-          country: user.country,
-        };
-
-        // Displays encrypted fields
-        if (user.preciseLocation) {
-          data.address = CryptoJS.AES.decrypt(user.address, KEY).toString(
-            CryptoJS.enc.Utf8
-          );
-          data.zipPostalCode = CryptoJS.AES.decrypt(
-            user.zipPostal,
-            KEY
-          ).toString(CryptoJS.enc.Utf8);
-        }
-
-        res.json(data);
+        return;
       }
+
+      const data = {
+        _id: user._id,
+        username: user.username,
+        fullName: user.name,
+        email: user.email,
+        city: user.city,
+        state: user.state,
+        country: user.country,
+      };
+
+      // Displays encrypted fields
+      if (user.preciseLocation) {
+        const KEY = secretKeys.findKey(user._id.toString());
+        data.address = CryptoJS.AES.decrypt(user.address, KEY).toString(
+          CryptoJS.enc.Utf8
+        );
+        data.zipPostalCode = CryptoJS.AES.decrypt(user.zipPostal, KEY).toString(
+          CryptoJS.enc.Utf8
+        );
+      }
+
+      res.json(data);
     })
   );
 
@@ -178,8 +178,8 @@ module.exports = (app) => {
 
       crud
         .getRequest(book.request)
-        .populate({ path: "users" })
         .populate({ path: "books" })
+        .populate({ path: "users" })
         .then((request) => {
           if (
             !request ||
@@ -191,36 +191,46 @@ module.exports = (app) => {
 
           res.json({
             give: {
-              books: request.giveBooks.map((book) => {
-                return {
-                  title: book.title,
-                  description: book.description,
-                };
-              }),
-              user: {
-                username: request.user[0].username,
-                city: request.user[0].city,
-                state: request.user[0].state,
-                country: request.user[0].country,
-                requests: request.user[0].requests.length,
-              },
+              books: request.giveBooks
+                .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                .map((book) => {
+                  return {
+                    _id: book._id,
+                    title: book.title,
+                    description: book.description,
+                    requests: book.numOfRequests,
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                      location:
+                        book.user.city +
+                        " " +
+                        book.user.state +
+                        ", " +
+                        book.user.country,
+                    },
+                  };
+                }),
             },
             take: {
-              books: request.takeBooks.map((book) => {
-                return {
-                  title: book.title,
-                  description: book.description,
-                };
-              }),
-              users: request.users
-                .filter((user) => user._id != request.users[0]._id)
-                .map((user) => {
+              books: request.takeBooks
+                .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                .map((book) => {
                   return {
-                    username: user.username,
-                    city: user.city,
-                    state: user.state,
-                    country: user.country,
-                    requests: user.requests.length,
+                    _id: book._id,
+                    title: book.title,
+                    description: book.description,
+                    requests: book.numOfRequests,
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                      location:
+                        book.user.city +
+                        " " +
+                        book.user.state +
+                        ", " +
+                        book.user.country,
+                    },
                   };
                 }),
             },
@@ -238,45 +248,49 @@ module.exports = (app) => {
 
     crud
       .getRequests()
-      .populate({ path: "users" })
       .populate({ path: "books" })
+      .populate({ path: "users" })
       .then((requests) => {
         res.json(
           requests
-            .filter((request) => request.traded.toString() == traded)
+            .filter((request) => request.traded.toString() === traded)
             .map((request) => {
               return {
                 give: {
-                  books: request.giveBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  user: {
-                    username: request.user[0].username,
-                    city: request.user[0].city,
-                    state: request.user[0].state,
-                    country: request.user[0].country,
-                    requests: request.user[0].requests.length,
-                  },
+                  books: request.giveBooks
+                    .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                    .map((book) => {
+                      return {
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                        user: {
+                          _id: book.user._id,
+                          username: book.user.username,
+                          city: book.user.city,
+                          state: book.user.state,
+                          country: book.user.country,
+                        },
+                      };
+                    }),
                 },
                 take: {
-                  books: request.takeBooks.map((book) => {
-                    return {
-                      title: book.title,
-                      description: book.description,
-                    };
-                  }),
-                  users: request.users
-                    .filter((user) => user._id != request.users[0]._id)
-                    .map((user) => {
+                  books: request.takeBooks
+                    .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                    .map((book) => {
                       return {
-                        username: user.username,
-                        city: user.city,
-                        state: user.state,
-                        country: user.country,
-                        requests: user.requests.length,
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                        user: {
+                          _id: book.user._id,
+                          username: book.user.username,
+                          city: book.user.city,
+                          state: book.user.state,
+                          country: book.user.country,
+                        },
                       };
                     }),
                 },
