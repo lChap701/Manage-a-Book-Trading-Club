@@ -675,11 +675,6 @@ suite("Unit Tests", () => {
               0,
               "response should return an array that contains zip/postal codes"
             );
-            assert.property(
-              JSON.parse(res.text)[0],
-              "zipPostal",
-              "response should contain objects with a property of 'zipPostal'"
-            );
             done();
           });
       });
