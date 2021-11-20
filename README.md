@@ -90,7 +90,7 @@ All URL paths part of this project.
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
 
-### Login abd Signup Paths
+### Login and Signup Paths
 
 - **/login** - Allows users to login
 - **/signup** - Allows users to create accounts
