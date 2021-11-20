@@ -1,0 +1,7 @@
+<!-- Structure of keys.xml -->
+<keys>
+  <key>
+    <id>(user ID)</id>
+    <value>(value of the key)</value>
+  </key>
+</keys>
