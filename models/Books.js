@@ -16,7 +16,7 @@ const bookSchema = new Schema(
       required: "{PATH} is required",
     },
     numOfRequests: { type: Number, default: 0 },
-    requests: [{ type: Schema.Types.ObjectId, ref: "Requests", default: [] }],
+    requests: [{ type: Schema.Types.ObjectId, ref: "Requests" }],
   },
   {
     timestamps: {
