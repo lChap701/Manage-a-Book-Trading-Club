@@ -1,3 +1,4 @@
+const { useState, useEffect, useCallback } = React;
 const {
   BrowserRouter,
   Route,
@@ -9,6 +10,25 @@ const {
   useParams,
 } = ReactRouterDOM;
 const Router = BrowserRouter;
+
+/**
+ * Makes an API call
+ * @param {string} url    Represents the API URL path
+ * @returns               Returns the result
+ */
+async function callApi(url) {
+  try {
+    let res = await fetch(url);
+
+    // Displays a special error message
+    if (!res.ok) throw Error(`Response ${res.status}: ${res.statusText}`);
+
+    return await res.json();
+  } catch (e) {
+    alert(e);
+    console.error(e);
+  }
+}
 
 /**
  * Validates input fields in the form and determines if the form is valid
@@ -92,51 +112,21 @@ class BookExchange extends React.Component {
         _id: "",
         username: "",
       },
-      urlUser: {},
     };
-
-    // Functions
-    this.isLoggedIn = this.isLoggedIn.bind(this);
-    this.getUser = this.getUser.bind(this);
-
-    // Event Listeners
-    window.addEventListener("load", this.isLoggedIn, true);
-    window.addEventListener("load", this.getUser, true);
   }
 
   /**
    * Determines if the user should be logged in or logged out
    */
-  isLoggedIn() {
+  componentDidMount() {
     fetch(`${location.origin}/session/user`)
       .then((res) => res.json())
       .then((data) => {
         this.setState({ login: Boolean(data) });
 
         // Determines if session should be passed to client
-        if (data) this.setState((state) => ({ user: { ...state.user, data } }));
+        if (data) this.setState({ user: data });
         console.log(this.state.user);
-      })
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  }
-
-  /**
-   * Gets information for the user's profile
-   * @returns   Returns nothing or is void
-   */
-  getUser() {
-    const id =
-      location.pathname.split("/")[location.pathname.split("/").length - 1];
-    if (!id.match(/\da-z/)) return;
-    fetch(`${location.origin}/users/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        this.setState({
-          urlUser: data,
-        });
       })
       .catch((e) => {
         alert(e);
@@ -279,18 +269,13 @@ class BookExchange extends React.Component {
  * @returns             Returns the content that should be displayed
  */
 const Books = (props) => {
-  let books = [];
+  let [books, setBooks] = useState([]);
 
-  /* Gets all books */
-  window.onload = () => {
-    fetch(`${location.origin}/api/books`)
-      .then((res) => res.json())
-      .then((data) => (books = data))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  };
+  // Gets all books
+  const getBooks = useCallback(async () => {
+    setBooks(await callApi(`${location.origin}/api/books`));
+  }, []);
+  useEffect(() => getBooks(), []);
 
   return (
     <form
@@ -354,29 +339,37 @@ const Books = (props) => {
  * @returns   Returns the content that should be displayed
  */
 const Requests = () => {
-  let requests = [];
+  let [requests, setRequests] = useState([]);
 
-  /* Gets all requests that have been made */
-  window.onload = () => {
-    fetch(`${location.origin}/api/requests`)
-      .then((res) => res.json())
-      .then((data) => (requests = data))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  };
+  // Gets all requests
+  const getRequests = useCallback(async () => {
+    setRequests(await callApi(`${location.origin}/api/requests`));
+  }, []);
+  useEffect(() => getRequests(), []);
 
   return <h2>All Requests</h2>;
 };
 
 /**
  * Component for displaying content on the Request for (book) page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
-const BookRequests = (props) => {
-  return <h2>Requests for {props.book}</h2>;
+const BookRequests = () => {
+  const { bookId } = useParams();
+  let [takeBooks, setTakeBooks] = useState([]);
+  let [giveBooks, setGiveBooks] = useState([]);
+
+  // Gets all requests for the book
+  const getRequestsForBook = useCallback(async () => {
+    let data = await callApi(`${location.origin}/api/books/${bookId}/requests`);
+    setTakeBooks(takeBooks.push([...data.take.books]));
+    setGiveBooks(giveBooks.push([...data.give.books]));
+  }, []);
+  useEffect(() => getRequestsForBook(), []);
+
+  return (
+    <h2>Requests for {takeBooks.find((book) => book._id == bookId).title}</h2>
+  );
 };
 
 /**
@@ -384,18 +377,13 @@ const BookRequests = (props) => {
  * @returns   Returns the content that should be displayed
  */
 const CreateRequest = () => {
-  let takeBooks = [];
+  let [requestedBooks, setRequestedBooks] = useState([]);
 
-  /* Gets the books that were requested for trading from the server */
-  window.onload = () => {
-    fetch(`${location.origin}/session/books`)
-      .then((res) => res.json())
-      .then((data) => (takeBooks = data))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  };
+  // Gets all requested books
+  const getRequestedBooks = useCallback(async () => {
+    setRequestedBooks(await callApi(`${location.origin}/session/books`));
+  }, []);
+  useEffect(() => getRequestedBooks(), []);
 
   return (
     <div>
@@ -405,7 +393,7 @@ const CreateRequest = () => {
         </div>
 
         <div className="panel-body">
-          {takeBooks.map((book) => {
+          {requestedBooks.map((book) => {
             <div className="item" id={book._id}>
               {book.name}
             </div>;
@@ -418,43 +406,32 @@ const CreateRequest = () => {
 
 /**
  * Component for displaying content on the Trades page
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
 const Trades = () => {
-  let trades = [];
+  let [trades, setTrades] = useState([]);
 
-  /* Gets all trades */
-  window.onload = () => {
-    fetch(`${location.origin}/api/requests?trades=true`)
-      .then((res) => res.json())
-      .then((data) => (trades = data))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  };
+  // Gets all trades
+  const getTrades = useCallback(async () => {
+    setTrades(await callApi(`${location.origin}/api/requests?trades=true`));
+  }, []);
+  useEffect(() => getTrades(), []);
 
   return <h2>Trades</h2>;
 };
 
 /**
  * Component for displaying content on the Users page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
-const Users = (props) => {
-  let users = [];
+const Users = () => {
+  let [users, setUsers] = useState([]);
 
-  /* Gets all users */
-  window.onload = () => {
-    fetch(`${location.origin}/api/users`)
-      .then((res) => res.json())
-      .then((data) => (users = data))
-      .catch((e) => {
-        alert(e);
-        console.error(e);
-      });
-  };
+  // Gets all users
+  const getUsers = useCallback(async () => {
+    setUsers(await callApi(`${location.origin}/api/users`));
+  }, []);
+  useEffect(() => getUsers(), []);
 
   return <h2>All Users</h2>;
 };
@@ -482,12 +459,18 @@ const Signup = () => {
  */
 const Profile = (props) => {
   const { id } = useParams();
-  const user = props.users.find((user) => user._id == id);
+  let [user, setUser] = useState({});
+
+  // Gets the user's profile information
+  const getUser = useCallback(async () => {
+    setUser(await callApi(`${location.origin}/api/users/${id}`));
+  }, []);
+  useEffect(() => getUser(), []);
 
   // Updates the document
   updateTitleAndMetaTags(
-    `Book Exchange - ${props.user.username}'s Profile`,
-    `View user's ${props.user.username} profile`,
+    `Book Exchange - ${user.username}'s Profile`,
+    `View ${user.username}'s profile`,
     `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
   );
 
@@ -498,15 +481,15 @@ const Profile = (props) => {
       </div>
 
       <AccountFormLayout
-        username={props.user.username}
-        password={props.user.password}
-        email={props.user.email || ""}
-        name={props.user.name || ""}
-        address={props.user.address || ""}
-        city={props.user.city || ""}
-        state={props.user.state || ""}
-        country={props.user.country || ""}
-        zipPostal={props.user.zipPostal || ""}
+        username={user.username}
+        password={user.password}
+        email={user.email || ""}
+        name={user.name || ""}
+        address={user.address || ""}
+        city={user.city || ""}
+        state={user.state || ""}
+        country={user.country || ""}
+        zipPostal={user.zipPostal || ""}
       />
 
       <div className="panel-footer px-3 py-2">
