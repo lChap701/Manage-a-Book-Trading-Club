@@ -42,8 +42,7 @@ const userSchema = new Schema(
         },
       },
     ],
-    books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
-    requests: [{ type: Schema.Types.ObjectId, ref: "Requests" }],
+    books: [{ type: Schema.Types.ObjectId, ref: "Books", default: [] }],
   },
   {
     timestamps: {

@@ -16,7 +16,6 @@ const requestSchema = new Schema({
       required: "request must include at least one book to take",
     },
   ],
-  users: [{ type: Schema.Types.ObjectId, ref: "Users" }],
   traded: { type: Boolean, default: false },
 });
 
