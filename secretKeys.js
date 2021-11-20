@@ -70,8 +70,9 @@ const saveKey = (key, id) => {
     if (fs.existsSync("./keys.xml")) {
       keys = fs
         .readFileSync("./keys.xml", "utf-8")
-        .split(/<\/?keys>/)
-        .filter((str) => str.length);
+        .split(/<\/?keys?>/)
+        .filter((str) => str.length)
+        .map((key) => `<key>${key}</key>`);
     }
 
     keys.push(`<key><id>${id}</id><value>${key}</value></key>`);
