@@ -102,6 +102,11 @@ module.exports = (app) => {
     passport.authenticate("microsoft", oauthOptions)
   );
 
+  // Displays the Book Exchange - Create Requests Page
+  app.get("/requests/new", (req, res) => {
+    res.sendFile(process.cwd() + "/public/createRequests.html");
+  });
+
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
   app
     .route("/users/edit")

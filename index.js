@@ -102,11 +102,6 @@ app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
-// Displays the Book Exchange - Create Requests Page
-app.get("/requests/new", (req, res) => {
-  res.sendFile(process.cwd() + "/public/createRequests.html");
-});
-
 // Form Handler for the form on the home page
 app.post("/requests/new/books", (req, res) => {
   if (!req.body) return;
