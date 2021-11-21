@@ -140,7 +140,6 @@ module.exports = () => {
             (req.body.address && req.body.address.length > 0)
           ) {
             req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
-
             return req.session.error ? done(null, false) : done(null, user);
           } else {
             return done(null, user);
