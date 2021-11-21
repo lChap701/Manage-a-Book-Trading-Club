@@ -25,8 +25,8 @@
     "OAuth",
     "bcrypt",
     "AES",
-    "login",
-    "book trading"
+    "user-authentication",
+    "book-trading"
   ],
   "author": "Lucas Chapman",
   "license": "MIT",
