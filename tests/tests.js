@@ -203,12 +203,11 @@ suite("Unit Tests", () => {
         .get("/api/users")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          
+
           // For the recently added users
           const json = JSON.parse(res.text).sort(
             (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
           );
-          console.log(json);
 
           assert.isArray(json, "response should return an array");
           assert.equal(
@@ -361,6 +360,7 @@ suite("Unit Tests", () => {
           .get("/users/" + ids.users[1])
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
+            console.log(res.text);
             done();
           });
       });
