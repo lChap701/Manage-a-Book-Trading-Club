@@ -59,15 +59,21 @@ module.exports = (app) => {
         country: user.country,
       };
 
-      // Displays encrypted fields
+      // Displays the encrypted fields
       if (user.preciseLocation) {
         const KEY = secretKeys.findKey(user._id.toString());
-        data.address = CryptoJS.AES.decrypt(user.address, KEY).toString(
-          CryptoJS.enc.Utf8
-        );
-        data.zipPostalCode = CryptoJS.AES.decrypt(user.zipPostal, KEY).toString(
-          CryptoJS.enc.Utf8
-        );
+        data.address =
+          user.address && user.address.length > 0
+            ? CryptoJS.AES.decrypt(user.address, KEY).toString(
+                CryptoJS.enc.Utf8
+              )
+            : "";
+        data.zipPostalCode =
+          user.zipPostal && user.zipPostal.length > 0
+            ? CryptoJS.AES.decrypt(user.zipPostal, KEY).toString(
+                CryptoJS.enc.Utf8
+              )
+            : "";
       }
 
       res.json(data);

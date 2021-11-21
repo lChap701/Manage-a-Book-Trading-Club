@@ -134,10 +134,17 @@ module.exports = () => {
                 : req.body.zipPostal,
           });
 
-          // Checks if the secret key was saved in keys.xml
-          req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
+          // Checks if the secret key was saved in keys.xml (if the key was used)
+          if (
+            (req.body.zipPostal && req.body.zipPostal.length > 0) ||
+            (req.body.address && req.body.address.length > 0)
+          ) {
+            req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
 
-          return req.session.error ? done(null, false) : done(null, user);
+            return req.session.error ? done(null, false) : done(null, user);
+          } else {
+            return done(null, user);
+          }
         } catch (err) {
           return done(err);
         }
