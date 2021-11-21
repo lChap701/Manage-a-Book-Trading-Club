@@ -18,7 +18,7 @@ module.exports = () => {
   });
 
   /**
-   * Checks if the user exists (for accounts created using OAuth)
+   * Checks if the user exists (for accounts to be created using OAuth)
    * @param {*} req                 Represents the request
    * @param {String} accessToken    Represents the token used to access an API
    * @param {String} refreshToken   Represents the token used to create a new access token
