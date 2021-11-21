@@ -441,7 +441,7 @@ const Users = () => {
  * @returns     Returns the content that should be displayed
  */
 const Login = () => {
-  return <AccountForm name="Login" />;
+  return <AccountForm formName="Login" />;
 };
 
 /**
@@ -449,7 +449,7 @@ const Login = () => {
  * @returns     Returns the content that should be displayed
  */
 const Signup = () => {
-  return <AccountForm name="Sign Up" />;
+  return <AccountForm formName="Sign Up" />;
 };
 
 /**
@@ -463,42 +463,63 @@ const Profile = (props) => {
 
   // Gets the user's profile information
   const getUser = useCallback(async () => {
-    setUser(await callApi(`${location.origin}/api/users/${id}`));
+    let json = await callApi(`${location.origin}/api/users/${id}`);
+
+    // Stores the user
+    setUser(json);
+
+    // Updates the document
+    updateTitleAndMetaTags(
+      `Book Exchange - ${json.username}'s Profile`,
+      `View ${json.username}'s profile`,
+      `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
+    );
   }, []);
   useEffect(() => getUser(), []);
 
-  // Updates the document
-  updateTitleAndMetaTags(
-    `Book Exchange - ${user.username}'s Profile`,
-    `View ${user.username}'s profile`,
-    `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
-  );
-
   return (
-    <form className="panel shadow-lg">
-      <div className="panel-header text-white p-1 mx-auto">
-        <h2 className="text-center">{props.user.username}'s Profile</h2>
-      </div>
+    <div>
+      {!user.username ? (
+        <span>Loading...</span>
+      ) : (
+        <form className="panel shadow-lg">
+          <div className="panel-header text-white p-1 mx-auto">
+            <h2 className="text-center">{user.username}'s Profile</h2>
+          </div>
 
-      <AccountFormLayout
-        username={user.username}
-        password={user.password}
-        email={user.email || ""}
-        name={user.name || ""}
-        address={user.address || ""}
-        city={user.city || ""}
-        state={user.state || ""}
-        country={user.country || ""}
-        zipPostal={user.zipPostal || ""}
-      />
+          <AccountFormLayout
+            username={user.username}
+            password={null}
+            email={user.email}
+            name={user.fullName}
+            address={user.address || ""}
+            city={user.city}
+            state={user.state}
+            country={user.country}
+            zipPostal={user.zipPostalCode || ""}
+            readonly={true}
+            hidePassword={true}
+          />
 
-      <div className="panel-footer px-3 py-2">
-        <Link
-          className="btn btn-success w-100"
-          to={props.myId == id ? "/books/my" : `${location.pathname}/books`}
-        ></Link>
-      </div>
-    </form>
+          <div className="panel-footer px-3 py-2">
+            <Link
+              className="btn btn-success"
+              to={props.myId == id ? "/books/my" : `${location.pathname}/books`}
+            >
+              {props.myId == id ? "My Books" : `${user.username}'s Books`}
+            </Link>
+
+            {props.myId == id ? (
+              <Link className="btn btn-success ml-1" to="/users/edit">
+                Edit Profile
+              </Link>
+            ) : (
+              ""
+            )}
+          </div>
+        </form>
+      )}
+    </div>
   );
 };
 
@@ -530,7 +551,7 @@ const UserBooks = (props) => {
 };
 
 /**
- * Component for displaying and handling forms on the Login, Sign Up, Profile, and Edit Profile pages
+ * Component for displaying and handling forms on the Login, Sign Up, and Edit Profile pages
  */
 class AccountForm extends React.Component {
   constructor(props) {
@@ -541,7 +562,7 @@ class AccountForm extends React.Component {
       username: props.username || "",
       password: props.password || "",
       email: props.email || "",
-      name: props.email || "",
+      name: props.name || "",
       address: props.address || "",
       city: props.city || "",
       state: props.state || "",
@@ -846,7 +867,7 @@ class AccountForm extends React.Component {
     };
 
     // For when users try to sign up or update their account
-    if (this.props.name != "Login") {
+    if (this.props.formName != "Login") {
       data.email = this.state.email;
       data.name = this.state.name;
       data.address = this.state.address;
@@ -864,7 +885,7 @@ class AccountForm extends React.Component {
       location.reload(res);
     } else {
       let { errs } = this.state;
-      errs[2] = res;
+      errs[3] = res;
       this.setState({ errs: errs });
     }
   }
@@ -874,7 +895,7 @@ class AccountForm extends React.Component {
       <form
         onSubmit={this.submitForm}
         className="panel shadow-lg"
-        name={this.props.name}
+        name={this.props.formName}
         novalidate="true"
       >
         {this.state.errs[3] != "" ? (
@@ -884,29 +905,16 @@ class AccountForm extends React.Component {
         )}
 
         <div className="panel-header text-white p-1 mx-auto">
-          <h2 className="text-center">{this.props.name}</h2>
+          <h2 className="text-center">{this.props.formName}</h2>
         </div>
 
-        {this.props.name == "Login" ? (
+        {this.props.formName == "Login" ? (
           <LoginFormLayout
             username={this.state.username}
             saveUsername={this.saveUsername}
             password={this.state.password}
             savePassword={this.savePassword}
             errs={this.state.errs}
-          />
-        ) : this.props.name == "Profile" ? (
-          <AccountFormLayout
-            readonly={true}
-            username={this.state.username}
-            password={this.state.password}
-            email={this.state.email}
-            name={this.state.name}
-            address={this.state.address}
-            city={this.city}
-            state={this.state.state}
-            country={this.state.country}
-            zipPostal={this.state.zipPostal}
           />
         ) : (
           <AccountFormLayout
@@ -941,10 +949,10 @@ class AccountForm extends React.Component {
           <input
             className="btn btn-success w-100"
             type="submit"
-            value={this.props.name}
+            value={this.props.formName}
           />
 
-          {this.props.name == "Login" ? (
+          {this.props.formName == "Login" ? (
             <div className="mt-2">
               <Link className="text-white" to="/signup">
                 Sign Up
@@ -1012,22 +1020,25 @@ const AccountFormLayout = (props) => {
           value={props.username}
           readonly={Boolean(props.readonly)}
           onChange={props.saveUsername || null}
-          validator="unameFeedback"
-          err={props.errs[0]}
+          validator={!Boolean(props.readonly) ? "unameFeedback" : null}
+          err={props.errs ? props.errs[0] : null}
         />
 
-        <Input
-          containerClass="form-group col"
-          id="psw"
-          label="Password"
-          type="password"
-          required={!Boolean(props.readonly)}
-          readonly={Boolean(props.readonly)}
-          value={props.password}
-          onChange={props.savePassword || null}
-          validator="pswFeedback"
-          err={props.errs[1] || null}
-        />
+        {!props.hidePassword ? (
+          <Input
+            containerClass="form-group col"
+            id="psw"
+            label="Password"
+            type="password"
+            required={true}
+            value={props.password}
+            onChange={props.savePassword}
+            validator="pswFeedback"
+            err={props.errs[1]}
+          />
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="row">
@@ -1039,8 +1050,8 @@ const AccountFormLayout = (props) => {
           value={props.email}
           readonly={Boolean(props.readonly)}
           onChange={props.saveEmail || null}
-          validator="emailFeedback"
-          err={props.errs[2] || null}
+          validator={!props.readonly ? "emailFeedback" : null}
+          err={props.errs ? props.errs[2] : null}
         />
 
         <Input
@@ -1137,7 +1148,7 @@ const AccountFormLayout = (props) => {
             label="Country"
             value={props.country}
             options={props.countryOpts}
-            onChange={props.saveCountry || null}
+            onChange={props.saveCountry}
             validator=""
             err=""
           />
@@ -1230,20 +1241,22 @@ const Input = (props) => {
     <div className={props.containerClass}>
       <label for={props.id}>
         {props.label}
-        {!props.required ? <small> (Optional)</small> : ""}
+        {!props.required && !props.readonly ? <small> (Optional)</small> : ""}
       </label>
       <input
         id={props.id}
         name={props.id}
         type={props.type}
         list={props.list || null}
-        className="form-control"
+        className={`form-control${
+          props.readonly && props.value ? "-plaintext" : ""
+        }`}
         required={Boolean(props.required)}
         value={props.value}
-        autocomplete={props.list ? "off" : "on"}
+        autocomplete={props.list && !props.readonly ? "off" : "on"}
         onChange={props.onChange || null}
         aria-describedby={props.validator || null}
-        readonly={Boolean(props.readonly)}
+        readOnly={Boolean(props.readonly)}
       />
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
