@@ -126,7 +126,6 @@ class BookExchange extends React.Component {
 
         // Determines if session should be passed to client
         if (data) this.setState({ user: data });
-        console.log(this.state.user);
       })
       .catch((e) => {
         alert(e);
@@ -163,7 +162,7 @@ class BookExchange extends React.Component {
                   id="navbarNavAltMarkup"
                 >
                   <div className="navbar-nav">
-                    <NavLink className="nav-item nav-link" to="/books">
+                    <NavLink className="nav-item nav-link" exact to="/books">
                       Books
                     </NavLink>
                     {!this.state.login ? (
@@ -177,6 +176,7 @@ class BookExchange extends React.Component {
                         links={[
                           {
                             path: "/requests",
+                            exact: true,
                             text: "All Requests",
                           },
                           {
@@ -189,7 +189,7 @@ class BookExchange extends React.Component {
                     <NavLink className="nav-item nav-link" to="/trades">
                       Trades
                     </NavLink>
-                    <NavLink className="nav-item nav-link" to="/users">
+                    <NavLink className="nav-item nav-link" exact to="/users">
                       Users
                     </NavLink>
                   </div>
@@ -240,15 +240,15 @@ class BookExchange extends React.Component {
               <Route exact path="/requests" component={Requests} />
               <Route path="/requests/new" component={CreateRequest} />
               <Route path="/trades" component={Trades} />
-              <Route exact path="/users" component={Users} />
-              <Route exact path="/users/:id">
-                <Profile user={this.state.urlUser} myId={this.state.user._id} />
+              <Route exact strict path="/users" component={Users} />
+              <Route exact path="/users/edit">
+                <EditProfile user={this.state.user} />
+              </Route>
+              <Route exact strict path="/users/:id">
+                <Profile myId={this.state.user._id} />
               </Route>
               <Route path="/users/:id/books">
                 <UserBooks />
-              </Route>
-              <Route path="/users/edit">
-                <EditProfile user={this.state.user} />
               </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
@@ -529,6 +529,7 @@ const Profile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const EditProfile = (props) => {
+  console.log(props.user);
   return <h2>Edit Profile</h2>;
 };
 
@@ -1204,7 +1205,11 @@ const Dropdown = (props) => {
       <div className="dropdown-menu" aria-labelledby={props.id}>
         {props.links.map((link) => {
           return (
-            <NavLink className="dropdown-item nav-item" to={link.path}>
+            <NavLink
+              className="dropdown-item nav-item"
+              exact={Boolean(link.exact)}
+              to={link.path}
+            >
               {link.text}
             </NavLink>
           );
