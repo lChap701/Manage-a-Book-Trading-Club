@@ -134,9 +134,9 @@ All URL paths part of this project.
 - **/api/countries/:cntry/states/:st/cities** - Allows all cities in a state to be sent to the client
 - **/api/countries/:cntry/zipPostalCodes/:zipPostal/states** - Allows all states to be sent to the client based on country and zip/postal code
 - **/api/countries/:cntry/zipPostalCodes/:zipPostal/cities** - Allows all cities to be sent to the client based on country and zip/postal code
-- **/api/countries/:cntry/states/:st/cities/:city/zipPostalCodes"** - Allows all zip/postal codes to be sent to the client based on country, state, and city
-- **/api/states"** - Allows states from around the world to be sent to the client
-- **/api/addresses/:text"** - Allows addresses from around the world to be sent to the client
+- **/api/countries/:cntry/states/:st/cities/:city/zipPostalCodes** - Allows all zip/postal codes to be sent to the client based on country, state, and city
+- **/api/states** - Allows states from around the world to be sent to the client
+- **/api/addresses/:text** - Allows addresses from around the world to be sent to the client
 
 ### Session Paths
 
