@@ -17,7 +17,8 @@ module.exports = (app) => {
     crud
       .getUsers()
       .populate({ path: "books" })
-      .then((users) =>
+      .then((users) => {
+        users.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
         res.json(
           users.map((user) => {
             return {
@@ -36,8 +37,8 @@ module.exports = (app) => {
               createdAt: user.createdAt,
             };
           })
-        )
-      );
+        );
+      });
   });
 
   // Routing for displaying a user's profile
@@ -92,8 +93,7 @@ module.exports = (app) => {
             return;
           }
 
-          books.sort((a, b) => b.bumpedOn - a.bumpedOn);
-
+          books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
           res.json({
             books: books.map((book) => {
               return {
@@ -152,7 +152,7 @@ module.exports = (app) => {
       .then((books) =>
         res.json(
           books
-            .sort((a, b) => b.bumpedOn - a.bumpedOn)
+            .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
             .map((book) => {
               return {
                 _id: book._id,
@@ -196,7 +196,7 @@ module.exports = (app) => {
           res.json({
             give: {
               books: request.giveBooks
-                .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                .sort((a, b) => b.numOfRequests - a.numOfRequests)
                 .map((book) => {
                   return {
                     _id: book._id,
@@ -218,7 +218,7 @@ module.exports = (app) => {
             },
             take: {
               books: request.takeBooks
-                .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                .sort((a, b) => b.numOfRequests - a.numOfRequests)
                 .map((book) => {
                   return {
                     _id: book._id,
@@ -262,7 +262,9 @@ module.exports = (app) => {
               return {
                 give: {
                   books: request.giveBooks
-                    .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                    .sort(
+                      (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                    )
                     .map((book) => {
                       return {
                         _id: book._id,
@@ -281,7 +283,9 @@ module.exports = (app) => {
                 },
                 take: {
                   books: request.takeBooks
-                    .sort((a, b) => b.bumpedOn - a.bumpedOn)
+                    .sort(
+                      (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                    )
                     .map((book) => {
                       return {
                         _id: book._id,
