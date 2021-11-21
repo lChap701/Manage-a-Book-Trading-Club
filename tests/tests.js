@@ -203,11 +203,12 @@ suite("Unit Tests", () => {
         .get("/api/users")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-
-          // Gets the recently added users
+          
+          // For the recently added users
           const json = JSON.parse(res.text).sort(
-            (a, b) => b.createdAt - a.createdAt
+            (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
           );
+          console.log(json);
 
           assert.isArray(json, "response should return an array");
           assert.equal(
@@ -221,49 +222,49 @@ suite("Unit Tests", () => {
             "response should return objects with a property of '_id'"
           );
           assert.propertyVal(
-            json[0],
+            json[1],
             "username",
             "dummyUser1",
-            "response should return an array containing an object with a property of 'name' that equals 'dummyUser1'"
+            "response should return an array containing an object with a property of 'username' that equals 'dummyUser1'"
+          );
+          assert.propertyVal(
+            json[0],
+            "username",
+            "dummyUser2",
+            "response should return an array containing an object with a property of 'username' that equals 'dummyUser2'"
           );
           assert.propertyVal(
             json[1],
-            "username",
-            "dummyUser2",
-            "response should return an array containing an object with a property of 'name' that equals 'dummyUser2'"
-          );
-          assert.propertyVal(
-            json[0],
             "city",
             "Big City",
             "response should return an array containing an object with a property of 'city' that equals 'Big City'"
           );
           assert.propertyVal(
-            json[1],
+            json[0],
             "city",
             "null",
             "response should return an array containing an object with a property of 'city' that equals 'null'"
           );
           assert.propertyVal(
-            json[0],
+            json[1],
             "state",
             "IA",
             "response should return an array containing an object with a property of 'state' that equals 'IA'"
           );
           assert.propertyVal(
-            json[1],
+            json[0],
             "state",
             "null",
             "response should return an array containing an object with a property of 'state' that equals 'null'"
           );
           assert.propertyVal(
-            json[0],
+            json[1],
             "country",
             "US",
             "response should return an array containing an object with a property of 'country' that equals 'US'"
           );
           assert.propertyVal(
-            json[1],
+            json[0],
             "country",
             "null",
             "response should return an array containing an object with a property of 'country' that equals 'null'"
@@ -281,8 +282,8 @@ suite("Unit Tests", () => {
           done();
 
           // Saves user IDS
-          ids.users.push(json[0]._id);
           ids.users.push(json[1]._id);
+          ids.users.push(json[0]._id);
         });
     });
   });
@@ -357,7 +358,7 @@ suite("Unit Tests", () => {
       test("1)  Loaded Test", (done) => {
         chai
           .request(app)
-          .get("/users/" + ids.users[1]._id)
+          .get("/users/" + ids.users[1])
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
             done();

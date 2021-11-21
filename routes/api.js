@@ -33,6 +33,7 @@ module.exports = (app) => {
                       (b1, b2) => b1.numOfRequests + b2.numOfRequests
                     )
                   : 0,
+              createdAt: user.createdAt,
             };
           })
         )
