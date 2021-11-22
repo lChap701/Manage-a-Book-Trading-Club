@@ -472,8 +472,8 @@ const Profile = (props) => {
     setUser(json);
 
     if (json.country.length > 0 && json.state.length > 0) {
-      getCountry(json.country);
-      getState(json.country, json.state);
+      await getCountry(json.country);
+      await getState(json.country, json.state);
     }
 
     // Updates the document
@@ -488,10 +488,9 @@ const Profile = (props) => {
    * Gets the full name of a country
    * @param {String} country    Represents the abbreviated country
    */
-  const getCountry = (country) => {
-    fetch(`${location.origin}/api/countries/${country}`)
-      .then((res) => res.json())
-      .then((data) => setUser((user) => (user.country = data.name)));
+  const getCountry = async (country) => {
+    let json = await callApi(`${location.origin}/api/countries/${country}`);
+    setUser((user) => (user.country = json.name));
   };
 
   /**
@@ -499,10 +498,11 @@ const Profile = (props) => {
    * @param {String} country    Represents the abbreviated country
    * @param {String} state      Represents the abbreviated state
    */
-  const getState = (country, state) => {
-    fetch(`${location.origin}/api/countries/${country}/states/${state}`)
-      .then((res) => res.json())
-      .then((data) => setUser((user) => (user.state = data.name)));
+  const getState = async (country, state) => {
+    let json = await callApi(
+      `${location.origin}/api/countries/${country}/states/${state}`
+    );
+    setUser((user) => (user.state = json.name));
   };
 
   // Calls the getUser() function once
