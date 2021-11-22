@@ -1,4 +1,4 @@
-const { useState, useEffect, useCallback } = React;
+const { useState, useEffect, useCallback, useRef } = React;
 const {
   BrowserRouter,
   Route,
@@ -126,6 +126,7 @@ class BookExchange extends React.Component {
 
         // Determines if session should be passed to client
         if (data) this.setState({ user: data });
+        console.log(this.state.user);
       })
       .catch((e) => {
         alert(e);
@@ -240,9 +241,9 @@ class BookExchange extends React.Component {
               <Route exact path="/requests" component={Requests} />
               <Route path="/requests/new" component={CreateRequest} />
               <Route path="/trades" component={Trades} />
-              <Route exact strict path="/users" component={Users} />
+              <Route exact path="/users" component={Users} />
               <Route exact path="/users/edit">
-                <EditProfile user={this.state.user} />
+                <EditProfile userId={this.state.user._id} />
               </Route>
               <Route exact strict path="/users/:id">
                 <Profile myId={this.state.user._id} />
@@ -461,12 +462,19 @@ const Profile = (props) => {
   const { id } = useParams();
   let [user, setUser] = useState({});
 
-  // Gets the user's profile information
+  /**
+   * Gets the user's profile information
+   */
   const getUser = useCallback(async () => {
     let json = await callApi(`${location.origin}/api/users/${id}`);
 
     // Stores the user
     setUser(json);
+
+    if (json.country.length > 0 && json.state.length > 0) {
+      getCountry(json.country);
+      getState(json.country, json.state);
+    }
 
     // Updates the document
     updateTitleAndMetaTags(
@@ -475,6 +483,29 @@ const Profile = (props) => {
       `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
     );
   }, []);
+
+  /**
+   * Gets the full name of a country
+   * @param {String} country    Represents the abbreviated country
+   */
+  const getCountry = (country) => {
+    fetch(`${location.origin}/api/countries/${country}`)
+      .then((res) => res.json())
+      .then((data) => setUser((user) => (user.country = data.name)));
+  };
+
+  /**
+   * Gets the full name of a state
+   * @param {String} country    Represents the abbreviated country
+   * @param {String} state      Represents the abbreviated state
+   */
+  const getState = (country, state) => {
+    fetch(`${location.origin}/api/countries/${country}/states/${state}`)
+      .then((res) => res.json())
+      .then((data) => setUser((user) => (user.state = data.name)));
+  };
+
+  // Calls the getUser() function once
   useEffect(() => getUser(), []);
 
   return (
@@ -529,8 +560,42 @@ const Profile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const EditProfile = (props) => {
-  console.log(props.user);
-  return <h2>Edit Profile</h2>;
+  let [user, setUser] = useState({});
+  let [updated, setUpdated] = useState(false);
+  let mounted = useRef();
+
+  // Gets the user's profile information
+  useEffect(() => {
+    // Checks if component was mounted and updates component once
+    if (!mounted.current) {
+      mounted.current = true;
+    } else if (!updated && props.userId.length > 0) {
+      callApi(`${location.origin}/api/users/${props.userId}`).then((data) => {
+        setUser(data);
+        setUpdated(true);
+      });
+    }
+  });
+
+  return (
+    <div>
+      {!user.username ? (
+        <span>Loading...</span>
+      ) : (
+        <AccountForm
+          formName="Edit Profile"
+          username={user.username}
+          email={user.email}
+          name={user.fullName}
+          address={user.address}
+          city={user.city}
+          state={user.state}
+          country={user.country}
+          zipPostalCode={user.zipPostalCode}
+        />
+      )}
+    </div>
+  );
 };
 
 /**
@@ -561,7 +626,7 @@ class AccountForm extends React.Component {
     // States
     this.state = {
       username: props.username || "",
-      password: props.password || "",
+      password: "",
       email: props.email || "",
       name: props.name || "",
       address: props.address || "",
@@ -588,9 +653,7 @@ class AccountForm extends React.Component {
     this.getAddresses = this.getAddresses.bind(this);
     this.getCities = this.getCities.bind(this);
     this.getStates = this.getStates.bind(this);
-    this.getState = this.getState.bind(this);
     this.getCountries = this.getCountries.bind(this);
-    this.getCountry = this.getCountry.bind(this);
     this.getZipPostalCodes = this.getZipPostalCodes.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
@@ -696,17 +759,6 @@ class AccountForm extends React.Component {
   }
 
   /**
-   * Gets the full name of a state
-   */
-  getState() {
-    const { state, country } = this.state;
-
-    fetch(`${location.origin}/api/countries/${country}/states/${state}`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ state: data.name }));
-  }
-
-  /**
    * Gets all possible countries
    */
   getCountries() {
@@ -725,15 +777,6 @@ class AccountForm extends React.Component {
         options.countries.push(...countries);
         this.setState({ options: options });
       });
-  }
-
-  /**
-   * Gets the full name of a country
-   */
-  getCountry() {
-    fetch(`${location.origin}/api/countries/${this.state.country}`)
-      .then((res) => res.json())
-      .then((data) => this.setState({ country: data.name }));
   }
 
   /**
@@ -939,6 +982,7 @@ class AccountForm extends React.Component {
             zipPostal={this.state.zipPostal}
             zipPostalOpts={this.state.options.zipPostalCodes}
             saveZipPostalCode={this.saveZipPostalCode}
+            hidePassword={this.props.formName == "Edit Profile"}
           />
         )}
 
@@ -946,7 +990,11 @@ class AccountForm extends React.Component {
           <input
             className="btn btn-success w-100"
             type="submit"
-            value={this.props.formName}
+            value={
+              this.props.formName == "Edit Profile"
+                ? "Update Profile"
+                : this.props.formName
+            }
           />
 
           {this.props.formName == "Login" ? (
