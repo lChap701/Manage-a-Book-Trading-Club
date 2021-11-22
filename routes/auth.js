@@ -126,10 +126,6 @@ module.exports = (app) => {
       crud
         .updateUser(req.body._id, {
           username: req.body.username,
-          password: bcrypt.hashAsync(
-            req.body.password,
-            parseInt(process.env.SALT_ROUNDS)
-          ),
           email: req.body.email,
           name: req.body.name,
           address:
