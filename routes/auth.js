@@ -103,7 +103,7 @@ module.exports = (app) => {
   );
 
   // Displays the Book Exchange - Create Requests Page
-  app.get("/requests/new", (req, res) => {
+  app.get("/requests/new", loggedOut, (req, res) => {
     res.sendFile(process.cwd() + "/public/createRequests.html");
   });
 
@@ -139,15 +139,14 @@ module.exports = (app) => {
             req.body.zipPostal && req.body.zipPostal.length > 0
               ? CryptoJS.AES.encrypt(req.body.zipPostal, KEY).toString()
               : req.body.zipPostal,
-          preciseLocation: req.body.preciseLocation == "false" ? false : true,
         })
         .then(() => {
-          req.session.error = !secretKeys.updateKey(KEY, user._id.toString());
+          req.session.error = !secretKeys.updateKey(KEY, req.body._id);
 
           if (req.session.error) {
             req.flash("error", "Unable to update your account");
           } else {
-            res.redirect("../" + req.body._id);
+            res.redirect("/users/" + req.body._id);
           }
         })
         .catch((err) => {
