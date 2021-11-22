@@ -8,6 +8,9 @@ const app = require("../index");
 const crud = require("../crud");
 const secretKeys = require("../secretKeys");
 
+// Agent setup
+const agent = chai.request.agent(app);
+
 suite("Unit Tests", () => {
   let ids = { users: [], books: [], requests: [] };
   let orgLength = 0;
@@ -20,17 +23,14 @@ suite("Unit Tests", () => {
   suite("Testing /signup", () => {
     suite("GET Tests", () => {
       test("1)  Loaded Test", (done) => {
-        chai
-          .request(app)
-          .get("/signup")
-          .end((err, res) => {
-            assert.equal(res.status, 200, "response status should be 200");
-            assert(
-              res.text.match(/<title>Book Exchange - Sign Up<\/title>/),
-              "response text should contain '<title>Book Exchange - Sign Up</title>'"
-            );
-            done();
-          });
+        agent.get("/signup").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Sign Up<\/title>/),
+            "response text should contain '<title>Book Exchange - Sign Up</title>'"
+          );
+          done();
+        });
       });
     });
 
@@ -48,8 +48,7 @@ suite("Unit Tests", () => {
           zipPostal: "52061",
         };
 
-        chai
-          .request(app)
+        agent
           .post("/signup")
           .send(data)
           .end((err, res) => {
@@ -68,8 +67,7 @@ suite("Unit Tests", () => {
           password: "test2",
         };
 
-        chai
-          .request(app)
+        agent
           .post("/signup")
           .send(data)
           .end((err, res) => {
@@ -118,20 +116,32 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /logout", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/logout").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Books<\/title>/),
+            "response text should contain '<title>Book Exchange - Books</title>'"
+          );
+          done();
+        });
+      });
+    });
+  });
+
   suite("Testing /login", () => {
     suite("GET Tests", () => {
       test("1)  Loaded Test", (done) => {
-        chai
-          .request(app)
-          .get("/login")
-          .end((err, res) => {
-            assert.equal(res.status, 200, "response status should be 200");
-            assert(
-              res.text.match(/<title>Book Exchange - Login<\/title>/),
-              "response text should contain '<title>Book Exchange - Login</title>'"
-            );
-            done();
-          });
+        agent.get("/login").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Login<\/title>/),
+            "response text should contain '<title>Book Exchange - Login</title>'"
+          );
+          done();
+        });
       });
     });
 
@@ -142,8 +152,7 @@ suite("Unit Tests", () => {
           password: "test1",
         };
 
-        chai
-          .request(app)
+        agent
           .post("/login")
           .send(data)
           .end((req, res) => {
@@ -355,26 +364,20 @@ suite("Unit Tests", () => {
   suite("Testing /users/:id", () => {
     suite("GET Tests", () => {
       test("1)  Loaded Test", (done) => {
-        chai
-          .request(app)
-          .get("/users/" + ids.users[1])
-          .end((err, res) => {
-            assert.equal(res.status, 200, "response status should be 200");
-            done();
-          });
+        agent.get("/users/" + ids.users[1]).end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          done();
+        });
       });
     });
   });
 
   suite("Testing /session/user", () => {
     test("1)  GET Test", (done) => {
-      chai
-        .request(app)
-        .get("/session/user")
-        .end((err, res) => {
-          assert.equal(res.status, 200, "response status should be 200");
-          done();
-        });
+      agent.get("/session/user").end((err, res) => {
+        assert.equal(res.status, 200, "response status should be 200");
+        done();
+      });
     });
   });
 
@@ -385,7 +388,6 @@ suite("Unit Tests", () => {
         .get("/api/countries")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          //console.log(res.text);
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
@@ -445,7 +447,6 @@ suite("Unit Tests", () => {
         .get("/api/states")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          //console.log(res.text);
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
@@ -482,7 +483,6 @@ suite("Unit Tests", () => {
         .get("/api/countries/us/states")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          //console.log(res.text);
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
@@ -681,8 +681,46 @@ suite("Unit Tests", () => {
     }
   );
 
+  suite("Testing /users/edit", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/users/edit").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Edit Profile<\/title>/),
+            "response text should contain '<title>Book Exchange - Edit Profile</title>'"
+          );
+          done();
+        });
+      });
+    });
+
+    suite("PUT Tests", () => {
+      test("1)  Send Data Test", (done) => {
+        agent
+          .put("/users/edit")
+          .send({
+            _id: ids.users[1],
+            username: "dummyUser2",
+            email: "email@gmail.com",
+            name: "Name Name",
+            address: "123 ABC Street",
+            city: "City",
+            state: "NY",
+            country: "USA",
+            zipPostal: "11111",
+          })
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            done();
+          });
+      });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
+    agent.close();
     // Deletes all test users
     ids.users.forEach((id) => {
       crud
