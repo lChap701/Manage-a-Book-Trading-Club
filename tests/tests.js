@@ -394,7 +394,7 @@ suite("Unit Tests", () => {
             JSON.parse(res.text),
             "state",
             "NY",
-            "response should return an object with a property of 'state' that equals 'MY'"
+            "response should return an object with a property of 'state' that equals 'NY'"
           );
           assert.propertyVal(
             JSON.parse(res.text),
