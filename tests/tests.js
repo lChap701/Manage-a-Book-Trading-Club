@@ -296,6 +296,58 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /users/:id", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/users/" + ids.users[1]).end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            !res.text.match(/<title>Book Exchange - Books<\/title>/),
+            "response text should contain '<title>Book Exchange - Books</title>'"
+          );
+          done();
+        });
+      });
+    });
+  });
+
+  suite("Testing /users/edit", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/users/edit").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Edit Profile<\/title>/),
+            "response text should contain '<title>Book Exchange - Edit Profile</title>'"
+          );
+          done();
+        });
+      });
+    });
+
+    suite("PUT Tests", () => {
+      test("1)  Send Data Test", (done) => {
+        agent
+          .put("/users/edit")
+          .send({
+            _id: ids.users[1],
+            username: "dummyUser2",
+            email: "email@gmail.com",
+            name: "Name Name",
+            address: "123 ABC Street",
+            city: "City",
+            state: "NY",
+            country: "USA",
+            zipPostal: "11111",
+          })
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            done();
+          });
+      });
+    });
+  });
+
   suite("Testing /api/users/:id", () => {
     test("1)  GET Test", (done) => {
       chai
@@ -358,21 +410,6 @@ suite("Unit Tests", () => {
           );
           done();
         });
-    });
-  });
-
-  suite("Testing /users/:id", () => {
-    suite("GET Tests", () => {
-      test("1)  Loaded Test", (done) => {
-        agent.get("/users/" + ids.users[1]).end((err, res) => {
-          assert.equal(res.status, 200, "response status should be 200");
-          assert(
-            !res.text.match(/<title>Book Exchange - Books<\/title>/),
-            "response text should contain '<title>Book Exchange - Books</title>'"
-          );
-          done();
-        });
-      });
     });
   });
 
@@ -700,43 +737,6 @@ suite("Unit Tests", () => {
       });
     }
   );
-
-  suite("Testing /users/edit", () => {
-    suite("GET Tests", () => {
-      test("1)  Loaded Test", (done) => {
-        agent.get("/users/edit").end((err, res) => {
-          assert.equal(res.status, 200, "response status should be 200");
-          assert(
-            res.text.match(/<title>Book Exchange - Edit Profile<\/title>/),
-            "response text should contain '<title>Book Exchange - Edit Profile</title>'"
-          );
-          done();
-        });
-      });
-    });
-
-    suite("PUT Tests", () => {
-      test("1)  Send Data Test", (done) => {
-        agent
-          .put("/users/edit")
-          .send({
-            _id: ids.users[1],
-            username: "dummyUser2",
-            email: "email@gmail.com",
-            name: "Name Name",
-            address: "123 ABC Street",
-            city: "City",
-            state: "NY",
-            country: "USA",
-            zipPostal: "11111",
-          })
-          .end((err, res) => {
-            assert.equal(res.status, 200, "response status should be 200");
-            done();
-          });
-      });
-    });
-  });
 
   // Done after all tests have been ran
   suiteTeardown((done) => {
