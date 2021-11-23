@@ -366,6 +366,10 @@ suite("Unit Tests", () => {
       test("1)  Loaded Test", (done) => {
         agent.get("/users/" + ids.users[1]).end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            !res.text.match(/<title>Book Exchange - Books<\/title>/),
+            "response text should contain '<title>Book Exchange - Books</title>'"
+          );
           done();
         });
       });
