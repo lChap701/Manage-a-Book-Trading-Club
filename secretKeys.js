@@ -28,14 +28,14 @@ const options = {
 };
 
 /**
- * Returns a key that is 32 characters long
+ * Returns a key that is 512 characters long
  * @returns     Returns the key that was generated
  */
 const genKey = () => {
   let key = "";
   let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (let i = 0; i < 32; i++) {
+  for (let i = 0; i < 512; i++) {
     key += chars.charAt(Math.floor(Math.random() * chars.length));
   }
 
