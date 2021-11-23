@@ -39,7 +39,7 @@ const locations = {
         });
         res.json([...new Set(addresses)].sort());
       })
-      .catch((err) => console.log(err));a
+      .catch((err) => console.log(err));
   },
   getAllCountries: (res) => {
     countryStateCity
