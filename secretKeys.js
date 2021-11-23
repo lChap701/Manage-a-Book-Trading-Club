@@ -135,7 +135,7 @@ const updateKey = (newKey, id) => {
   try {
     let json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
 
-    // Adds a secret key to keys.xml 
+    // Adds a secret key to keys.xml
     if (!json.keys.key || !json.keys.key.find((key) => key.id == id)) {
       return saveKey(newKey, id);
     }
