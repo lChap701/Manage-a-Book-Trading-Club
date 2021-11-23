@@ -45,7 +45,7 @@ const locations = {
     countryStateCity
       .get("/countries")
       .then((resp) => {
-        res.json(
+        res.json(a
           resp.data.map((country) => {
             return {
               name: country.name,
