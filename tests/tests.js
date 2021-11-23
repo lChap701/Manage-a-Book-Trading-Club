@@ -738,6 +738,36 @@ suite("Unit Tests", () => {
     }
   );
 
+  suite("Testing /api/addresses/:text", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/addresses/South Street")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          console.log(res.text);
+          assert.isArray(JSON.parse(res.text), "response should return an array");
+          done();
+        });
+    });
+  });
+
+  suite("Testing /api/countries/us/addresses/:text", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/addresses/South Street")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          done();
+        });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
