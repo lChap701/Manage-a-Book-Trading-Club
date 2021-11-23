@@ -348,7 +348,7 @@ suite("Unit Tests", () => {
     });
   });
 
-  suite("Testing /api/users/:id", () => {
+  suite("Testing /api/users/:id", () => {a
     test("1)  GET Test", (done) => {
       chai
         .request(app)
