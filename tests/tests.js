@@ -720,7 +720,9 @@ suite("Unit Tests", () => {
 
   // Done after all tests have been ran
   suiteTeardown((done) => {
+    // Allows each test to start off fresh
     agent.close();
+
     // Deletes all test users
     ids.users.forEach((id) => {
       crud
