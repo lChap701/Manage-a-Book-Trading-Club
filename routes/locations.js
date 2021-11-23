@@ -23,25 +23,23 @@ const locationIq = axios.create({
  */
 const locations = {
   getAllAddresses: (res, q, cntyAbbr = null) => {
-    const TAGS = "building:house,building:apartment,building:dormitory";
-    let url = `?key=${process.env.LOCATIONIQ_ACCESS_TOKEN}&q=${q}&limit=20&tag=${TAGS}`;
+    let url = `?key=${process.env.LOCATIONIQ_ACCESS_TOKEN}&q=${q}&limit=20&tag=building:house`;
 
     if (cntyAbbr) url += `&countrycodes=${cntyAbbr}`;
 
     locationIq
       .get(url)
       .then((resp) => {
-        res.json(
-          resp.data.map((obj) => {
-            if (obj.hasOwnProperty("house_number")) {
-              return `${obj.house_number} ${obj.road}`;
-            } else if (obj.type == "apartment") {
-              return `${obj.name} ${obj.road}`;
-            }
-          })
-        );
+        let addresses = resp.data.map((obj) => {
+          if (obj.address.hasOwnProperty("house_number")) {
+            return `${obj.address.house_number} ${obj.address.road}`;
+          } else {
+            return `${obj.address.road}`;
+          }
+        });
+        res.json([...new Set(addresses)].sort());
       })
-      .catch((err) => console.log(err));
+      .catch((err) => console.log(err));a
   },
   getAllCountries: (res) => {
     countryStateCity
