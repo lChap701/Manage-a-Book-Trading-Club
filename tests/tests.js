@@ -376,6 +376,22 @@ suite("Unit Tests", () => {
     test("1)  GET Test", (done) => {
       agent.get("/session/user").end((err, res) => {
         assert.equal(res.status, 200, "response status should be 200");
+        assert.isObject(
+          JSON.parse(res.text),
+          "response should return an object"
+        );
+        assert.propertyVal(
+          JSON.parse(res.text),
+          "_id",
+          ids.users[0],
+          `response should return an object with a property of '_id' that equals '${ids.users[0]}'`
+        );
+        assert.propertyVal(
+          JSON.parse(res.text),
+          "username",
+          "dummyUser1",
+          "response should return an object with a property of 'username' that equals 'dummyUser1'"
+        );
         done();
       });
     });
