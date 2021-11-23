@@ -752,11 +752,11 @@ suite("Unit Tests", () => {
     });
   });
 
-  suite("Testing /api/countries/us/addresses/:text", () => {
+  suite("Testing /api/countries/:cntry/addresses/:text", () => {
     test("1)  GET Test", (done) => {
       chai
         .request(app)
-        .get("/api/addresses/South Street")
+        .get("/api/countries/:cntry/addresses/South Street")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
           assert.isArray(
