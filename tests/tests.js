@@ -342,6 +342,10 @@ suite("Unit Tests", () => {
           })
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              !res.text.match(/<title>Book Exchange - Edit Profile<\/title>/),
+              "response text should not contain '<title>Book Exchange - Edit Profile</title>'"
+            );
             done();
           });
       });
@@ -745,8 +749,10 @@ suite("Unit Tests", () => {
         .get("/api/addresses/South Street")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          console.log(res.text);
-          assert.isArray(JSON.parse(res.text), "response should return an array");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
           done();
         });
     });
