@@ -243,7 +243,7 @@ class BookExchange extends React.Component {
                 <Books login={this.state.login} />
               </Route>
               <Route path="/books/my">
-                <MyBooks />
+                <MyBooks userId={this.state.user._id} />
               </Route>
               <Route exact path="/requests" component={Requests} />
               <Route path="/requests/new" component={CreateRequest} />
@@ -610,6 +610,7 @@ const EditProfile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const MyBooks = (props) => {
+  console.log(props.userId);
   return <h2>My Books</h2>;
 };
 
