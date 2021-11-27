@@ -61,9 +61,6 @@ function validateForm() {
  */
 async function sendData(data, method = "POST") {
   try {
-    console.log(data);
-    console.log(method);
-    const PROFILE_URL = `${location.origin}/users/${data._id}`;
     const res = await fetch(location.href, {
       method: method,
       body: JSON.stringify(data),
@@ -76,9 +73,10 @@ async function sendData(data, method = "POST") {
 
     // Ensures that an error message is displayed
     if (!res.ok) {
+      // Allows for redirects to the user's profile
       if (method != "PUT") {
         throw new Error(`Request failed: ${res.status}`);
-      } else if (res.url != PROFILE_URL) {
+      } else if (res.url != `${location.origin}/users/${data._id}`) {
         throw new Error(`Request failed: ${res.status}`);
       }
     }
@@ -918,7 +916,7 @@ class AccountForm extends React.Component {
             username: this.state.username,
             password: this.state.password,
           }
-        : { username: this.state.username };
+        : { _id: this.state._id, username: this.state.username };
 
     // For when users try to sign up or update their account
     if (this.props.formName != "Login") {
@@ -931,9 +929,6 @@ class AccountForm extends React.Component {
       data.zipPostal = this.state.zipPostal;
     }
 
-    // Adds user ID
-    if (this.props.formName == "Edit Profile") data._id = this.state._id;
-
     // Submits the form and gets the result
     let res =
       this.props.formName == "Edit Profile"
@@ -942,7 +937,7 @@ class AccountForm extends React.Component {
 
     // Checks if a new page should be displayed or if an error occurred
     if (res.includes("http")) {
-      location.reload(res);
+      location.href = res;
     } else {
       let { errs } = this.state;
       errs[3] = res;
