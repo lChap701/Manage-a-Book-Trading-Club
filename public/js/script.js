@@ -252,7 +252,7 @@ class BookExchange extends React.Component {
               <Route exact path="/users/edit">
                 <EditProfile userId={this.state.user._id} />
               </Route>
-              <Route exact strict path="/users/:id">
+              <Route exact path="/users/:id">
                 <Profile myId={this.state.user._id} />
               </Route>
               <Route path="/users/:id/books">
