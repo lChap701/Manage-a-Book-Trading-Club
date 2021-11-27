@@ -107,18 +107,21 @@ body {
   width: 70%;
 }
 
+.shimmer-wrapper,
+.shimmer {
+  height: 100%;
+}
+
 .shimmer-wrapper {
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
-  height: 100%;
   overflow: hidden;
 }
 
 .shimmer {
   width: 50%;
-  height: 100%;
   opacity: 0.2;
   background: rgba(238, 238, 238, 0.966);
   transform: skewX(-20deg);
