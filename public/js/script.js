@@ -473,20 +473,23 @@ const Profile = (props) => {
   const getUser = useCallback(async () => {
     let json = await callApi(`${location.origin}/api/users/${id}`);
 
-    // Stores the user
-    setUser(json);
-
-    if (json.country.length > 0 && json.state.length > 0) {
-      await getCountry(json.country);
-      await getState(json.country, json.state);
-    }
-
     // Updates the document
     updateTitleAndMetaTags(
       `Book Exchange - ${json.username}'s Profile`,
       `View ${json.username}'s profile`,
       `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}`
     );
+
+    // Gets the full country and state names
+    if (json.country.length > 0) {
+      if (json.country.length > 0) {
+        json.state = await getState(json.country, json.state);
+      }
+      json.country = await getCountry(json.country);
+    }
+
+    // Stores the user
+    setUser(json);
   }, []);
 
   /**
@@ -495,7 +498,7 @@ const Profile = (props) => {
    */
   const getCountry = async (country) => {
     let json = await callApi(`${location.origin}/api/countries/${country}`);
-    setUser((user) => (user.country = json.name));
+    return json.name;
   };
 
   /**
@@ -507,7 +510,7 @@ const Profile = (props) => {
     let json = await callApi(
       `${location.origin}/api/countries/${country}/states/${state}`
     );
-    setUser((user) => (user.state = json.name));
+    return json.name;
   };
 
   // Calls the getUser() function once
