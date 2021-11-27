@@ -516,7 +516,7 @@ const Profile = (props) => {
   return (
     <div>
       {!user.username ? (
-        <span>Loading...</span>
+        <Spinner />
       ) : (
         <form className="panel shadow-lg">
           <div className="panel-header text-white p-1 mx-auto">
@@ -585,7 +585,7 @@ const EditProfile = (props) => {
   return (
     <div>
       {!user.username ? (
-        <span>Loading...</span>
+        <Spinner />
       ) : (
         <AccountForm
           formName="Edit Profile"
@@ -1242,6 +1242,20 @@ const AccountFormLayout = (props) => {
  */
 const UserBooksFormLayout = (props) => {
   return;
+};
+
+/**
+ * Component for displaying a loading animation with a spinner
+ * @returns   Returns the content that should be displayed
+ */
+const Spinner = () => {
+  return (
+    <div className="overlay d-flex justify-content-center align-items-center">
+      <div className="spinner-border text-light" role="status">
+        <span className="sr-only">Loading...</span>
+      </div>
+    </div>
+  );
 };
 
 /**
