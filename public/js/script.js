@@ -75,7 +75,7 @@ async function sendData(data, method = "POST") {
     if (!res.ok) {
       // Allows for redirects to the user's profile
       if (method != "PUT") {
-        throw new Error(`Request failed: ${res.status}`);a
+        throw new Error(`Request failed: ${res.status}`);
       } else if (res.url != `${location.origin}/users/${data._id}`) {
         throw new Error(`Request failed: ${res.status}`);
       }
