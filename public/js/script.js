@@ -1373,19 +1373,23 @@ const Select = (props) => {
         {props.label}
         {!props.required ? <small> (Optional)</small> : ""}
       </label>
-      <select
-        id={props.id}
-        name={props.id}
-        className="form-control"
-        required={props.required || false}
-        value={props.value}
-        onChange={props.onChange || null}
-        aria-describedby={props.validator}
-      >
-        {props.options.map((option) => {
-          return <option value={option.value}>{option.text}</option>;
-        })}
-      </select>
+      {props.options.length == 0 ? (
+        <Skeleton type="form-control" />
+      ) : (
+        <select
+          id={props.id}
+          name={props.id}
+          className="form-control"
+          required={props.required || false}
+          value={props.value}
+          onChange={props.onChange || null}
+          aria-describedby={props.validator}
+        >
+          {props.options.map((option) => {
+            return <option value={option.value}>{option.text}</option>;
+          })}
+        </select>
+      )}
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
           {props.err}
@@ -1393,6 +1397,24 @@ const Select = (props) => {
       ) : (
         ""
       )}
+    </div>
+  );
+};
+
+/**
+ * Component for displaying a skeleton loading animation
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Skeleton = (props) => {
+  return (
+    <div className="skeleton-wrapper ">
+      <div className="skeleton">
+        <div className={props.type}></div>
+      </div>
+      <div className="shimmer-wrapper">
+        <div className="shimmer"></div>
+      </div>
     </div>
   );
 };
