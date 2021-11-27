@@ -6,6 +6,11 @@ body {
   position: relative;
 }
 
+.form-control-plaintext {
+  border: solid #ced4da !important;
+  border-width: 1px 0 !important;
+}
+
 /* Spinner Loader */
 .overlay {
   background: rgba(0, 0, 0, 0.9);
