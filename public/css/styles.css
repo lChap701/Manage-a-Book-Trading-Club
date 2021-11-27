@@ -73,18 +73,38 @@ body {
 
 /* Skeleton Loader */
 .skeleton-wrapper {
-  width: 100%;
   position: relative;
 }
 
-.skeleton {
+.skeleton * {
+  background: #d2dbe2 !important;
+  border-radius: 0.25em;
+}
+
+.skeleton .thumbnail {
   width: 100%;
+  min-height: 200px;
+  background: #d2dbe2;
 }
 
 .skeleton .form-control {
-  background: #d2dbe2 !important;
   border: none;
   transition: none;
+}
+
+.skeleton .text-sm,
+.skeleton .text-md,
+.skeleteon .text-lg {
+  margin-bottom: 0.5em;
+  min-height: 16px;
+}
+
+.skeleton .text-sm {
+  width: 40%;
+}
+
+.skeleton .text-md {
+  width: 70%;
 }
 
 .shimmer-wrapper {
