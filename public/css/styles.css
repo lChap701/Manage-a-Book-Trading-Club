@@ -6,6 +6,7 @@ body {
   position: relative;
 }
 
+/* Spinner Loader */
 .overlay {
   background: rgba(0, 0, 0, 0.9);
   position: fixed;
@@ -21,6 +22,7 @@ body {
   height: 4rem !important;
 }
 
+/* Panel */
 .panel {
   margin: 20px auto 0;
 }
@@ -67,4 +69,50 @@ body {
 .buttons {
   display: flex;
   justify-content: space-between;
+}
+
+/* Skeleton Loader */
+.skeleton-wrapper {
+  width: 100%;
+  position: relative;
+}
+
+.skeleton {
+  width: 100%;
+}
+
+.skeleton .form-control {
+  background: #d2dbe2 !important;
+  border: none;
+  transition: none;
+}
+
+.shimmer-wrapper {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.shimmer {
+  width: 50%;
+  height: 100%;
+  opacity: 0.2;
+  background: rgba(238, 238, 238, 0.966);
+  transform: skewX(-20deg);
+  animation: loader 1s linear infinite;
+}
+
+@keyframes loader {
+  0% {
+    transform: translateX(-150%);
+  }
+  50% {
+    transform: translateX(-60%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
 }
