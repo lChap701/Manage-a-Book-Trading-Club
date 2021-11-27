@@ -332,6 +332,11 @@ module.exports = (app) => {
     locations.getStatesByCountry(res, req.params.cntry);
   });
 
+  // Routing for retrieving a states from a country
+  app.get("/api/countries/:cntry/states/:st", (req, res) => {
+    locations.getState(res, req.params.cntry, req.params.st);
+  });
+
   // Routing for retrieving cities in a country
   app.get("/api/countries/:cntry/cities", (req, res) => {
     locations.getCitiesByCountry(res, req.params.cntry);
