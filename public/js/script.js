@@ -61,6 +61,9 @@ function validateForm() {
  */
 async function sendData(data, method = "POST") {
   try {
+    console.log(data);
+    console.log(method);
+    const PROFILE_URL = `${location.origin}/users/${data._id}`;
     const res = await fetch(location.href, {
       method: method,
       body: JSON.stringify(data),
@@ -69,16 +72,22 @@ async function sendData(data, method = "POST") {
       },
     });
 
-    // Ensures that an error message is displayed
-    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
     console.log(res);
+
+    // Ensures that an error message is displayed
+    if (!res.ok) {
+      if (method != "PUT") {
+        throw new Error(`Request failed: ${res.status}`);
+      } else if (res.url != PROFILE_URL) {
+        throw new Error(`Request failed: ${res.status}`);
+      }
+    }
 
     // Determines if an error message or a new URL was returned
     return location.href == res.url ? await res.text() : res.url;
   } catch (err) {
     alert(err.message);
-    console.error(err.message);
+    console.error(err);
   }
 }
 
@@ -584,6 +593,7 @@ const EditProfile = (props) => {
       ) : (
         <AccountForm
           formName="Edit Profile"
+          _id={user._id}
           username={user.username}
           email={user.email}
           name={user.fullName}
@@ -625,6 +635,7 @@ class AccountForm extends React.Component {
 
     // States
     this.state = {
+      _id: props._id || "",
       username: props.username || "",
       password: "",
       email: props.email || "",
@@ -633,7 +644,7 @@ class AccountForm extends React.Component {
       city: props.city || "",
       state: props.state || "",
       country: props.country || "",
-      zipPostal: props.zipPostal || "",
+      zipPostal: props.zipPostalCode || "",
       errs: [
         "Username is required",
         "Password is required",
@@ -901,10 +912,13 @@ class AccountForm extends React.Component {
     // Determines if form should be submitted
     if (!validateForm()) return;
 
-    const data = {
-      username: this.state.username,
-      password: this.state.password,
-    };
+    const data =
+      this.props.formName != "Edit Profile"
+        ? {
+            username: this.state.username,
+            password: this.state.password,
+          }
+        : { username: this.state.username };
 
     // For when users try to sign up or update their account
     if (this.props.formName != "Login") {
@@ -917,8 +931,14 @@ class AccountForm extends React.Component {
       data.zipPostal = this.state.zipPostal;
     }
 
+    // Adds user ID
+    if (this.props.formName == "Edit Profile") data._id = this.state._id;
+
     // Submits the form and gets the result
-    let res = await sendData(data);
+    let res =
+      this.props.formName == "Edit Profile"
+        ? await sendData(data, "PUT")
+        : await sendData(data);
 
     // Checks if a new page should be displayed or if an error occurred
     if (res.includes("http")) {
