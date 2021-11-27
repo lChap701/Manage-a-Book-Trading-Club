@@ -482,7 +482,7 @@ const Profile = (props) => {
 
     // Gets the full country and state names
     if (json.country.length > 0) {
-      if (json.country.length > 0) {
+      if (json.state.length > 0) {
         json.state = await getState(json.country, json.state);
       }
       json.country = await getCountry(json.country);
