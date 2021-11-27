@@ -178,7 +178,11 @@ const locations = {
     zippopotam
       .get(`/${cntyAbbr}/${stAbbr}/${city}`)
       .then((resp) => {
-        res.json(resp.data.places.map((place) => place["post code"]));
+        if (resp.data.places) {
+          res.json(resp.data.places.map((place) => place["post code"]));
+        } else {
+          res.json([]);
+        }
       })
       .catch((err) => console.log(err));
   },
