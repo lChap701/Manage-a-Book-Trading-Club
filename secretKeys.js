@@ -92,7 +92,7 @@ const saveKey = (key, id) => {
 const findKey = (id) => {
   try {
     const json = parser.parse(fs.readFileSync("./keys.xml", "utf-8"), options);
-    return json.keys.key
+    return json.keys.key && json.keys.key.find((key) => key.id == id)
       ? json.keys.key.find((key) => key.id == id).value
       : undefined;
   } catch (e) {

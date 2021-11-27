@@ -141,7 +141,13 @@ module.exports = (app) => {
               : req.body.zipPostal,
         })
         .then(() => {
-          req.session.error = !secretKeys.updateKey(KEY, req.body._id);
+          req.session.error =
+            req.body.address &&
+            req.body.address.length > 0 &&
+            req.body.zipPostal &&
+            req.body.zipPostal.length > 0
+              ? !secretKeys.updateKey(KEY, req.body._id)
+              : false;
 
           if (req.session.error) {
             req.flash("error", "Unable to update your account");
