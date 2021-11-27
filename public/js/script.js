@@ -1369,10 +1369,14 @@ const Datalist = (props) => {
 const Select = (props) => {
   return (
     <div className={props.containerClass}>
-      <label for={props.id}>
-        {props.label}
-        {!props.required ? <small> (Optional)</small> : ""}
-      </label>
+      {props.options.length == 0 ? (
+        <Skeleton type={`text-${!props.required ? "md" : "sm"}`} />
+      ) : (
+        <label for={props.id}>
+          {props.label}
+          {!props.required ? <small> (Optional)</small> : ""}
+        </label>
+      )}
       {props.options.length == 0 ? (
         <Skeleton type="form-control" />
       ) : (
