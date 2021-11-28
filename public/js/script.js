@@ -14,16 +14,17 @@ const Router = BrowserRouter;
 /**
  * Makes an API call
  * @param {string} url    Represents the API URL path
+ * @param {string} type   Represents the type of data that is returned (default is 'JSON')
  * @returns               Returns the result
  */
-async function callApi(url) {
+async function callApi(url, type = "JSON") {
   try {
     let res = await fetch(url);
 
     // Displays a special error message
     if (!res.ok) throw Error(`Response ${res.status}: ${res.statusText}`);
 
-    return await res.json();
+    return type == "text" ? await res.text() : await res.json();
   } catch (e) {
     alert(e);
     console.error(e);
@@ -639,7 +640,29 @@ const EditProfile = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const MyBooks = (props) => {
+  let [books, setBooks] = useState([]);
+  let [updated, setUpdated] = useState(false);
+  let mounted = useRef();
   console.log(props.userId);
+
+  // Gets the user's profile information
+  useEffect(() => {
+    // Checks if component was mounted and updates component once
+    if (!mounted.current) {
+      mounted.current = true;
+    } else if (!updated && props.userId.length > 0) {
+      callApi(
+        `${location.origin}/api/users/${props.userId}/books`,
+        "text"
+      ).then((data) => {
+        console.log(data);
+        if (JSON.parse(data)) setBooks(data);
+        setUpdated(true);
+      });
+    }
+  });
+  console.log(books);
+
   return <h2>My Books</h2>;
 };
 
