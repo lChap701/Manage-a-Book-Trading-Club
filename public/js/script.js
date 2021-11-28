@@ -338,7 +338,7 @@ const Books = (props) => {
               value="New Request"
             />
             <Link className="btn btn-success" to="/books/my">
-              My Books
+              Add Books
             </Link>
           </div>
         )}
