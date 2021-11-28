@@ -1316,7 +1316,7 @@ const SpinnerButton = (props) => {
         role="status"
         aria-hidden="true"
       ></span>
-      Loading...
+      <span class="sr-only">Loading...</span>
     </button>
   );
 };
