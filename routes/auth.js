@@ -163,7 +163,7 @@ module.exports = (app) => {
 
   // Displays the Book Exchange - My Books Page
   app.get("/books/my", loggedOut, (req, res) => {
-    res.sendFile(process.cwd() + "/public/books.html");
+    res.sendFile(process.cwd() + "/public/myBooks.html");
   });
 
   // Logs the user out
