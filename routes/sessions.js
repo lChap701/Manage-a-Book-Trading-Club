@@ -15,6 +15,6 @@ module.exports = (app) => {
 
   // Routing for getting requested books during trades
   app.get("/session/books", (req, res) => {
-    res.json(req.session.books ? req.session.books : null);
+    res.json(req.session.books ? req.session.books : []);
   });
 };
