@@ -133,7 +133,6 @@ class BookExchange extends React.Component {
 
         // Determines if session should be passed to client
         if (data) this.setState({ user: data });
-        console.log(this.state.user);
       })
       .catch((e) => {
         alert(e);
@@ -536,8 +535,9 @@ const Profile = (props) => {
             state={user.state}
             country={user.country}
             zipPostal={user.zipPostalCode || ""}
-            readonly={true}
-            hidePassword={true}
+            readonly
+            hidePassword
+            loaded
           />
 
           <div className="panel-footer px-3 py-2">
@@ -1000,19 +1000,29 @@ class AccountForm extends React.Component {
             zipPostalOpts={this.state.options.zipPostalCodes}
             saveZipPostalCode={this.saveZipPostalCode}
             hidePassword={this.props.formName == "Edit Profile"}
+            loaded={
+              this.state.options.states.length > 0 &&
+              this.state.options.countries.length > 0
+            }
           />
         )}
 
         <div className="panel-footer px-3 py-2">
-          <input
-            className="btn btn-success w-100"
-            type="submit"
-            value={
-              this.props.formName == "Edit Profile"
-                ? "Update Profile"
-                : this.props.formName
-            }
-          />
+          {(this.state.options.states.length > 0 &&
+            this.state.options.countries.length > 0) ||
+          this.props.formName == "Login" ? (
+            <input
+              className="btn btn-success w-100"
+              type="submit"
+              value={
+                this.props.formName == "Edit Profile"
+                  ? "Update Profile"
+                  : this.props.formName
+              }
+            />
+          ) : (
+            <SpinnerButton class="btn btn-success w-100" />
+          )}
 
           {this.props.formName == "Login" ? (
             <div className="mt-2">
@@ -1073,94 +1083,118 @@ const AccountFormLayout = (props) => {
   return (
     <div className="panel-body border-top-0 border-bottom-0 p-3">
       <div className="row">
-        <Input
-          containerClass="form-group col"
-          id="uname"
-          label="Username"
-          type="text"
-          required={!Boolean(props.readonly)}
-          value={props.username}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveUsername || null}
-          validator={!Boolean(props.readonly) ? "unameFeedback" : null}
-          err={props.errs ? props.errs[0] : null}
-        />
-
-        {!props.hidePassword ? (
+        {props.loaded ? (
           <Input
             containerClass="form-group col"
-            id="psw"
-            label="Password"
-            type="password"
-            required={true}
-            value={props.password}
-            onChange={props.savePassword}
-            validator="pswFeedback"
-            err={props.errs[1]}
+            id="uname"
+            label="Username"
+            type="text"
+            required={!Boolean(props.readonly)}
+            value={props.username}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveUsername || null}
+            validator={!Boolean(props.readonly) ? "unameFeedback" : null}
+            err={props.errs ? props.errs[0] : null}
           />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" required />
+        )}
+
+        {!props.hidePassword ? (
+          props.loaded ? (
+            <Input
+              containerClass="form-group col"
+              id="psw"
+              label="Password"
+              type="password"
+              required={true}
+              value={props.password}
+              onChange={props.savePassword}
+              validator="pswFeedback"
+              err={props.errs[1]}
+            />
+          ) : (
+            <SkeletonFormControl containerClass="form-group col" required />
+          )
         ) : (
           ""
         )}
       </div>
 
       <div className="row">
-        <Input
-          containerClass="form-group col"
-          id="email"
-          label="Email"
-          type="email"
-          value={props.email}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveEmail || null}
-          validator={!props.readonly ? "emailFeedback" : null}
-          err={props.errs ? props.errs[2] : null}
-        />
+        {props.loaded ? (
+          <Input
+            containerClass="form-group col"
+            id="email"
+            label="Email"
+            type="email"
+            value={props.email}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveEmail || null}
+            validator={!props.readonly ? "emailFeedback" : null}
+            err={props.errs ? props.errs[2] : null}
+          />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
+        )}
 
-        <Input
-          containerClass="form-group col"
-          id="name"
-          label="Full Name"
-          type="text"
-          value={props.name}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveName || null}
-          validator=""
-          err=""
-        />
+        {props.loaded ? (
+          <Input
+            containerClass="form-group col"
+            id="name"
+            label="Full Name"
+            type="text"
+            value={props.name}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveName || null}
+            validator=""
+            err=""
+          />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
+        )}
       </div>
 
       <div className="row">
-        <Input
-          containerClass="form-group col-7"
-          id="addr"
-          label="Address"
-          list={!props.readonly ? "addresses" : null}
-          type="text"
-          value={props.address}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveAddress || null}
-          validator=""
-          err=""
-        />
-        {!props.readonly ? (
+        {props.loaded ? (
+          <Input
+            containerClass="form-group col-7"
+            id="addr"
+            label="Address"
+            list={!props.readonly ? "addresses" : null}
+            type="text"
+            value={props.address}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveAddress || null}
+            validator=""
+            err=""
+          />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
+        )}
+        {!props.readonly && props.loaded ? (
           <Datalist id="addresses" options={props.addressOpts} />
         ) : (
           ""
         )}
 
-        <Input
-          containerClass="form-group col"
-          id="city"
-          label="City"
-          list={!props.readonly ? "cities" : null}
-          type="text"
-          value={props.city}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveCity || null}
-          validator=""
-          err=""
-        />
-        {!props.readonly ? (
+        {props.loaded ? (
+          <Input
+            containerClass="form-group col"
+            id="city"
+            label="City"
+            list={!props.readonly ? "cities" : null}
+            type="text"
+            value={props.city}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveCity || null}
+            validator=""
+            err=""
+          />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
+        )}
+        {!props.readonly && props.loaded ? (
           <Datalist id="cities" options={props.cityOpts} />
         ) : (
           ""
@@ -1179,7 +1213,7 @@ const AccountFormLayout = (props) => {
             validator=""
             err=""
           />
-        ) : (
+        ) : props.loaded ? (
           <Select
             containerClass="form-group col"
             id="state"
@@ -1190,6 +1224,8 @@ const AccountFormLayout = (props) => {
             validator=""
             err=""
           />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
         )}
 
         {props.readonly ? (
@@ -1203,7 +1239,7 @@ const AccountFormLayout = (props) => {
             validator=""
             err=""
           />
-        ) : (
+        ) : props.loaded ? (
           <Select
             containerClass="form-group col"
             id="country"
@@ -1214,21 +1250,27 @@ const AccountFormLayout = (props) => {
             validator=""
             err=""
           />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
         )}
 
-        <Input
-          containerClass="form-group col-4"
-          id="zipPostal"
-          label="Zip/Postal"
-          list={!props.readonly ? "zipPostalCodes" : null}
-          type="text"
-          value={props.zipPostal}
-          readonly={Boolean(props.readonly)}
-          onChange={props.saveZipPostalCode || null}
-          validator=""
-          err=""
-        />
-        {!props.readonly ? (
+        {props.loaded ? (
+          <Input
+            containerClass="form-group col-4"
+            id="zipPostal"
+            label="Zip/Postal"
+            list={!props.readonly ? "zipPostalCodes" : null}
+            type="text"
+            value={props.zipPostal}
+            readonly={Boolean(props.readonly)}
+            onChange={props.saveZipPostalCode || null}
+            validator=""
+            err=""
+          />
+        ) : (
+          <SkeletonFormControl containerClass="form-group col" />
+        )}
+        {!props.readonly && props.loaded ? (
           <Datalist id="zipPostalCodes" options={props.zipPostalOpts} />
         ) : (
           ""
@@ -1248,7 +1290,7 @@ const UserBooksFormLayout = (props) => {
 };
 
 /**
- * Component for displaying a loading animation with a spinner
+ * Component for displaying a spinner loading animation
  * @returns   Returns the content that should be displayed
  */
 const Spinner = () => {
@@ -1258,6 +1300,24 @@ const Spinner = () => {
         <span className="sr-only">Loading...</span>
       </div>
     </div>
+  );
+};
+
+/**
+ * Component for displaying a spinner loading animation for buttons
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the dropdown menu that should be displayed
+ */
+const SpinnerButton = (props) => {
+  return (
+    <button className={props.class} type="button" disabled>
+      <span
+        className="spinner-grow spinner-grow-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      Loading...
+    </button>
   );
 };
 
@@ -1365,38 +1425,30 @@ const Datalist = (props) => {
 };
 
 /**
- * Component for displaying select input fields
+ * Component for displaying select form controls
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
 const Select = (props) => {
   return (
     <div className={props.containerClass}>
-      {props.options.length == 0 ? (
-        <Skeleton type={`text-${!props.required ? "md" : "sm"}`} />
-      ) : (
-        <label for={props.id}>
-          {props.label}
-          {!props.required ? <small> (Optional)</small> : ""}
-        </label>
-      )}
-      {props.options.length == 0 ? (
-        <Skeleton type="form-control" />
-      ) : (
-        <select
-          id={props.id}
-          name={props.id}
-          className="form-control"
-          required={props.required || false}
-          value={props.value}
-          onChange={props.onChange || null}
-          aria-describedby={props.validator}
-        >
-          {props.options.map((option) => {
-            return <option value={option.value}>{option.text}</option>;
-          })}
-        </select>
-      )}
+      <label for={props.id}>
+        {props.label}
+        {!props.required ? <small> (Optional)</small> : ""}
+      </label>
+      <select
+        id={props.id}
+        name={props.id}
+        className="form-control"
+        required={props.required || false}
+        value={props.value}
+        onChange={props.onChange || null}
+        aria-describedby={props.validator}
+      >
+        {props.options.map((option) => {
+          return <option value={option.value}>{option.text}</option>;
+        })}
+      </select>
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
           {props.err}
@@ -1422,6 +1474,20 @@ const Skeleton = (props) => {
       <div className="shimmer-wrapper">
         <div className="shimmer"></div>
       </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying a skeleton loading animation for form controls
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const SkeletonFormControl = (props) => {
+  return (
+    <div className={props.containerClass}>
+      <Skeleton type={`text-${!props.required ? "md" : "sm"}`} />
+      <Skeleton type="form-control" />
     </div>
   );
 };
