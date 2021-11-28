@@ -83,13 +83,12 @@ body {
 
 .skeleton * {
   background: #d2dbe2 !important;
-  border-radius: 0.25em;
+  border-radius: 0.25em !important;
 }
 
 .skeleton .thumbnail {
   width: 100%;
   min-height: 200px;
-  background: #d2dbe2;
 }
 
 .skeleton .form-control {
@@ -101,7 +100,7 @@ body {
 .skeleton .text-md,
 .skeleteon .text-lg {
   margin-bottom: 0.5em;
-  min-height: 16px;
+  min-height: 1rem;
 }
 
 .skeleton .text-sm {
