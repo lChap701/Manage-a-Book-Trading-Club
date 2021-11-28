@@ -119,6 +119,7 @@ class BookExchange extends React.Component {
         _id: "",
         username: "",
       },
+      checkedLogin: false,
     };
   }
 
@@ -129,7 +130,7 @@ class BookExchange extends React.Component {
     fetch(`${location.origin}/session/user`)
       .then((res) => res.json())
       .then((data) => {
-        this.setState({ login: Boolean(data) });
+        this.setState({ login: Boolean(data), checkedLogin: true });
 
         // Determines if session should be passed to client
         if (data) this.setState({ user: data });
@@ -202,7 +203,9 @@ class BookExchange extends React.Component {
                   </div>
 
                   <div className="navbar-nav ml-auto">
-                    {!this.state.login ? (
+                    {!this.state.checkedLogin ? (
+                      ""
+                    ) : !this.state.login ? (
                       <NavLink className="nav-item nav-link" to="/login">
                         Login
                       </NavLink>
@@ -239,7 +242,10 @@ class BookExchange extends React.Component {
           <div className="container">
             <Switch>
               <Route exact path="/books">
-                <Books login={this.state.login} />
+                <Books
+                  login={this.state.login}
+                  ready={this.state.checkedLogin}
+                />
               </Route>
               <Route path="/books/my">
                 <MyBooks userId={this.state.user._id} />
@@ -318,7 +324,9 @@ const Books = (props) => {
       </div>
 
       <div className="panel-footer p-2">
-        {!props.login ? (
+        {!props.ready ? (
+          <SpinnerButton class="btn btn-success w-25" />
+        ) : !props.login ? (
           <Link className="btn btn-success" to="/login">
             Login to Add Books and Submit Requests
           </Link>
