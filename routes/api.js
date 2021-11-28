@@ -100,6 +100,7 @@ module.exports = (app) => {
           }
 
           books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
+          console.log(books);
           res.json({
             books: books.map((book) => {
               return {
@@ -108,16 +109,9 @@ module.exports = (app) => {
                 description: book.description,
                 addedAt: book.addedAt,
                 requests: {
-                  count: book.request.users.filter(
-                    (user) => user._id != req.params.id
-                  ).length,
-                  users: book.request.users.map((user) => {
-                    if (user._id != req.params.id) {
-                      return {
-                        _id: user._id,
-                        username: user.username,
-                      };
-                    }
+                  count: book.numOfRequests,
+                  users: book.requests.map((request) => {
+                    return request.giveBooks.map((gb) => gb.user);
                   }),
                 },
               };
