@@ -394,24 +394,42 @@ const CreateRequest = () => {
 
   // Gets all requested books
   const getRequestedBooks = useCallback(async () => {
-    setRequestedBooks(await callApi(`${location.origin}/session/books`));
+    let json = await callApi(`${location.origin}/session/books`);
+    setRequestedBooks(json);
   }, []);
   useEffect(() => getRequestedBooks(), []);
 
   return (
-    <div>
-      <div className="panel shadow-lg">
-        <div className="panel-header text-center">
-          <h2>Create Request</h2>
-        </div>
+    <div className="panel shadow-lg">
+      <div className="panel-header p-1 mx-auto text-white">
+        <h2 className="text-center">Create Request</h2>
+      </div>
 
-        <div className="panel-body">
-          {requestedBooks.map((book) => {
-            <div className="item" id={book._id}>
-              {book.name}
-            </div>;
-          })}
-        </div>
+      <div className="panel-body">
+        {requestedBooks.map((book) => {
+          <div className="item" id={book._id}>
+            {book.name}
+          </div>;
+        })}
+      </div>
+
+      <div className="panel-footer p-2">
+        <form name="Create Request" action="/requests/create" method="POST">
+          <Input
+            id="takes"
+            name="takes"
+            type="text"
+            hidden
+            required
+            value={JSON.stringify(requestedBooks)}
+          />
+          <Input id="gives" name="gives" type="text" hidden required value="" />
+          <input
+            type="submit"
+            class="btn btn-success w-100"
+            value="Submit Request"
+          />
+        </form>
       </div>
     </div>
   );
@@ -819,7 +837,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the username while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveUsername(e) {
     this.setState({ username: e.target.value });
@@ -827,14 +845,14 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the password while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   savePassword(e) {
     this.setState({ password: e.target.value });
   }
   /**
    * Saves the user's email while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveEmail(e) {
     this.setState({ email: e.target.value });
@@ -842,7 +860,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the user's full name while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveName(e) {
     this.setState({ name: e.target.value });
@@ -850,7 +868,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the user's address while the user is typing
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveAddress(e) {
     this.setState({ address: e.target.value });
@@ -859,7 +877,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the city that the user lives at enters while they type
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveCity(e) {
     this.setState({ city: e.target.value });
@@ -871,7 +889,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the state that the user lives at enters while they type
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveState(e) {
     this.setState({ state: e.target.value });
@@ -884,7 +902,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the country that the user lives at enters while they type
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveCountry(e) {
     this.setState({ country: e.target.value });
@@ -898,7 +916,7 @@ class AccountForm extends React.Component {
 
   /**
    * Saves the zip/postal code of the user's location while they type
-   * @param {InputEvent} e    Represents the event that occurred
+   * @param {InputControlEvent} e    Represents the event that occurred
    */
   saveZipPostalCode(e) {
     this.setState({ zipPostal: e.target.value });
@@ -1055,7 +1073,7 @@ class AccountForm extends React.Component {
 const LoginFormLayout = (props) => {
   return (
     <div className="panel-body border-top-0 border-bottom-0 p-3">
-      <Input
+      <InputControl
         containerClass="form-group"
         id="uname"
         label="Username"
@@ -1067,7 +1085,7 @@ const LoginFormLayout = (props) => {
         err={props.errs[0]}
       />
 
-      <Input
+      <InputControl
         containerClass="form-group"
         id="psw"
         label="Password"
@@ -1092,7 +1110,7 @@ const AccountFormLayout = (props) => {
     <div className="panel-body border-top-0 border-bottom-0 p-3">
       <div className="row">
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="uname"
             label="Username"
@@ -1110,7 +1128,7 @@ const AccountFormLayout = (props) => {
 
         {!props.hidePassword ? (
           props.loaded ? (
-            <Input
+            <InputControl
               containerClass="form-group col"
               id="psw"
               label="Password"
@@ -1131,7 +1149,7 @@ const AccountFormLayout = (props) => {
 
       <div className="row">
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="email"
             label="Email"
@@ -1147,7 +1165,7 @@ const AccountFormLayout = (props) => {
         )}
 
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="name"
             label="Full Name"
@@ -1165,7 +1183,7 @@ const AccountFormLayout = (props) => {
 
       <div className="row">
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col-7"
             id="addr"
             label="Address"
@@ -1187,7 +1205,7 @@ const AccountFormLayout = (props) => {
         )}
 
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="city"
             label="City"
@@ -1211,7 +1229,7 @@ const AccountFormLayout = (props) => {
 
       <div className="row">
         {props.readonly ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="state"
             label="State"
@@ -1237,7 +1255,7 @@ const AccountFormLayout = (props) => {
         )}
 
         {props.readonly ? (
-          <Input
+          <InputControl
             containerClass="form-group col"
             id="country"
             label="Country"
@@ -1263,7 +1281,7 @@ const AccountFormLayout = (props) => {
         )}
 
         {props.loaded ? (
-          <Input
+          <InputControl
             containerClass="form-group col-4"
             id="zipPostal"
             label="Zip/Postal"
@@ -1380,25 +1398,27 @@ const Alert = (props) => {
 };
 
 /**
- * Component for displaying input fields
+ * Component for displaying input form controls with label
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
-const Input = (props) => {
+const InputControl = (props) => {
   return (
     <div className={props.containerClass}>
-      <label for={props.id}>
-        {props.label}
-        {!props.required && !props.readonly ? <small> (Optional)</small> : ""}
-      </label>
-      <input
+      {!props.hidden ? (
+        <label for={props.id}>
+          {props.label}
+          {!props.required && !props.readonly ? <small> (Optional)</small> : ""}
+        </label>
+      ) : (
+        ""
+      )}
+      <Input
         id={props.id}
         name={props.id}
         type={props.type}
         list={props.list || null}
-        className={`form-control${
-          props.readonly && props.value ? "-plaintext" : ""
-        }`}
+        hidden={Boolean(props.hidden)}
         required={Boolean(props.required)}
         value={props.value}
         autocomplete={props.list && !props.readonly ? "off" : "on"}
@@ -1414,6 +1434,32 @@ const Input = (props) => {
         ""
       )}
     </div>
+  );
+};
+
+/**
+ * Component for displaying input fields
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Input = (props) => {
+  return (
+    <input
+      id={props.id}
+      name={props.id}
+      type={props.type}
+      list={props.list || null}
+      className={`form-control${
+        props.readonly && props.value ? "-plaintext" : ""
+      }`}
+      hidden={Boolean(props.hidden)}
+      required={Boolean(props.required)}
+      value={props.value}
+      autocomplete={props.list && !props.readonly ? "off" : "on"}
+      onChange={props.onChange || null}
+      aria-describedby={props.validator || null}
+      readOnly={Boolean(props.readonly)}
+    />
   );
 };
 
