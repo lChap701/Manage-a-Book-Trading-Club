@@ -102,7 +102,7 @@ app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
-// Form Handler for the form on the home page
+// Form Handler for the form on the home page and My Books page
 app.post("/requests/new/books", (req, res) => {
   if (!req.body) return;
   console.log(req.body);
@@ -111,7 +111,7 @@ app.post("/requests/new/books", (req, res) => {
   keys.forEach((bookId) => ids.push(bookId.replace("book", "")));
   req.session.books = ids;
   console.log(req.session.books);
-  res.redirect("..");
+  res.redirect("../new");
 });
 
 // Displays the Book Exchange - All Trades Page
