@@ -161,10 +161,28 @@ module.exports = (app) => {
         });
     });
 
-  // Displays the Book Exchange - My Books Page
-  app.get("/books/my", loggedOut, (req, res) => {
-    res.sendFile(process.cwd() + "/public/myBooks.html");
-  });
+  // Displays and handles POST requests on the Book Exchange - My Books Page
+  app
+    .route("/books/my")
+    .get(loggedOut, (req, res) => {
+      res.sendFile(process.cwd() + "/public/myBooks.html");
+    })
+    .post((req, res) => {
+      crud
+        .addBook(req.body)
+        .then(() => res.send("success"))
+        .catch((ex) => {
+          let error = "Title must be unique";
+
+          if (ex.errors) {
+            Object.keys(ex.errors).forEach((field) => {
+              if (ex.errors[field]) error = ex.errors[field].message;
+            });
+          }
+
+          res.send(error);
+        });
+    });
 
   // Logs the user out
   app.get("/logout", loggedOut, (req, res) => {
