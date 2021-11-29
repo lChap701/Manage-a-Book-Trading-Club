@@ -182,7 +182,7 @@ module.exports = (app) => {
 
           res.send(error);
         });
-    });
+    }).put();
 
   // Logs the user out
   app.get("/logout", loggedOut, (req, res) => {
