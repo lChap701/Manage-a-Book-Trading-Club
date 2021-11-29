@@ -75,7 +75,7 @@ async function sendData(data, method = "POST") {
     // Ensures that an error message is displayed
     if (!res.ok) {
       // Allows for redirects to the user's profile
-      if (method != "PUT") {
+      if (method != "PUT" || !location.href.includes("users")) {
         throw new Error(`Request failed: ${res.status}`);
       } else if (res.url != `${location.origin}/users/${data._id}`) {
         throw new Error(`Request failed: ${res.status}`);
@@ -338,7 +338,7 @@ const Books = (props) => {
               type="submit"
               value="New Request"
             />
-            <Link className="btn btn-success" to="/books/my">
+            <Link className="btn btn-primary" to="/books/my">
               Add Books
             </Link>
           </div>
@@ -576,7 +576,7 @@ const Profile = (props) => {
             </Link>
 
             {props.myId == id ? (
-              <Link className="btn btn-success ml-1" to="/users/edit">
+              <Link className="btn btn-primary ml-2" to="/users/edit">
                 Edit Profile
               </Link>
             ) : (
@@ -641,6 +641,7 @@ const EditProfile = (props) => {
  */
 const MyBooks = (props) => {
   let [books, setBooks] = useState([]);
+  let [msg, setMsg] = useState("");
   let [updated, setUpdated] = useState(false);
   let mounted = useRef();
   console.log(props.userId);
@@ -656,14 +657,61 @@ const MyBooks = (props) => {
         "text"
       ).then((data) => {
         console.log(data);
-        if (typeof data == "object") setBooks(data);
+        if (typeof data == "object") {
+          setBooks(data);
+        } else {
+          setMsg(data);
+        }
         setUpdated(true);
       });
     }
   });
   console.log(books);
 
-  return <h2>My Books</h2>;
+  return (
+    <form
+      className="panel shadow-lg"
+      method="POST"
+      action="/requests/new/books"
+    >
+      <div className="panel-header text-white p-1 mx-auto">
+        <h2 className="text-center">My Books</h2>
+      </div>
+      <div className="panel-body">
+        {books.length == 0 ? (
+          <div className="item border-top-0 border-bottom-0 p-5">
+            <h4 className="text-muted text-center mt-1">{msg}</h4>
+          </div>
+        ) : (
+          books.map((book) => {
+            return (
+              <div className="item border-top-0 border-bottom-0">
+                <div className="form-group">
+                  <input
+                    id={`book${book._id}`}
+                    name={`book${book._id}`}
+                    type="checkbox"
+                  />
+                  <label for={`book${book._id}`}></label>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+      <div className="panel-footer px-3 py-2">
+        <input type="submit" className="btn btn-success" value="New Request" />
+        <input
+          type="button"
+          className="btn btn-primary ml-2"
+          data-toggle="modal"
+          data-target="#addBookModal"
+          value="Add Book To Exchange"
+        />
+        <BookForm id="addBookModal" formName="Add Book" userId={props.userId} />
+      </div>
+    </form>
+  );
 };
 
 /**
@@ -1101,7 +1149,7 @@ const LoginFormLayout = (props) => {
         id="uname"
         label="Username"
         type="text"
-        required={true}
+        required
         value={props.username}
         onChange={props.saveUsername}
         validator="unameFeedback"
@@ -1113,7 +1161,7 @@ const LoginFormLayout = (props) => {
         id="psw"
         label="Password"
         type="password"
-        required={true}
+        required
         value={props.password}
         onChange={props.savePassword}
         validator="pswFeedback"
@@ -1156,7 +1204,7 @@ const AccountFormLayout = (props) => {
               id="psw"
               label="Password"
               type="password"
-              required={true}
+              required
               value={props.password}
               onChange={props.savePassword}
               validator="pswFeedback"
@@ -1339,6 +1387,158 @@ const UserBooksFormLayout = (props) => {
 };
 
 /**
+ * Component for displaying and handling forms on the My Books page
+ */
+class BookForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    // States
+    this.state = {
+      title: this.props.title || "",
+      description: this.props.description || "",
+      errs: ["Title is required", "Description is required"],
+    };
+
+    // Functions
+    this.saveTitle = this.saveTitle.bind(this);
+    this.saveDescription = this.saveDescription.bind(this);
+    this.submitForm = this.submitForm.bind(this);
+  }
+
+  /**
+   * Saves the title of a book
+   * @param {InputControlEvent} e   Represents the event that occurred
+   */
+  saveTitle(e) {
+    this.setState({ title: e.target.value });
+  }
+
+  /**
+   * Saves the description provided by the user
+   * @param {InputControlEvent} e   Represents the event that occurred
+   */
+  saveDescription(e) {
+    this.setState({ description: e.target.value });
+  }
+
+  /**
+   * Handles form validation and form submission
+   * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
+   */
+  async submitForm(e) {
+    e.preventDefault();
+
+    // Determines if form should be submitted
+    if (!validateForm()) return;
+
+    const data = { user: this.props.userId };
+
+    if (this.props.formName != "Delete Book") {
+      data.title = this.state.title;
+      data.description = this.state.description;
+    }
+
+    // Submits the form and gets the result
+    let res =
+      this.props.formName == "Edit Book"
+        ? await sendData(data, "PUT")
+        : this.props.formName == "Delete Book"
+        ? await sendData(data, "DELETE")
+        : await sendData(data);
+
+    // Checks if the page should reload
+    if (res == "success") {
+      location.reload();
+    } else {
+      let { errs } = this.state;
+      errs[0] = res;
+      this.setState({ errs: errs });
+    }
+  }
+
+  render() {
+    return (
+      <form
+        name={this.props.formName}
+        className="modal fade"
+        tabindex="-1"
+        id={this.props.id}
+        role="dialog"
+        aria-labelledby={`${this.props.id}Label`}
+        aria-hidden="true"
+        onSubmit={this.submitForm}
+        novalidate="true"
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id={`${this.props.id}Label`}>
+                {this.props.formName}
+              </h5>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <InputControl
+                containerClass="form-group"
+                id="title"
+                label="Title"
+                type="text"
+                required
+                value={this.state.title}
+                onChange={this.saveTitle}
+                validator="titleFeedback"
+                err={this.state.errs[0]}
+              />
+
+              <InputControl
+                containerClass="form-group"
+                id="desc"
+                label="Description"
+                type="text"
+                placeholder="Author, condition..."
+                required
+                value={this.state.description}
+                onChange={this.saveDescription}
+                validator="descFeedback"
+                err={this.state.errs[1]}
+              />
+            </div>
+
+            <div className="modal-footer">
+              <input
+                type="submit"
+                className="btn btn-primary"
+                value={
+                  this.props.formName == "Edit Book"
+                    ? "Update Book"
+                    : this.props.formName
+                }
+              />
+              <input
+                type="button"
+                className="btn btn-danger"
+                data-dismiss="modal"
+                value="Cancel"
+              />
+            </div>
+          </div>
+        </div>
+      </form>
+    );
+  }
+}
+
+/**
  * Component for displaying a spinner loading animation
  * @returns   Returns the content that should be displayed
  */
@@ -1444,10 +1644,11 @@ const InputControl = (props) => {
         hidden={Boolean(props.hidden)}
         required={Boolean(props.required)}
         value={props.value}
+        placeholder={props.placeholder || null}
         autocomplete={props.list && !props.readonly ? "off" : "on"}
         onChange={props.onChange || null}
         aria-describedby={props.validator || null}
-        readOnly={Boolean(props.readonly)}
+        readonly={Boolean(props.readonly)}
       />
       {props.validator ? (
         <div id={props.validator} className="invalid-feedback">
@@ -1477,6 +1678,7 @@ const Input = (props) => {
       }`}
       hidden={Boolean(props.hidden)}
       required={Boolean(props.required)}
+      placeholder={props.placeholder}
       value={props.value}
       autocomplete={props.list && !props.readonly ? "off" : "on"}
       onChange={props.onChange || null}
