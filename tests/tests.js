@@ -774,6 +774,123 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /books/my", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/books/my").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - My Books<\/title>/),
+            "response text should contain '<title>Book Exchange - My Books</title>'"
+          );
+          done();
+        });
+      });
+    });
+
+    suite("POST Tests", () => {
+      test("1)  All Data Test", (done) => {
+        const data = {
+          title: "Dummy Book #1",
+          description: "Dummy Text",
+          user: ids.users[0],
+        };
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "success",
+              "response should return 'success'"
+            );
+            done();
+          });
+      });
+
+      test("2)  Repeat Book Title Test", (done) => {
+        const data = {
+          title: "Dummy Book #1",
+          description: "Dummy Text",
+          user: ids.users[1],
+        };
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "Title must be unique",
+              "response should return 'Title must be unique'"
+            );
+            done();
+          });
+      });
+
+      test("3)  Repeat Book Description Test", (done) => {
+        const data = {
+          title: "Dummy Book #2",
+          description: "Dummy Text",
+          user: ids.users[1],
+        };
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "success",
+              "response should return 'success'"
+            );
+            done();
+          });
+      });
+
+      test("4)  No Title Test", (done) => {
+        const data = {
+          title: "",
+          description: "Dummy Text",
+          user: ids.users[1],
+        };
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.notEqual(
+              res.text,
+              "success",
+              "response should not return 'success'"
+            );
+            done();
+          });
+      });
+
+      test("5)  No Description Test", (done) => {
+        const data = {
+          title: "doesn't matter",
+          description: "",
+          user: ids.users[1],
+        };
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.notEqual(
+              res.text,
+              "success",
+              "response should not return 'success'"
+            );
+            done();
+          });
+      });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
