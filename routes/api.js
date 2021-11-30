@@ -92,15 +92,13 @@ module.exports = (app) => {
         .getBooks(user)
         .populate({ path: "requests" })
         .then((books) => {
-          console.log(books);
-
           if (!books || books.length == 0) {
             res.send("No books have been added yet");
             return;
           }
 
           books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
-          console.log(books);
+          //console.log(books);
           res.json({
             books: books.map((book) => {
               return {
