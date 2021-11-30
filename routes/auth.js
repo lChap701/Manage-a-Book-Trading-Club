@@ -102,10 +102,28 @@ module.exports = (app) => {
     passport.authenticate("microsoft", oauthOptions)
   );
 
-  // Displays the Book Exchange - Create Requests Page
-  app.get("/requests/new", loggedOut, (req, res) => {
-    res.sendFile(process.cwd() + "/public/createRequests.html");
-  });
+  // Displays and handles POST requests for the Book Exchange - Create Requests Page
+  app
+    .route("/requests/new")
+    .get(loggedOut, (req, res) => {
+      res.sendFile(process.cwd() + "/public/createRequests.html");
+    })
+    .post((req, res) => {
+      crud
+        .addRequest(req.body)
+        .then(() => res.send("success"))
+        .catch((ex) => {
+          let error = ex.message;
+
+          if (ex.errors) {
+            Object.keys(ex.errors).forEach((field) => {
+              if (ex.errors[field]) error = ex.errors[field].message;
+            });
+          }
+
+          res.send(error);
+        });
+    });
 
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
   app
@@ -182,7 +200,7 @@ module.exports = (app) => {
 
           res.send(error);
         });
-    }).put();
+    });
 
   // Logs the user out
   app.get("/logout", loggedOut, (req, res) => {
