@@ -62,6 +62,7 @@ app.use(flash());
 // DB Setup
 const connectDB = require("./db.config");
 connectDB();
+const crud = require("./crud");
 
 // Allows stylesheets, JS scripts, and other files to be loaded
 app.use("/css", express.static(process.cwd() + "/public/css"));
@@ -102,16 +103,38 @@ app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
-// Form Handler for the form on the home page and My Books page
+// Form handler for the form on the home page and Book Exchange - My Books page
 app.post("/requests/new/books", (req, res) => {
   if (!req.body) return;
   console.log(req.body);
   let ids = [];
-  let keys = Object.keys(req.body);
-  keys.forEach((bookId) => ids.push(bookId.replace("book", "")));
+  let { books } = req.body;
+  books.forEach((bookId) => ids.push(bookId.replace("book", "")));
   req.session.books = ids;
   console.log(req.session.books);
   res.redirect("../new");
+});
+
+// Form handler for the form on the Book Exchange - Request for (book) Page
+app.put("/requests/:requestId/accept", (req, res) => {
+  crud
+    .updateRequest(req.body.requestId)
+    .then(() => res.redirect("/books/my"))
+    .catch((ex) => {
+      console.log(ex);
+      res.send(ex.message);
+    });
+});
+
+// Form handler for the form on the Book Exchange - Request for (book) Page
+app.delete("/requests/:requestId/cancel", (req, res) => {
+  crud
+    .deleteRequest(req.body.requestId)
+    .then(() => res.redirect("/books/my"))
+    .catch((ex) => {
+      console.log(ex);
+      res.send(ex.message);
+    });
 });
 
 // Displays the Book Exchange - All Trades Page
