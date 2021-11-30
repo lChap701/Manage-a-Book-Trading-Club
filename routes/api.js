@@ -141,6 +141,7 @@ module.exports = (app) => {
               _id: book._id,
               title: book.title,
               description: book.description,
+              createdAt: book.addedAt,
               requests: {
                 _ids: book.requests,
                 count: book.numOfRequests,
