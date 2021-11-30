@@ -657,8 +657,8 @@ const MyBooks = (props) => {
         "text"
       ).then((data) => {
         console.log(data);
-        if (typeof data == "object") {
-          setBooks(data);
+        if (typeof JSON.parse(data) == "object") {
+          setBooks(JSON.parse(data));
         } else {
           setMsg(data);
         }
