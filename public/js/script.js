@@ -678,7 +678,7 @@ const MyBooks = (props) => {
         <h2 className="text-center">My Books</h2>
       </div>
       <div className="panel-body">
-        {books.length == 0 ? (
+        {msg.length > 0 ? (
           <div className="item border-top-0 border-bottom-0 p-5">
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
