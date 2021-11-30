@@ -316,7 +316,7 @@ const Books = (props) => {
                     name={`book${book._id}`}
                     type="checkbox"
                   />
-                  <label for={`book${book._id}`}></label>
+                  <label for={`book${book._id}`}>{book.title}</label>
                 </div>
               </div>
             );
@@ -692,7 +692,7 @@ const MyBooks = (props) => {
                     name={`book${book._id}`}
                     type="checkbox"
                   />
-                  <label for={`book${book._id}`}></label>
+                  <label for={`book${book._id}`}>{book.title}</label>
                 </div>
               </div>
             );
