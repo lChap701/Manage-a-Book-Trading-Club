@@ -129,47 +129,34 @@ module.exports = (app) => {
 
   // Routing for retrieving all books
   app.get("/api/books", (req, res) => {
-    const { bookId } = req.query;
-    let books = [];
-
-    // For when books are requested for trades
-    if (bookId) {
-      if (Array.isArray(bookId)) {
-        bookId.forEach((id) => {
-          crud.getBook(id).then((book) => books.push(book));
-        });
-      } else {
-        crud.getBook(bookId).then((book) => books.push(book));
-      }
-
-      res.json(books);
-      return;
-    }
-
     crud
       .getAllBooks()
-      .populate({ path: "users" })
-      .then((books) =>
+      .populate({ path: "user" })
+      .then((books) => {
+        books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
+        //console.log(books);
         res.json(
-          books
-            .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
-            .map((book) => {
-              return {
-                _id: book._id,
-                title: book.title,
-                description: book.description,
-                user: {
-                  _id: book.user._id,
-                  username: book.user.username,
-                  city: book.user.city,
-                  state: book.user.state,
-                  country: book.user.country,
-                },
-                request: book.request,
-              };
-            })
-        )
-      );
+          books.map((book) => {
+            return {
+              _id: book._id,
+              title: book.title,
+              description: book.description,
+              requests: {
+                _ids: book.requests,
+                count: book.numOfRequests,
+              },
+              user: {
+                _id: book.user._id,
+                username: book.user.username,
+                city: book.user.city,
+                state: book.user.state,
+                country: book.user.country,
+              },
+            };
+          })
+        );
+      })
+      .catch((e) => console.log(e));
   });
 
   // Routing for retrieving all requests for a book
