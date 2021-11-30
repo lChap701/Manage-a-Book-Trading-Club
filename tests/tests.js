@@ -227,7 +227,7 @@ suite("Unit Tests", () => {
           assert.property(
             json[0],
             "_id",
-            "response should return objects with a property of '_id'"
+            "response should return an array containing objects with a property of '_id'"
           );
           assert.propertyVal(
             json[1],
@@ -891,6 +891,64 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /api/books", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/books")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          console.log(JSON.parse(res.text));
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "_id",
+            "response should return an array containing objects with a property of '_id'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[1],
+            "title",
+            "Dummy Book #1",
+            "response should return an array containing an object with a property of 'title' that equals 'Dummy Book #1'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[0],
+            "title",
+            "Dummy Book #2",
+            "response should return an array containing an object with a property of 'title' that equals 'Dummy Book #2'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[0],
+            "description",
+            "Dummy Text",
+            "response should return an array containing objects with a property of 'description' that equals 'Dummy Text'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "requests",
+            "response should return an array containing objects with a nested object called 'requests'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].requests,
+            "_ids",
+            "response should return an array containing nested 'requests' objects with a property of '_ids'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[0].requests,
+            "count",
+            0,
+            "response should return an array containing nested 'requests' objects with a property of 'count' that equals '0'"
+          );
+          done();
+          ids.books.push(JSON.parse(res.text)[1]._id);
+          ids.books.push(JSON.parse(res.text)[0]._id);
+        });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
@@ -913,6 +971,8 @@ suite("Unit Tests", () => {
     ids.requests.forEach((id) => {
       crud.deleteRequest(id).catch((err) => console.log(err));
     });
-    done();
+
+    // Gives enough time for the code above to be executed
+    setTimeout(() => done(), 2000);
   });
 });
