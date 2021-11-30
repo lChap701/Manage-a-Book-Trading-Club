@@ -13,11 +13,13 @@ const agent = chai.request.agent(app);
 
 suite("Unit Tests", () => {
   let ids = { users: [], books: [], requests: [] };
-  let orgLength = 0;
+  let orgLength = { users: 0, books: 0, requests: 0 };
 
   // Done before any tests are ran
   suiteSetup(() => {
-    crud.getUsers().then((users) => (orgLength = users.length));
+    console.log("Setting up tests...");
+    crud.getUsers().then((users) => (orgLength.users = users.length));
+    crud.getAllBooks().then((books) => (orgLength.books = books.length));
   });
 
   suite("Testing /signup", () => {
@@ -221,8 +223,8 @@ suite("Unit Tests", () => {
           assert.isArray(json, "response should return an array");
           assert.equal(
             json.length,
-            orgLength + 2,
-            `response should return ${orgLength + 2} objects`
+            orgLength.users + 2,
+            `response should return ${orgLength.users + 2} objects`
           );
           assert.property(
             json[0],
@@ -898,10 +900,14 @@ suite("Unit Tests", () => {
         .get("/api/books")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          console.log(JSON.parse(res.text));
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
+          );
+          assert.equal(
+            JSON.parse(res.text).length,
+            orgLength.books + 2,
+            `response should return ${orgLength.books + 2} objects`
           );
           assert.property(
             JSON.parse(res.text)[0],
@@ -935,6 +941,10 @@ suite("Unit Tests", () => {
             JSON.parse(res.text)[0].requests,
             "_ids",
             "response should return an array containing nested 'requests' objects with a property of '_ids'"
+          );
+          assert.isArray(
+            JSON.parse(res.text)[0].requests._ids,
+            "the '_ids' property in the nested 'requests' objects should be an array"
           );
           assert.propertyVal(
             JSON.parse(res.text)[0].requests,
