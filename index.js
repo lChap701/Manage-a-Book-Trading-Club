@@ -95,7 +95,7 @@ app.get("/books", (req, res) => {
 
 // Displays the Book Exchange - Requests for (book) Page
 app.get("/books/:bookId/requests", (req, res) => {
-  res.sendFile(process.cwd() + "/public/requests.html");
+  res.sendFile(process.cwd() + "/public/bookRequests.html");
 });
 
 // Displays the Book Exchange - All Requests Page
