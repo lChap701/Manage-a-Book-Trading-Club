@@ -168,6 +168,8 @@ module.exports = (app) => {
 
       crud
         .getRequest(book.request)
+        .where("traded")
+        .equals(false)
         .populate({ path: "giveBooks", populate: { path: "user" } })
         .populate({ path: "takeBooks", populate: { path: "user" } })
         .then((request) => {
@@ -228,58 +230,54 @@ module.exports = (app) => {
   app.route("/api/requests").get((req, res) => {
     let { traded } = req.query;
 
-    // Set to default value
-    if (!traded) traded = "false";
+    // Set to default value or converts string to false
+    if (!traded || traded == "false") traded = false;
 
     crud
       .getRequests()
       .populate({ path: "giveBooks", populate: { path: "user" } })
       .populate({ path: "takeBooks", populate: { path: "user" } })
+      .where("traded")
+      .equals(Boolean(traded))
       .then((requests) => {
         res.json(
-          requests
-            .filter((request) => request.traded.toString() === traded)
-            .map((request) => {
-              return {
-                _id: request._id,
-                gives: request.giveBooks
-                  .sort(
-                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                  )
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                      },
-                    };
-                  }),
-                takes: request.takeBooks
-                  .sort(
-                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                  )
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                      },
-                    };
-                  }),
-              };
-            })
+          requests.map((request) => {
+            return {
+              _id: request._id,
+              gives: request.giveBooks
+                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .map((book) => {
+                  return {
+                    book: {
+                      _id: book._id,
+                      title: book.title,
+                      description: book.description,
+                      requests: book.numOfRequests,
+                    },
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    },
+                  };
+                }),
+              takes: request.takeBooks
+                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .map((book) => {
+                  return {
+                    book: {
+                      _id: book._id,
+                      title: book.title,
+                      description: book.description,
+                      requests: book.numOfRequests,
+                    },
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    },
+                  };
+                }),
+            };
+          })
         );
       });
   });
