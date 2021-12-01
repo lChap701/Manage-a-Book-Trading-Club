@@ -24,9 +24,9 @@ module.exports = (app) => {
             return {
               _id: user._id,
               username: user.username,
-              city: user.city || "null",
-              state: user.state || "null",
-              country: user.country || "null",
+              city: user.city || "N/A",
+              state: user.state || "N/A",
+              country: user.country || "N/A",
               books: user.books.length,
               incomingRequests:
                 user.books.length > 0
