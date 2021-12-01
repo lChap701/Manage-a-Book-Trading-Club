@@ -115,26 +115,51 @@ app.post("/requests/new/books", (req, res) => {
   res.redirect("../new");
 });
 
-// Form handler for the form on the Book Exchange - Request for (book) Page
+// Form handler for the Accept Request form on the Book Exchange - Request for (book) Page
 app.put("/requests/:requestId/accept", (req, res) => {
-  crud
-    .updateRequest(req.body.requestId)
-    .then(() => res.redirect("/books/my"))
-    .catch((ex) => {
-      console.log(ex);
-      res.send(ex.message);
-    });
+  crud.getRequest(req.params.requestId).then((request) => {
+    if (!request) {
+      res.send("Unknown Request");
+      return;
+    }
+
+    crud
+      .updateRequest(request._id)
+      .then(() => res.redirect("/books/my"))
+      .catch((ex) => {
+        console.log(ex);
+        res.send(ex.message);
+      });
+  });
 });
 
-// Form handler for the form on the Book Exchange - Request for (book) Page
+// Form handler for the Cancel Request form on the Book Exchange - Request for (book) Page
 app.delete("/requests/:requestId/cancel", (req, res) => {
-  crud
-    .deleteRequest(req.body.requestId)
-    .then(() => res.redirect("/books/my"))
-    .catch((ex) => {
-      console.log(ex);
-      res.send(ex.message);
+  crud.getRequest(req.params.requestId).then((request) => {
+    if (!request) {
+      res.send("Unknown Request");
+      return;
+    }
+
+    // Updates all books part of the request
+    let books = request.giveBooks.concat(request.takeBooks);
+    books.forEach((b) => {
+      crud.getBook(b).then((book) => {
+        book.requests = book.requests.filter((r) => r != request._id);
+        book.save();
+      });
+
+      if (b == books[books.length - 1]._id) {
+        crud
+          .deleteRequest(request._id)
+          .then(() => res.redirect("/books/my"))
+          .catch((ex) => {
+            console.log(ex);
+            res.send(ex.message);
+          });
+      }
     });
+  });
 });
 
 // Displays the Book Exchange - All Trades Page
