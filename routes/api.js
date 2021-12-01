@@ -238,44 +238,50 @@ module.exports = (app) => {
 
     crud
       .getRequests()
-      .populate({ path: "giveBooks" })
-      .populate({ path: "takeBooks" })
+      .populate({ path: "giveBooks", populate: { path: "user" } })
+      .populate({ path: "takeBooks", populate: { path: "user" } })
       .then((requests) => {
         res.json(
           requests
             .filter((request) => request.traded.toString() === traded)
             .map((request) => {
               return {
-                give: {
-                  books: request.giveBooks
-                    .sort(
-                      (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                    )
-                    .map((book) => {
-                      return {
+                gives: request.giveBooks
+                  .sort(
+                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                  )
+                  .map((book) => {
+                    return {
+                      book: {
                         _id: book._id,
                         title: book.title,
                         description: book.description,
                         requests: book.numOfRequests,
-                        user: book.user,
-                      };
-                    }),
-                },
-                take: {
-                  books: request.takeBooks
-                    .sort(
-                      (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                    )
-                    .map((book) => {
-                      return {
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                      },
+                    };
+                  }),
+                takes: request.takeBooks
+                  .sort(
+                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                  )
+                  .map((book) => {
+                    return {
+                      book: {
                         _id: book._id,
                         title: book.title,
                         description: book.description,
                         requests: book.numOfRequests,
-                        user: book.user,
-                      };
-                    }),
-                },
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                      },
+                    };
+                  }),
               };
             })
         );
