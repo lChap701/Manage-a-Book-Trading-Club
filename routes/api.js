@@ -167,61 +167,66 @@ module.exports = (app) => {
       }
 
       crud
-        .getRequest(book.request)
+        .getRequests()
         .populate({ path: "giveBooks", populate: { path: "user" } })
         .populate({ path: "takeBooks", populate: { path: "user" } })
         .where("traded")
         .equals(false)
-        .then((request) => {
-          if (
-            !request ||
-            !request.takeBooks.find((book) => book == req.params.bookId)
-          ) {
+        .where("_id")
+        .in(book.requests)
+        .where("takeBooks")
+        .in(book._id)
+        .then((requests) => {
+          if (!requests || requests.length == 0) {
             res.send("There are currently no requests");
             return;
           }
 
-          res.json({
-            _id: request._id,
-            give: request.giveBooks
-              .sort((a, b) => b.numOfRequests - a.numOfRequests)
-              .map((book) => {
-                return {
-                  book: {
-                    _id: book._id,
-                    title: book.title,
-                    description: book.description,
-                    requests: book.numOfRequests,
-                  },
-                  user: {
-                    _id: book.user._id,
-                    username: book.user.username,
-                    city: book.user.city || "N/A",
-                    state: book.user.state || "N/A",
-                    country: book.user.country || "N/A",
-                  },
-                };
-              }),
-            take: request.takeBooks
-              .sort((a, b) => b.numOfRequests - a.numOfRequests)
-              .map((book) => {
-                return {
-                  book: {
-                    _id: book._id,
-                    title: book.title,
-                    description: book.description,
-                    requests: book.numOfRequests,
-                  },
-                  user: {
-                    _id: book.user._id,
-                    username: book.user.username,
-                    city: book.user.city || "N/A",
-                    state: book.user.state || "N/A",
-                    country: book.user.country || "N/A",
-                  },
-                };
-              }),
-          });
+          res.json(
+            requests.map((request) => {
+              return {
+                _id: request._id,
+                gives: request.giveBooks
+                  .sort((a, b) => b.numOfRequests - a.numOfRequests)
+                  .map((book) => {
+                    return {
+                      book: {
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                        city: book.user.city || "N/A",
+                        state: book.user.state || "N/A",
+                        country: book.user.country || "N/A",
+                      },
+                    };
+                  }),
+                takes: request.takeBooks
+                  .sort((a, b) => b.numOfRequests - a.numOfRequests)
+                  .map((book) => {
+                    return {
+                      book: {
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                        city: book.user.city || "N/A",
+                        state: book.user.state || "N/A",
+                        country: book.user.country || "N/A",
+                      },
+                    };
+                  }),
+              };
+            })
+          );
         });
     });
   });
