@@ -123,10 +123,24 @@ module.exports = (app) => {
 
       crud
         .addRequest({
-          giveBooks: req.body.gives,
-          takeBooks: req.body.takes,
+          giveBooks: gives,
+          takeBooks: takes,
         })
-        .then(() => res.send("success"))
+        .then((request) => {
+          // Update referenced books
+          let books = gives.concat(takes);
+          books.forEach((id) => {
+            crud.getBook(id).then((book) => {
+              if (takes.find((b) => b == book._id)) book.numOfRequests++;
+              book.requests.push(request);
+              book.save();
+            });
+
+            //if (books[books.length - 1] == id) res.send("success");
+          });
+
+          res.send("success");
+        })
         .catch((ex) => {
           res.send(ex.message);
         });
@@ -193,20 +207,31 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + "/public/myBooks.html");
     })
     .post((req, res) => {
-      crud
-        .addBook(req.body)
-        .then(() => res.send("success"))
-        .catch((ex) => {
-          let error = "Title must be unique";
+      crud.getUser({ _id: req.body.user }).then((user) => {
+        if (!user) {
+          res.send("Unknown user");
+          return;
+        }
 
-          if (ex.errors) {
-            Object.keys(ex.errors).forEach((field) => {
-              if (ex.errors[field]) error = ex.errors[field].message;
-            });
-          }
+        crud
+          .addBook(req.body)
+          .then((book) => {
+            user.books.push(book);
+            user.save();
+            res.send("success");
+          })
+          .catch((ex) => {
+            let error = "Title must be unique";
 
-          res.send(error);
-        });
+            if (ex.errors) {
+              Object.keys(ex.errors).forEach((field) => {
+                if (ex.errors[field]) error = ex.errors[field].message;
+              });
+            }
+
+            res.send(error);
+          });
+      });
     });
 
   // Logs the user out
