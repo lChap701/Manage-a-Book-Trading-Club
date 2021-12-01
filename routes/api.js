@@ -168,10 +168,10 @@ module.exports = (app) => {
 
       crud
         .getRequest(book.request)
-        .where("traded")
-        .equals(false)
         .populate({ path: "giveBooks", populate: { path: "user" } })
         .populate({ path: "takeBooks", populate: { path: "user" } })
+        .where("traded")
+        .equals(false)
         .then((request) => {
           if (
             !request ||
