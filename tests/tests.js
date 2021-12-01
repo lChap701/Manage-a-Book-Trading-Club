@@ -1200,6 +1200,24 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /books/:bookId/requests", () => {
+    suite("GET Tests", () => {
+      test("1) Loaded Tests", (done) => {
+        chai
+          .request(app)
+          .get(`/books/${ids.books[0]}/requests`)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              !res.text.match(/<title>Book Exchange - Books<\/title>/),
+              "response text should not contain '<title>Book Exchange - Books</title>'"
+            );
+            done();
+          });
+      });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
