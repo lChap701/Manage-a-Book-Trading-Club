@@ -168,8 +168,8 @@ module.exports = (app) => {
 
       crud
         .getRequest(book.request)
-        .populate({ path: "books" })
-        .populate({ path: "users" })
+        .populate({ path: "giveBooks", populate: { path: "user" } })
+        .populate({ path: "takeBooks", populate: { path: "user" } })
         .then((request) => {
           if (
             !request ||
@@ -180,44 +180,45 @@ module.exports = (app) => {
           }
 
           res.json({
-            give: {
-              books: request.giveBooks
-                .sort((a, b) => b.numOfRequests - a.numOfRequests)
-                .map((book) => {
-                  return {
+            _id: request._id,
+            give: request.giveBooks
+              .sort((a, b) => b.numOfRequests - a.numOfRequests)
+              .map((book) => {
+                return {
+                  book: {
                     _id: book._id,
                     title: book.title,
                     description: book.description,
                     requests: book.numOfRequests,
-                    user: {
-                      _id: book.user._id,
-                      username: book.user.username,
-                      city: book.user.city || "N/A",
-                      state: book.user.state || "N/A",
-                      country: book.user.country || "N/A",
-                    },
-                  };
-                }),
-            },
-            take: {
-              books: request.takeBooks
-                .sort((a, b) => b.numOfRequests - a.numOfRequests)
-                .map((book) => {
-                  return {
+                  },
+                  user: {
+                    _id: book.user._id,
+                    username: book.user.username,
+                    city: book.user.city || "N/A",
+                    state: book.user.state || "N/A",
+                    country: book.user.country || "N/A",
+                  },
+                };
+              }),
+            take: request.takeBooks
+              .sort((a, b) => b.numOfRequests - a.numOfRequests)
+              .map((book) => {
+                return {
+                  book: {
                     _id: book._id,
                     title: book.title,
                     description: book.description,
                     requests: book.numOfRequests,
-                    user: {
-                      _id: book.user._id,
-                      username: book.user.username,
-                      city: book.user.city || "N/A",
-                      state: book.user.state || "N/A",
-                      country: book.user.country || "N/A",
-                    },
-                  };
-                }),
-            },
+                  },
+                  user: {
+                    _id: book.user._id,
+                    username: book.user.username,
+                    city: book.user.city || "N/A",
+                    state: book.user.state || "N/A",
+                    country: book.user.country || "N/A",
+                  },
+                };
+              }),
           });
         });
     });
