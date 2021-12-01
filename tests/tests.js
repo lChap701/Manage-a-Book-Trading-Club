@@ -17,9 +17,11 @@ suite("Unit Tests", () => {
 
   // Done before any tests are ran
   suiteSetup(() => {
-    console.log("Setting up tests...");
     crud.getUsers().then((users) => (orgLength.users = users.length));
     crud.getAllBooks().then((books) => (orgLength.books = books.length));
+    crud
+      .getRequests()
+      .then((requests) => (orgLength.requests = requests.length));
   });
 
   suite("Testing /signup", () => {
@@ -305,7 +307,7 @@ suite("Unit Tests", () => {
           assert.equal(res.status, 200, "response status should be 200");
           assert(
             !res.text.match(/<title>Book Exchange - Books<\/title>/),
-            "response text should contain '<title>Book Exchange - Books</title>'"
+            "response text should not contain '<title>Book Exchange - Books</title>'"
           );
           done();
         });
@@ -998,6 +1000,81 @@ suite("Unit Tests", () => {
           );
           done();
         });
+    });
+  });
+
+  suite("Testing /requests/new", () => {
+    suite("GET Tests", () => {
+      test("1)  Loaded Test", (done) => {
+        agent.get("/requests/new").end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - Create Requests<\/title>/),
+            "response text should contain '<title>Book Exchange - Create Requests</title>'"
+          );
+          done();
+        });
+      });
+    });
+
+    suite("POST Tests", () => {
+      test("1)  Valid Data Test", (done) => {
+        const data = {
+          gives: [ids.books[0]],
+          takes: [ids.books[1]],
+        };
+
+        agent
+          .post("/requests/new")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "success",
+              "response should return 'success'"
+            );
+            done();
+          });
+      });
+
+      test("2)  No Books to Give Test", (done) => {
+        const data = {
+          takes: [ids.books[0]],
+        };
+
+        agent
+          .post("/requests/new")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.notEqual(
+              res.text,
+              "success",
+              "response text should not return 'success'"
+            );
+            done();
+          });
+      });
+
+      test("3)  No Books to Take Test", (done) => {
+        const data = {
+          gives: [ids.books[1]],
+        };
+
+        agent
+          .post("/requests/new")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.notEqual(
+              res.text,
+              "success",
+              "response text should not return 'success'"
+            );
+            done();
+          });
+      });
     });
   });
 
