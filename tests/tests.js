@@ -1218,6 +1218,65 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /api/books/:bookId/requests", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get(`/api/books/${ids.books[1]}/requests`)
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "_id",
+            "response should return an array containing an object with a property of '_id'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "gives",
+            "response should return an array containing an object with a property of 'gives'"
+          );
+          assert.isArray(
+            JSON.parse(res.text)[0].gives,
+            "the 'gives' property should be an array"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].gives[0],
+            "book",
+            "the 'gives' property should contain an object with a property of 'book'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].gives[0],
+            "user",
+            "the 'gives' property should contain an object with a property of 'user'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "gives",
+            "response should return an array containing an object with a property of 'gives'"
+          );
+          assert.isArray(
+            JSON.parse(res.text)[0].takes,
+            "the 'takes' property should be an array"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].takes[0],
+            "book",
+            "the 'takes' property should contain an object with a property of 'book'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].takes[0],
+            "user",
+            "the 'takes' property should contain an object with a property of 'user'"
+          );
+          done();
+        });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
