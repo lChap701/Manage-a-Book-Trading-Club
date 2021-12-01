@@ -136,10 +136,9 @@ module.exports = (app) => {
               book.save();
             });
 
-            //if (books[books.length - 1] == id) res.send("success");
+            // Ensures the requested books are updated before the response is sent
+            if (books[books.length - 1] == id) res.send("success");
           });
-
-          res.send("success");
         })
         .catch((ex) => {
           res.send(ex.message);

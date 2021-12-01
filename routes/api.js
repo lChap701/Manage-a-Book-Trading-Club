@@ -147,9 +147,9 @@ module.exports = (app) => {
               user: {
                 _id: book.user._id,
                 username: book.user.username,
-                city: book.user.city,
-                state: book.user.state,
-                country: book.user.country,
+                city: book.user.city || "N/A",
+                state: book.user.state || "N/A",
+                country: book.user.country || "N/A",
               },
             };
           })
@@ -192,12 +192,9 @@ module.exports = (app) => {
                     user: {
                       _id: book.user._id,
                       username: book.user.username,
-                      location:
-                        book.user.city +
-                        " " +
-                        book.user.state +
-                        ", " +
-                        book.user.country,
+                      city: book.user.city || "N/A",
+                      state: book.user.state || "N/A",
+                      country: book.user.country || "N/A",
                     },
                   };
                 }),
@@ -214,12 +211,9 @@ module.exports = (app) => {
                     user: {
                       _id: book.user._id,
                       username: book.user.username,
-                      location:
-                        book.user.city +
-                        " " +
-                        book.user.state +
-                        ", " +
-                        book.user.country,
+                      city: book.user.city || "N/A",
+                      state: book.user.state || "N/A",
+                      country: book.user.country || "N/A",
                     },
                   };
                 }),
@@ -246,6 +240,7 @@ module.exports = (app) => {
             .filter((request) => request.traded.toString() === traded)
             .map((request) => {
               return {
+                _id: request._id,
                 gives: request.giveBooks
                   .sort(
                     (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
