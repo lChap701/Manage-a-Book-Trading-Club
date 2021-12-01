@@ -42,6 +42,7 @@ const userSchema = new Schema(
         },
       },
     ],
+    books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
   },
   {
     timestamps: {
