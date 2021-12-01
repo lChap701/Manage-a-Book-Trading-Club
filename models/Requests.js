@@ -4,30 +4,14 @@ const { Schema } = mongoose;
 const requestSchema = new Schema({
   giveBooks: [
     {
-      book: {
-        type: Schema.Types.ObjectId,
-        ref: "Books",
-        required: "request must include at least one book to give",
-      },
-      user: {
-        type: Schema.Types.ObjectId,
-        ref: "Users",
-        required: "request must include at least one user",
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Books",
     },
   ],
   takeBooks: [
     {
-      book: {
-        type: Schema.Types.ObjectId,
-        ref: "Books",
-        required: "request must include at least one book to take",
-      },
-      user: {
-        type: Schema.Types.ObjectId,
-        ref: "Users",
-        required: "request must include at least one user",
-      },
+      type: Schema.Types.ObjectId,
+      ref: "Books",
     },
   ],
   traded: { type: Boolean, default: false },

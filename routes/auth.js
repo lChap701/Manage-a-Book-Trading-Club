@@ -109,19 +109,26 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + "/public/createRequests.html");
     })
     .post((req, res) => {
+      const { gives, takes } = req.body;
+
+      if (!gives || gives.length == 0) {
+        res.send("Request must include at least one book to give");
+        return;
+      }
+
+      if (!takes || takes.length == 0) {
+        res.send("Request must include at least one book to take");
+        return;
+      }
+
       crud
-        .addRequest(req.body)
+        .addRequest({
+          giveBooks: req.body.gives,
+          takeBooks: req.body.takes,
+        })
         .then(() => res.send("success"))
         .catch((ex) => {
-          let error = ex.message;
-
-          if (ex.errors) {
-            Object.keys(ex.errors).forEach((field) => {
-              if (ex.errors[field]) error = ex.errors[field].message;
-            });
-          }
-
-          res.send(error);
+          res.send(ex.message);
         });
     });
 

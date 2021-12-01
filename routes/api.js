@@ -238,8 +238,8 @@ module.exports = (app) => {
 
     crud
       .getRequests()
-      .populate({ path: "books" })
-      .populate({ path: "users" })
+      .populate({ path: "giveBooks" })
+      .populate({ path: "takeBooks" })
       .then((requests) => {
         res.json(
           requests
@@ -257,13 +257,7 @@ module.exports = (app) => {
                         title: book.title,
                         description: book.description,
                         requests: book.numOfRequests,
-                        user: {
-                          _id: book.user._id,
-                          username: book.user.username,
-                          city: book.user.city,
-                          state: book.user.state,
-                          country: book.user.country,
-                        },
+                        user: book.user,
                       };
                     }),
                 },
@@ -278,13 +272,7 @@ module.exports = (app) => {
                         title: book.title,
                         description: book.description,
                         requests: book.numOfRequests,
-                        user: {
-                          _id: book.user._id,
-                          username: book.user.username,
-                          city: book.user.city,
-                          state: book.user.state,
-                          country: book.user.country,
-                        },
+                        user: book.user,
                       };
                     }),
                 },
