@@ -1085,6 +1085,7 @@ suite("Unit Tests", () => {
         .get("/api/requests")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
+          //console.log(res.text);
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
@@ -1219,61 +1220,93 @@ suite("Unit Tests", () => {
   });
 
   suite("Testing /api/books/:bookId/requests", () => {
-    test("1)  GET Test", (done) => {
-      chai
-        .request(app)
-        .get(`/api/books/${ids.books[1]}/requests`)
-        .end((err, res) => {
-          assert.equal(res.status, 200, "response status should be 200");
-          assert.isArray(
-            JSON.parse(res.text),
-            "response should return an array"
-          );
-          assert.property(
-            JSON.parse(res.text)[0],
-            "_id",
-            "response should return an array containing an object with a property of '_id'"
-          );
-          assert.property(
-            JSON.parse(res.text)[0],
-            "gives",
-            "response should return an array containing an object with a property of 'gives'"
-          );
-          assert.isArray(
-            JSON.parse(res.text)[0].gives,
-            "the 'gives' property should be an array"
-          );
-          assert.property(
-            JSON.parse(res.text)[0].gives[0],
-            "book",
-            "the 'gives' property should contain an object with a property of 'book'"
-          );
-          assert.property(
-            JSON.parse(res.text)[0].gives[0],
-            "user",
-            "the 'gives' property should contain an object with a property of 'user'"
-          );
-          assert.property(
-            JSON.parse(res.text)[0],
-            "gives",
-            "response should return an array containing an object with a property of 'gives'"
-          );
-          assert.isArray(
-            JSON.parse(res.text)[0].takes,
-            "the 'takes' property should be an array"
-          );
-          assert.property(
-            JSON.parse(res.text)[0].takes[0],
-            "book",
-            "the 'takes' property should contain an object with a property of 'book'"
-          );
-          assert.property(
-            JSON.parse(res.text)[0].takes[0],
-            "user",
-            "the 'takes' property should contain an object with a property of 'user'"
-          );
-          done();
-        });
+    suite("GET Tests", () => {
+      test("1)  Book Requested to Take Test", (done) => {
+        chai
+          .request(app)
+          .get(`/api/books/${ids.books[1]}/requests`)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "_id",
+              "response should return an array containing an object with a property of '_id'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "gives",
+              "response should return an array containing an object with a property of 'gives'"
+            );
+            assert.isArray(
+              JSON.parse(res.text)[0].gives,
+              "the 'gives' property should be an array"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0],
+              "book",
+              "the 'gives' property should contain an object with a property of 'book'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0],
+              "user",
+              "the 'gives' property should contain an object with a property of 'user'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "gives",
+              "response should return an array containing an object with a property of 'gives'"
+            );
+            assert.isArray(
+              JSON.parse(res.text)[0].takes,
+              "the 'takes' property should be an array"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0],
+              "book",
+              "the 'takes' property should contain an object with a property of 'book'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0],
+              "user",
+              "the 'takes' property should contain an object with a property of 'user'"
+            );
+            done();
+          });
+      });
+
+      test("2)  Book Requested to be Given Test", (done) => {
+        chai
+          .request(app)
+          .get(`/api/books/${ids.books[0]}/requests`)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "There are currently no requests",
+              "response text should return 'There are currently no requests'"
+            );
+            done();
+          });
+      });
+
+      test("3)  Unknown Book Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/books/71792ae9cd5ad940788652af/requests")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "Unknown book",
+              "response text should return 'Unknown book'"
+            );
+            done();
+          });
+      });
     });
   });
 
