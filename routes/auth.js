@@ -106,7 +106,12 @@ module.exports = (app) => {
   app
     .route("/requests/new")
     .get(loggedOut, (req, res) => {
-      res.sendFile(process.cwd() + "/public/createRequests.html");
+      if (req.session.error) {
+        req.session.error = false;
+        res.send(req.flash("error")[0]);
+      } else {
+        res.sendFile(process.cwd() + "/public/createRequests.html");
+      }
     })
     .post((req, res) => {
       const { gives, takes } = req.body;
@@ -137,13 +142,107 @@ module.exports = (app) => {
             });
 
             // Ensures the requested books are updated before the response is sent
-            if (books[books.length - 1] == id) res.send("success");
+            if (books[books.length - 1] == id) {
+              req.flash("success", "Created Request");
+              req.session.success = true;
+              res.redirect("/requests");
+            }
           });
         })
         .catch((ex) => {
           res.send(ex.message);
         });
     });
+
+  // Routing for allowing requests to be accepted and books to be traded
+  app.get("/requests/:requestId/accept", loggedOut, (req, res) => {
+    crud
+      .getRequest(req.params.requestId)
+      /* .populate({ path: "giveBooks", populate: { path: "user" } })
+      .populate({ path: "takeBooks", populate: { path: "user" } }) */
+      .populate({ path: "giveBooks" })
+      .populate({ path: "takeBooks" })
+      .then((request) => {
+        if (!request) {
+          res.send("Unknown request");
+          return;
+        }
+        console.log(request);
+
+        // Updates all books and users part of the request
+        let requestData = {
+          books: request.giveBooks
+            .concat(request.takeBooks)
+            .map((book) => book._id),
+          users: [request.takeBooks[0].user, request.giveBooks[0].user],
+        };
+        console.log(requestData);
+
+        requestData.users.forEach((u) => {
+          crud.getUser({ _id: u }).then((user) => {
+            user.books = user.books.filter(
+              (b) => request.takeBooks.indexOf(b) == -1
+            );
+            user.books.push(...request.giveBooks);
+            console.log(user);
+            user.save();
+          });
+        });
+
+        requestData.books.forEach((b) => {
+          crud.getBook(b).then((book) => {
+            book.user = requestData.users.filter(
+              (user) => user != book.user
+            )[0];
+            book.numOfRequests--;
+            console.log(book);
+            book.save();
+          });
+        });
+
+        crud
+          .updateRequest(request._id)
+          .then(() => {
+            req.session.success = true;
+            req.flash("success", "Accepted Request");
+            res.redirect("..");
+          })
+          .catch((ex) => {
+            console.log(ex);
+            res.send(ex.message);
+          });
+      });
+  });
+
+  // Routing for cancelling requests and declining trades
+  app.get("/requests/:requestId/cancel", loggedOut, (req, res) => {
+    crud.getRequest(req.params.requestId).then((request) => {
+      if (!request) {
+        res.send("Unknown request");
+        return;
+      }
+
+      // Updates all books part of the request
+      let books = request.giveBooks.concat(request.takeBooks);
+      books.forEach((b) => {
+        crud.getBook(b).then((book) => {
+          book.requests = book.requests.filter((r) => r != String(request._id));
+          book.numOfRequests--;
+          book.save();
+        });
+
+        if (b == books[books.length - 1]._id) {
+          crud
+            .deleteRequest(request._id)
+            .then(() => res.redirect(".."))
+            .catch((ex) => {
+              console.log(ex);
+              res.send(ex.message);
+            });
+        }
+      });
+    });
+  });
 
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page
   app

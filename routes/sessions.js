@@ -17,4 +17,12 @@ module.exports = (app) => {
   app.get("/session/books", (req, res) => {
     res.json(req.session.books ? req.session.books : []);
   });
+
+  // Routing for getting success messages for the Book Exchange - All Requests Page
+  app.get("/session/success", (req, res) => {
+    if (req.session.success) {
+      req.session.success = false;
+      res.send(req.flash("success")[0]);
+    }
+  });
 };

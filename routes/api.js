@@ -234,16 +234,17 @@ module.exports = (app) => {
   // Routing for handling and retrieving requests
   app.route("/api/requests").get((req, res) => {
     let { traded } = req.query;
+    console.log(traded);
 
-    // Set to default value or converts string to false
-    if (!traded || traded == "false") traded = false;
+    // Set to default value
+    if (!traded) traded = false;
 
     crud
       .getRequests()
       .populate({ path: "giveBooks", populate: { path: "user" } })
       .populate({ path: "takeBooks", populate: { path: "user" } })
       .where("traded")
-      .equals(Boolean(traded))
+      .equals(traded)
       .then((requests) => {
         res.json(
           requests.map((request) => {
