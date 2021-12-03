@@ -961,7 +961,6 @@ suite("Unit Tests", () => {
         .get(`/api/users/${ids.users[0]}/books`)
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          //console.log(JSON.parse(res.text).books[0].requests);
           assert.property(
             JSON.parse(res.text),
             "books",
@@ -1327,6 +1326,17 @@ suite("Unit Tests", () => {
           .get("/api/requests?traded=true")
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.equal(
+              JSON.parse(res.text).length,
+              orgLength.requests + 1,
+              `response should return an array with a length of ${
+                orgLength.requests + 1
+              }`
+            );
             assert.property(
               JSON.parse(res.text)[0],
               "_id",
@@ -1437,6 +1447,25 @@ suite("Unit Tests", () => {
               "username",
               "dummyUser1",
               "the 'user' object/property should contain a property of 'username' that equals 'dummyUser1'"
+            );
+            done();
+          });
+      });
+
+      test("2)  Requested Books Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/requests?traded=false")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.isArray(
+              JSON.parse(res.text),
+              "response should return an array"
+            );
+            assert.equal(
+              JSON.parse(res.text).length,
+              orgLength.requests,
+              `response should return an array with a length of ${orgLength.requests}`
             );
             done();
           });
