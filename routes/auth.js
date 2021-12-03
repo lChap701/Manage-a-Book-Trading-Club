@@ -167,38 +167,46 @@ module.exports = (app) => {
           res.send("Unknown request");
           return;
         }
-        console.log(request);
 
-        // Updates all books and users part of the request
-        let requestData = {
-          books: request.giveBooks
-            .concat(request.takeBooks)
-            .map((book) => book._id),
-          users: [request.takeBooks[0].user, request.giveBooks[0].user],
-        };
-        console.log(requestData);
-
-        requestData.users.forEach((u) => {
-          crud.getUser({ _id: u }).then((user) => {
-            user.books = user.books.filter(
-              (b) => request.takeBooks.indexOf(b) == -1
-            );
-            user.books.push(...request.giveBooks);
-            console.log(user);
-            user.save();
+        // Updates all books part of the request
+        const { giveBooks, takeBooks } = request;
+        crud
+          .getUsers()
+          .where("_id")
+          .in([giveBooks[0].user, takeBooks[0].user])
+          .then((users) => {
+            users.forEach((user) => {
+              let remove =
+                user._id.toString() == giveBooks[0].user.toString()
+                  ? new Set(giveBooks.map((book) => book._id.toString()))
+                  : new Set(takeBooks.map((book) => book._id.toString()));
+              let add =
+                user._id.toString() == giveBooks[0].user.toString()
+                  ? takeBooks.map((book) => book._id)
+                  : giveBooks.map((book) => book._id);
+              user.books = user.books.filter((book) => !remove.has(book));
+              user.books.push(...add);
+              user.save();
+            });
           });
-        });
 
-        requestData.books.forEach((b) => {
-          crud.getBook(b).then((book) => {
-            book.user = requestData.users.filter(
-              (user) => user != book.user
-            )[0];
-            book.numOfRequests--;
-            console.log(book);
-            book.save();
+        crud
+          .getAllBooks()
+          .where("_id")
+          .in(giveBooks.concat(takeBooks).map((b) => b._id))
+          .then((books) => {
+            books.forEach((book) => {
+              if (String(book.user) == String(takeBooks[0].user)) {
+                --book.numOfRequests;
+              }
+
+              book.user =
+                book.user.toString() == takeBooks[0].user.toString()
+                  ? giveBooks[0].user
+                  : takeBooks[0].user;
+              book.save();
+            });
           });
-        });
 
         crud
           .updateRequest(request._id)
@@ -226,8 +234,10 @@ module.exports = (app) => {
       let books = request.giveBooks.concat(request.takeBooks);
       books.forEach((b) => {
         crud.getBook(b).then((book) => {
-          book.requests = book.requests.filter((r) => r != String(request._id));
-          book.numOfRequests--;
+          book.requests = book.requests.filter(
+            (r) => r.toString() != request._id.toString()
+          );
+          --book.numOfRequests;
           book.save();
         });
 
