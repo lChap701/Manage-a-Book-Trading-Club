@@ -1029,10 +1029,9 @@ suite("Unit Tests", () => {
           .send(data)
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
-            assert.equal(
-              res.text,
-              "success",
-              "response should return 'success'"
+            assert(
+              res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+              "response text should contain '<title>Book Exchange - All Requests</title>'"
             );
             done();
           });
@@ -1048,10 +1047,9 @@ suite("Unit Tests", () => {
           .send(data)
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
-            assert.notEqual(
-              res.text,
-              "success",
-              "response text should not return 'success'"
+            assert(
+              !res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+              "response text should contain '<title>Book Exchange - All Requests</title>'"
             );
             done();
           });
@@ -1067,10 +1065,9 @@ suite("Unit Tests", () => {
           .send(data)
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
-            assert.notEqual(
-              res.text,
-              "success",
-              "response text should not return 'success'"
+            assert(
+              !res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+              "response text should contain '<title>Book Exchange - All Requests</title>'"
             );
             done();
           });
@@ -1085,7 +1082,6 @@ suite("Unit Tests", () => {
         .get("/api/requests")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          //console.log(res.text);
           assert.isArray(
             JSON.parse(res.text),
             "response should return an array"
@@ -1257,8 +1253,8 @@ suite("Unit Tests", () => {
             );
             assert.property(
               JSON.parse(res.text)[0],
-              "gives",
-              "response should return an array containing an object with a property of 'gives'"
+              "takes",
+              "response should return an array containing an object with a property of 'takes'"
             );
             assert.isArray(
               JSON.parse(res.text)[0].takes,
@@ -1310,6 +1306,144 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /requests/:requestId/accept", () => {
+    test("1)  GET Test", (done) => {
+      agent.get(`/requests/${ids.requests[0]}/accept`).end((err, res) => {
+        assert.equal(res.status, 200, "response status should be 200");
+        assert(
+          res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+          "response text should contain '<title>Book Exchange - All Requests</title>'"
+        );
+        done();
+      });
+    });
+  });
+
+  suite("Testing /api/requests (With Queries)", () => {
+    suite("GET Tests", () => {
+      test("1)  Traded Books Test", (done) => {
+        chai
+          .request(app)
+          .get("/api/requests?traded=true")
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.property(
+              JSON.parse(res.text)[0],
+              "_id",
+              "response should return an array containing an object with a property of '_id'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "gives",
+              "response should return an array containing an object with a property of 'gives'"
+            );
+            assert.isArray(
+              JSON.parse(res.text)[0].gives,
+              "the 'gives' property should be an array"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0],
+              "book",
+              "the 'gives' property should contain an object with a property of 'book'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0].book,
+              "_id",
+              "the 'book' object/property should contain a property of '_id'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].gives[0].book,
+              "title",
+              "Dummy Book #1",
+              "the 'book' object/property should contain a property of 'title' that equals 'Dummy Book #1'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].gives[0].book,
+              "description",
+              "Dummy Text",
+              "the 'book' object/property should contain a property of 'description' that equals 'Dummy Text'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].gives[0].book,
+              "requests",
+              0,
+              "the 'book' object/property should contain a property of 'requests' that equals '0'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0],
+              "user",
+              "the 'gives' property should contain an object with a property of 'user'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].gives[0].user,
+              "_id",
+              "the 'user' object/property should contain a property of '_id'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].gives[0].user,
+              "username",
+              "dummyUser2",
+              "the 'user' object/property should contain a property of 'username' that equals 'dummyUser2'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "takes",
+              "response should return an array containing an object with a property of 'takes'"
+            );
+            assert.isArray(
+              JSON.parse(res.text)[0].takes,
+              "the 'takes' property should be an array"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0],
+              "book",
+              "the 'takes' property should contain an object with a property of 'book'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0].book,
+              "_id",
+              "the 'book' object/property should contain a property of '_id'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].takes[0].book,
+              "title",
+              "Dummy Book #2",
+              "the 'book' object/property should contain a property of 'title' that equals 'Dummy Book #2'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].takes[0].book,
+              "description",
+              "Dummy Text",
+              "the 'book' object/property should contain a property of 'description' that equals 'Dummy Text'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].takes[0].book,
+              "requests",
+              0,
+              "the 'book' object/property should contain a property of 'requests' that equals '0'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0],
+              "user",
+              "the 'takes' property should contain an object with a property of 'user'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0].takes[0].user,
+              "_id",
+              "the 'user' object/property should contain a property of '_id'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text)[0].takes[0].user,
+              "username",
+              "dummyUser1",
+              "the 'user' object/property should contain a property of 'username' that equals 'dummyUser1'"
+            );
+            done();
+          });
+      });
+    });
+  });
+
   // Done after all tests have been ran
   suiteTeardown((done) => {
     // Allows each test to start off fresh
@@ -1334,6 +1468,6 @@ suite("Unit Tests", () => {
     });
 
     // Gives enough time for the code above to be executed
-    setTimeout(() => done(), 2000);
+    setTimeout(() => done(), 2500);
   });
 });
