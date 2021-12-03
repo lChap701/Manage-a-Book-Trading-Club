@@ -234,7 +234,6 @@ module.exports = (app) => {
   // Routing for handling and retrieving requests
   app.route("/api/requests").get((req, res) => {
     let { traded } = req.query;
-    console.log(traded);
 
     // Set to default value
     if (!traded) traded = false;
