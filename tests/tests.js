@@ -13,7 +13,7 @@ const agent = chai.request.agent(app);
 
 suite("Unit Tests", () => {
   let ids = { users: [], books: [], requests: [] };
-  let orgLength = { users: 0, books: 0, requests: 0 };
+  let orgLength = { users: 0, books: 0, requests: 0, trades: 0 };
 
   // Done before any tests are ran
   suiteSetup(() => {
@@ -21,7 +21,14 @@ suite("Unit Tests", () => {
     crud.getAllBooks().then((books) => (orgLength.books = books.length));
     crud
       .getRequests()
+      .where("traded")
+      .equals(false)
       .then((requests) => (orgLength.requests = requests.length));
+    crud
+      .getRequests()
+      .where("traded")
+      .equals(true)
+      .then((trades) => (orgLength.trades = trades.length));
   });
 
   suite("Testing /signup", () => {
@@ -216,86 +223,83 @@ suite("Unit Tests", () => {
         .get("/api/users")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-
-          // For the recently added users
-          const json = JSON.parse(res.text).sort(
-            (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
           );
-
-          assert.isArray(json, "response should return an array");
           assert.equal(
-            json.length,
+            JSON.parse(res.text).length,
             orgLength.users + 2,
             `response should return ${orgLength.users + 2} objects`
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "_id",
             "response should return an array containing objects with a property of '_id'"
           );
           assert.propertyVal(
-            json[1],
+            JSON.parse(res.text)[1],
             "username",
             "dummyUser1",
             "response should return an array containing an object with a property of 'username' that equals 'dummyUser1'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[0],
             "username",
             "dummyUser2",
             "response should return an array containing an object with a property of 'username' that equals 'dummyUser2'"
           );
           assert.propertyVal(
-            json[1],
+            JSON.parse(res.text)[1],
             "city",
             "Big City",
             "response should return an array containing an object with a property of 'city' that equals 'Big City'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[0],
             "city",
             "N/A",
             "response should return an array containing an object with a property of 'city' that equals 'N/A'"
           );
           assert.propertyVal(
-            json[1],
+            JSON.parse(res.text)[1],
             "state",
             "IA",
             "response should return an array containing an object with a property of 'state' that equals 'IA'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[0],
             "state",
             "N/A",
             "response should return an array containing an object with a property of 'state' that equals 'N/A'"
           );
           assert.propertyVal(
-            json[1],
+            JSON.parse(res.text)[1],
             "country",
             "US",
             "response should return an array containing an object with a property of 'country' that equals 'US'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[0],
             "country",
             "N/A",
             "response should return an array containing an object with a property of 'country' that equals 'N/A'"
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "books",
             "response should return objects with a property of 'books'"
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "incomingRequests",
             "response should return objects with a property of 'incomingRequests'"
           );
           done();
 
           // Saves user IDS
-          ids.users.push(json[1]._id);
-          ids.users.push(json[0]._id);
+          ids.users.push(JSON.parse(res.text)[1]._id);
+          ids.users.push(JSON.parse(res.text)[0]._id);
         });
     });
   });
@@ -892,6 +896,27 @@ suite("Unit Tests", () => {
             done();
           });
       });
+
+      test("6)  New Description Test", (done) => {
+        const data = {
+          title: "Dummy Book #3",
+          description: "Dummy Description",
+          user: ids.users[1],
+        };
+
+        agent
+          .post("/books/my")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert.equal(
+              res.text,
+              "success",
+              "response should return 'success'"
+            );
+            done();
+          });
+      });
     });
   });
 
@@ -902,54 +927,64 @@ suite("Unit Tests", () => {
         .get("/api/books")
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-
-          // Bug Fix
-          const json = JSON.parse(res.text).sort(
-            (a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
           );
-
-          assert.isArray(json, "response should return an array");
           assert.equal(
-            json.length,
-            orgLength.books + 2,
-            `response should return ${orgLength.books + 2} objects`
+            JSON.parse(res.text).length,
+            orgLength.books + 3,
+            `response should return ${orgLength.books + 3} objects`
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "_id",
             "response should return an array containing objects with a property of '_id'"
           );
           assert.propertyVal(
-            json[1],
+            JSON.parse(res.text)[2],
             "title",
             "Dummy Book #1",
             "response should return an array containing an object with a property of 'title' that equals 'Dummy Book #1'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[1],
             "title",
             "Dummy Book #2",
             "response should return an array containing an object with a property of 'title' that equals 'Dummy Book #2'"
           );
           assert.propertyVal(
-            json[0],
+            JSON.parse(res.text)[0],
+            "title",
+            "Dummy Book #3",
+            "response should return an array containing an object with a property of 'title' that equals 'Dummy Book #3'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[0],
+            "description",
+            "Dummy Description",
+            "response should return an array containing objects with a property of 'description' that equals 'Dummy Description'"
+          );
+          assert.propertyVal(
+            JSON.parse(res.text)[1],
             "description",
             "Dummy Text",
             "response should return an array containing objects with a property of 'description' that equals 'Dummy Text'"
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "requests",
             "response should return an array containing objects with a nested object called 'requests'"
           );
           assert.property(
-            json[0],
+            JSON.parse(res.text)[0],
             "user",
             "response should return an array containing objects with a nested object called 'user'"
           );
           done();
-          ids.books.push(json[1]._id);
-          ids.books.push(json[0]._id);
+          ids.books.push(JSON.parse(res.text)[2]._id);
+          ids.books.push(JSON.parse(res.text)[1]._id);
+          ids.books.push(JSON.parse(res.text)[0]._id);
         });
     });
   });
@@ -1017,7 +1052,7 @@ suite("Unit Tests", () => {
     });
 
     suite("POST Tests", () => {
-      test("1)  Valid Data Test", (done) => {
+      test("1)  One Book to Give/Take Test", (done) => {
         const data = {
           gives: [ids.books[0]],
           takes: [ids.books[1]],
@@ -1066,6 +1101,44 @@ suite("Unit Tests", () => {
             assert.equal(res.status, 200, "response status should be 200");
             assert(
               !res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+              "response text should contain '<title>Book Exchange - All Requests</title>'"
+            );
+            done();
+          });
+      });
+
+      test("4)  Multiple Books to Give Test", (done) => {
+        const data = {
+          gives: [ids.books[1], ids.books[2]],
+          takes: [ids.books[0]],
+        };
+
+        agent
+          .post("/requests/new")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+              "response text should contain '<title>Book Exchange - All Requests</title>'"
+            );
+            done();
+          });
+      });
+
+      test("5)  Multiple Books to Take Test", (done) => {
+        const data = {
+          gives: [ids.books[0]],
+          takes: [ids.books[1], ids.books[2]],
+        };
+
+        agent
+          .post("/requests/new")
+          .send(data)
+          .end((err, res) => {
+            assert.equal(res.status, 200, "response status should be 200");
+            assert(
+              res.text.match(/<title>Book Exchange - All Requests<\/title>/),
               "response text should contain '<title>Book Exchange - All Requests</title>'"
             );
             done();
@@ -1122,8 +1195,8 @@ suite("Unit Tests", () => {
           assert.propertyVal(
             JSON.parse(res.text)[0].gives[0].book,
             "requests",
-            0,
-            "the 'book' object/property should contain a property of 'requests' that equals '0'"
+            1,
+            "the 'book' object/property should contain a property of 'requests' that equals '1'"
           );
           assert.property(
             JSON.parse(res.text)[0].gives[0],
@@ -1172,8 +1245,8 @@ suite("Unit Tests", () => {
           assert.propertyVal(
             JSON.parse(res.text)[0].takes[0].book,
             "requests",
-            1,
-            "the 'book' object/property should contain a property of 'requests' that equals '1'"
+            2,
+            "the 'book' object/property should contain a property of 'requests' that equals '2'"
           );
           assert.property(
             JSON.parse(res.text)[0].takes[0],
@@ -1191,6 +1264,8 @@ suite("Unit Tests", () => {
             "the 'user' object/property should contain a property of 'username'"
           );
           done();
+          ids.requests.push(JSON.parse(res.text)[2]._id);
+          ids.requests.push(JSON.parse(res.text)[1]._id);
           ids.requests.push(JSON.parse(res.text)[0]._id);
         });
     });
@@ -1214,9 +1289,22 @@ suite("Unit Tests", () => {
     });
   });
 
+  suite("Testing /requests/:requestId/cancel", () => {
+    test("1)  GET Test", (done) => {
+      agent.get(`/requests/${ids.requests[2]}/cancel`).end((err, res) => {
+        assert.equal(res.status, 200, "response status should be 200");
+        assert(
+          res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+          "response text should contain '<title>Book Exchange - All Requests</title>'"
+        );
+        done();
+      });
+    });
+  });
+
   suite("Testing /api/books/:bookId/requests", () => {
     suite("GET Tests", () => {
-      test("1)  Book Requested to Take Test", (done) => {
+      test("1)  Book Requested To Take Test", (done) => {
         chai
           .request(app)
           .get(`/api/books/${ids.books[1]}/requests`)
@@ -1273,10 +1361,10 @@ suite("Unit Tests", () => {
           });
       });
 
-      test("2)  Book Requested to be Given Test", (done) => {
+      test("2)  Book With No Requests Test", (done) => {
         chai
           .request(app)
-          .get(`/api/books/${ids.books[0]}/requests`)
+          .get(`/api/books/${ids.books[2]}/requests`)
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
             assert.equal(
@@ -1376,8 +1464,8 @@ suite("Unit Tests", () => {
             assert.propertyVal(
               JSON.parse(res.text)[0].gives[0].book,
               "requests",
-              0,
-              "the 'book' object/property should contain a property of 'requests' that equals '0'"
+              1,
+              "the 'book' object/property should contain a property of 'requests' that equals '1'"
             );
             assert.property(
               JSON.parse(res.text)[0].gives[0],
@@ -1464,9 +1552,9 @@ suite("Unit Tests", () => {
             );
             assert.equal(
               JSON.parse(res.text).length,
-              orgLength.requests,
-              `response should return an array with a length of ${orgLength.requests}`
-            );
+              orgLength.requests + 1,
+              `response should return an array with a length of ${orgLength.requests + 1}`
+            ); 
             done();
           });
       });
@@ -1497,6 +1585,6 @@ suite("Unit Tests", () => {
     });
 
     // Gives enough time for the code above to be executed
-    setTimeout(() => done(), 2500);
+    setTimeout(() => done(), 3000);
   });
 });
