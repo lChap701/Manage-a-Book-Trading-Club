@@ -48,7 +48,7 @@ All URL paths part of this project.
 - **/logout** - Allows users to logout
   - Redirects to **/books**
 
-### Books Path
+### Books Paths
 
 - **/books** - Shows all books
   - Displays the _index.html_ file
@@ -59,7 +59,7 @@ All URL paths part of this project.
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
 
-### Requests Path
+### Requests Paths
 
 - **/requests** - Show all requests
   - Displays the _requests.html_ file
@@ -79,7 +79,7 @@ All URL paths part of this project.
 - **/trades** - Shows all trades that have occurred
   - Displays the _trades.html_ file
 
-### Users Path
+### Users Paths
 
 - **/users** - Shows all users
   - Displays the _users.html_ file
