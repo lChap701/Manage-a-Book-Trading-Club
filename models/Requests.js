@@ -15,6 +15,8 @@ const requestSchema = new Schema({
     },
   ],
   traded: { type: Boolean, default: false },
+  requestedAt: Date,
+  tradedAt: Date,
 });
 
 /**
