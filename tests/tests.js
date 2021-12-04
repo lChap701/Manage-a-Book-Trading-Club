@@ -1425,7 +1425,7 @@ suite("Unit Tests", () => {
                 orgLength.trades + 1
               }`
             );
-            assert.property(a
+            assert.property(
               JSON.parse(res.text)[0],
               "_id",
               "response should return an array containing an object with a property of '_id'"
