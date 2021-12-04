@@ -1263,6 +1263,11 @@ suite("Unit Tests", () => {
             "username",
             "the 'user' object/property should contain a property of 'username'"
           );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "requestedAt",
+            "response should return an array containing an object with a property of 'requesredAt'"
+          );
           done();
           ids.requests.push(JSON.parse(res.text)[2]._id);
           ids.requests.push(JSON.parse(res.text)[1]._id);
@@ -1535,6 +1540,16 @@ suite("Unit Tests", () => {
               "username",
               "dummyUser1",
               "the 'user' object/property should contain a property of 'username' that equals 'dummyUser1'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "requestedAt",
+              "response should return an array containing an object with a property of 'requesredAt'"
+            );
+            assert.property(
+              JSON.parse(res.text)[0],
+              "tradedAt",
+              "response should return an array containing an object with a property of 'tradedAt'"
             );
             done();
           });

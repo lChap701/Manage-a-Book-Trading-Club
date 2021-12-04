@@ -248,51 +248,52 @@ module.exports = (app) => {
       .where("traded")
       .equals(traded)
       .then((requests) => {
+        if (!traded || traded == "false") {
+          requests.sort((a, b) => b.requestedAt - a.requestedAt);
+        } else {
+          requests.sort((a, b) => b.tradedAt - a.tradedAt);
+        }
+
         res.json(
-          requests
-            .sort((a, b) => b.requestedAt - a.requestedAt)
-            .map((request) => {
-              return {
-                _id: request._id,
-                gives: request.giveBooks
-                  .sort(
-                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                  )
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                      },
-                    };
-                  }),
-                takes: request.takeBooks
-                  .sort(
-                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
-                  )
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                      },
-                    };
-                  }),
-                requestedAt: request.requestedAt,
-              };
-            })
+          requests.map((request) => {
+            return {
+              _id: request._id,
+              gives: request.giveBooks
+                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .map((book) => {
+                  return {
+                    book: {
+                      _id: book._id,
+                      title: book.title,
+                      description: book.description,
+                      requests: book.numOfRequests,
+                    },
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    },
+                  };
+                }),
+              takes: request.takeBooks
+                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .map((book) => {
+                  return {
+                    book: {
+                      _id: book._id,
+                      title: book.title,
+                      description: book.description,
+                      requests: book.numOfRequests,
+                    },
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    },
+                  };
+                }),
+              requestedAt: request.requestedAt,
+              tradedAt: request.tradedAt,
+            };
+          })
         );
       });
   });
