@@ -133,21 +133,32 @@ module.exports = (app) => {
         })
         .then((request) => {
           // Update referenced books
-          let books = gives.concat(takes);
-          books.forEach((id) => {
-            crud.getBook(id).then((book) => {
-              if (takes.find((b) => b == book._id)) book.numOfRequests++;
-              book.requests.push(request);
-              book.save();
-            });
+          crud
+            .getAllBooks()
+            .where("_id")
+            .in(gives.concat(takes))
+            .then((books) => {
+              books.forEach((book) => {
+                if (takes.find((b) => b == book._id)) ++book.numOfRequests;
+                book.requests.push(request);
+                book.save();
+              });
 
-            // Ensures the requested books are updated before the response is sent
-            if (books[books.length - 1] == id) {
+              // Ensures the requested books are updated before the response is sent
+              /* if (books[books.length - 1] == id) {
               req.flash("success", "Created Request");
               req.session.success = true;
               res.redirect("/requests");
-            }
-          });
+            } */
+
+              // Updates the new request
+              request.requestedAt = new Date();
+              request.save();
+
+              req.flash("success", "Created Request");
+              req.session.success = true;
+              res.redirect("/requests");
+            });
         })
         .catch((ex) => {
           res.send(ex.message);
@@ -158,8 +169,6 @@ module.exports = (app) => {
   app.get("/requests/:requestId/accept", loggedOut, (req, res) => {
     crud
       .getRequest(req.params.requestId)
-      /* .populate({ path: "giveBooks", populate: { path: "user" } })
-      .populate({ path: "takeBooks", populate: { path: "user" } }) */
       .populate({ path: "giveBooks" })
       .populate({ path: "takeBooks" })
       .then((request) => {
@@ -224,34 +233,43 @@ module.exports = (app) => {
 
   // Routing for cancelling requests and declining trades
   app.get("/requests/:requestId/cancel", loggedOut, (req, res) => {
-    crud.getRequest(req.params.requestId).then((request) => {
-      if (!request) {
-        res.send("Unknown request");
-        return;
-      }
-
-      // Updates all books part of the request
-      let books = request.giveBooks.concat(request.takeBooks);
-      books.forEach((b) => {
-        crud.getBook(b).then((book) => {
-          book.requests = book.requests.filter(
-            (r) => r.toString() != request._id.toString()
-          );
-          --book.numOfRequests;
-          book.save();
-        });
-
-        if (b == books[books.length - 1]._id) {
-          crud
-            .deleteRequest(request._id)
-            .then(() => res.redirect(".."))
-            .catch((ex) => {
-              console.log(ex);
-              res.send(ex.message);
-            });
+    crud
+      .getRequest(req.params.requestId)
+      .populate({ path: "giveBooks" })
+      .populate({ path: "takeBooks" })
+      .then((request) => {
+        if (!request) {
+          res.send("Unknown request");
+          return;
         }
+
+        // Updates all books part of the request
+        crud
+          .getAllBooks()
+          .where("_id")
+          .in(request.giveBooks.concat(request.takeBooks).map((b) => b._id))
+          .then((books) => {
+            books.forEach((b) => {
+              crud.getBook(b).then((book) => {
+                if (String(book.user) == String(request.takeBooks[0].user)) {
+                  --book.numOfRequests;
+                }
+                book.requests = book.requests.filter(
+                  (r) => r.toString() != request._id.toString()
+                );
+                book.save();
+              });
+            });
+          });
+
+        crud
+          .deleteRequest(request._id)
+          .then(() => res.redirect(".."))
+          .catch((ex) => {
+            console.log(ex);
+            res.send(ex.message);
+          });
       });
-    });
   });
 
   // Displays and handles PUT requests on the Book Exchange - Edit Profile Page

@@ -18,7 +18,7 @@ module.exports = (app) => {
       .getUsers()
       .populate({ path: "books" })
       .then((users) => {
-        users.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
+        users.sort((a, b) => b.createdAt - a.createdAt);
         res.json(
           users.map((user) => {
             return {
@@ -131,8 +131,7 @@ module.exports = (app) => {
       .getAllBooks()
       .populate({ path: "user" })
       .then((books) => {
-        books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
-        //console.log(books);
+        books.sort((a, b) => b.bumpedOn - a.bumpedOn);
         res.json(
           books.map((book) => {
             return {
@@ -183,49 +182,53 @@ module.exports = (app) => {
           }
 
           res.json(
-            requests.map((request) => {
-              return {
-                _id: request._id,
-                gives: request.giveBooks
-                  .sort((a, b) => b.numOfRequests - a.numOfRequests)
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                        city: book.user.city || "N/A",
-                        state: book.user.state || "N/A",
-                        country: book.user.country || "N/A",
-                      },
-                    };
-                  }),
-                takes: request.takeBooks
-                  .sort((a, b) => b.numOfRequests - a.numOfRequests)
-                  .map((book) => {
-                    return {
-                      book: {
-                        _id: book._id,
-                        title: book.title,
-                        description: book.description,
-                        requests: book.numOfRequests,
-                      },
-                      user: {
-                        _id: book.user._id,
-                        username: book.user.username,
-                        city: book.user.city || "N/A",
-                        state: book.user.state || "N/A",
-                        country: book.user.country || "N/A",
-                      },
-                    };
-                  }),
-              };
-            })
+            requests
+              .sort(
+                (a, b) => Date.parse(b.requestedAt) - Date.parse(a.requestedAt)
+              )
+              .map((request) => {
+                return {
+                  _id: request._id,
+                  gives: request.giveBooks
+                    .sort((a, b) => b.numOfRequests - a.numOfRequests)
+                    .map((book) => {
+                      return {
+                        book: {
+                          _id: book._id,
+                          title: book.title,
+                          description: book.description,
+                          requests: book.numOfRequests,
+                        },
+                        user: {
+                          _id: book.user._id,
+                          username: book.user.username,
+                          city: book.user.city || "N/A",
+                          state: book.user.state || "N/A",
+                          country: book.user.country || "N/A",
+                        },
+                      };
+                    }),
+                  takes: request.takeBooks
+                    .sort((a, b) => b.numOfRequests - a.numOfRequests)
+                    .map((book) => {
+                      return {
+                        book: {
+                          _id: book._id,
+                          title: book.title,
+                          description: book.description,
+                          requests: book.numOfRequests,
+                        },
+                        user: {
+                          _id: book.user._id,
+                          username: book.user.username,
+                          city: book.user.city || "N/A",
+                          state: book.user.state || "N/A",
+                          country: book.user.country || "N/A",
+                        },
+                      };
+                    }),
+                };
+              })
           );
         });
     });
@@ -246,43 +249,50 @@ module.exports = (app) => {
       .equals(traded)
       .then((requests) => {
         res.json(
-          requests.map((request) => {
-            return {
-              _id: request._id,
-              gives: request.giveBooks
-                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
-                .map((book) => {
-                  return {
-                    book: {
-                      _id: book._id,
-                      title: book.title,
-                      description: book.description,
-                      requests: book.numOfRequests,
-                    },
-                    user: {
-                      _id: book.user._id,
-                      username: book.user.username,
-                    },
-                  };
-                }),
-              takes: request.takeBooks
-                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
-                .map((book) => {
-                  return {
-                    book: {
-                      _id: book._id,
-                      title: book.title,
-                      description: book.description,
-                      requests: book.numOfRequests,
-                    },
-                    user: {
-                      _id: book.user._id,
-                      username: book.user.username,
-                    },
-                  };
-                }),
-            };
-          })
+          requests
+            .sort((a, b) => b.requestedAt - a.requestedAt)
+            .map((request) => {
+              return {
+                _id: request._id,
+                gives: request.giveBooks
+                  .sort(
+                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                  )
+                  .map((book) => {
+                    return {
+                      book: {
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                      },
+                    };
+                  }),
+                takes: request.takeBooks
+                  .sort(
+                    (a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn)
+                  )
+                  .map((book) => {
+                    return {
+                      book: {
+                        _id: book._id,
+                        title: book.title,
+                        description: book.description,
+                        requests: book.numOfRequests,
+                      },
+                      user: {
+                        _id: book.user._id,
+                        username: book.user.username,
+                      },
+                    };
+                  }),
+                requestedAt: request.requestedAt,
+              };
+            })
         );
       });
   });
