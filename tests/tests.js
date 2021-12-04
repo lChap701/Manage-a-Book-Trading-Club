@@ -1420,9 +1420,9 @@ suite("Unit Tests", () => {
             );
             assert.equal(
               JSON.parse(res.text).length,
-              orgLength.requests + 1,
+              orgLength.trades + 1,
               `response should return an array with a length of ${
-                orgLength.requests + 1
+                orgLength.trades + 1
               }`
             );
             assert.property(
@@ -1553,8 +1553,10 @@ suite("Unit Tests", () => {
             assert.equal(
               JSON.parse(res.text).length,
               orgLength.requests + 1,
-              `response should return an array with a length of ${orgLength.requests + 1}`
-            ); 
+              `response should return an array with a length of ${
+                orgLength.requests + 1
+              }`
+            );
             done();
           });
       });
