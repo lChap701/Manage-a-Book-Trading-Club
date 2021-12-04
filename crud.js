@@ -19,7 +19,8 @@ const crud = {
   getBook: (id) => Books.findOne({ _id: id }),
   getRequest: (id) => Requests.findOne({ _id: id }),
   updateUser: (id, data) => Users.updateOne({ _id: id }, data),
-  updateRequest: (id) => Requests.updateOne({ _id: id }, { traded: true }),
+  updateRequest: (id) =>
+    Requests.updateOne({ _id: id }, { traded: true, tradedAt: new Date() }),
   deleteUser: (id) => Users.deleteOne({ _id: id }),
   deleteBook: (id) => Books.deleteOne({ _id: id }),
   deleteRequest: (id) => Requests.deleteOne({ _id: id }),
