@@ -264,7 +264,7 @@ module.exports = (app) => {
             });
           });
 
-        // Deletes the requests
+        // Deletes the request
         crud
           .deleteRequest(request._id)
           .then(() => res.redirect(".."))
