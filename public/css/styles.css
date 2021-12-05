@@ -15,6 +15,11 @@ form[name="Create Request"] {
   margin: 0;
 }
 
+.dropdown-item:hover {
+  color: #fff !important;
+  background: #007bff !important;
+}
+
 /* Spinner Loader */
 .overlay {
   background: rgba(0, 0, 0, 0.9);
