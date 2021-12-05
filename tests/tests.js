@@ -1374,8 +1374,8 @@ suite("Unit Tests", () => {
             assert.equal(res.status, 200, "response status should be 200");
             assert.equal(
               res.text,
-              "There are currently no requests",
-              "response text should return 'There are currently no requests'"
+              "There are currently no requests at this time",
+              "response text should return 'There are currently no requests at this time'"
             );
             done();
           });
