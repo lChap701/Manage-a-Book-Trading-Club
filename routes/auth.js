@@ -177,7 +177,7 @@ module.exports = (app) => {
           return;
         }
 
-        // Updates all books part of the request
+        // Updates all users part of the request
         const { giveBooks, takeBooks } = request;
         crud
           .getUsers()
@@ -199,6 +199,7 @@ module.exports = (app) => {
             });
           });
 
+        // Updates all books part of the request
         crud
           .getAllBooks()
           .where("_id")
@@ -217,6 +218,7 @@ module.exports = (app) => {
             });
           });
 
+        // Updates the request
         crud
           .updateRequest(request._id)
           .then(() => {
