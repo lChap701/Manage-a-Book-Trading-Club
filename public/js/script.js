@@ -750,18 +750,19 @@ const MyBooks = (props) => {
 
   // Gets the user's profile information
   useEffect(() => {
+    let text = "";
     // Checks if component was mounted and updates component once
     if (!mounted.current) {
       mounted.current = true;
     } else if (!updated && props.userId.length > 0) {
       callApi(`${location.origin}/api/users/${props.userId}/books`)
         .then((data) => {
-          console.log(data);
+          text = data;
           setBooks(JSON.parse(data));
           setUpdated(true);
         })
         .catch(() => {
-          setMsg(data);
+          setMsg(text);
           setUpdated(true);
         });
     }
