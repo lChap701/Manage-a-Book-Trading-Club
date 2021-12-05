@@ -173,7 +173,7 @@ module.exports = (app) => {
       .populate({ path: "takeBooks" })
       .then((request) => {
         if (!request) {
-          res.send("Unknown request");
+          res.sendStatus(404);
           return;
         }
 
@@ -241,7 +241,7 @@ module.exports = (app) => {
       .populate({ path: "takeBooks" })
       .then((request) => {
         if (!request) {
-          res.send("Unknown request");
+          res.sendStatus(404);
           return;
         }
 

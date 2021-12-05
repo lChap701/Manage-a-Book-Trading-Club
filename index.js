@@ -95,7 +95,13 @@ app.get("/books", (req, res) => {
 
 // Displays the Book Exchange - Requests for (book) Page
 app.get("/books/:bookId/requests", (req, res) => {
-  res.sendFile(process.cwd() + "/public/bookRequests.html");
+  crud.getBook(req.params.bookId).then((book) => {
+    if (book) {
+      res.sendFile(process.cwd() + "/public/bookRequests.html");
+    } else {
+      res.sendStatus(404);
+    }
+  });
 });
 
 // Displays the Book Exchange - All Requests Page
@@ -127,12 +133,24 @@ app.get("/users", (req, res) => {
 
 // Displays the Book Exchange - (username)'s Profile Page
 app.get("/users/:id", (req, res) => {
-  res.sendFile(process.cwd() + "/public/profile.html");
+  crud.getUser({ _id: req.params.id }).then((user) => {
+    if (user) {
+      res.sendFile(process.cwd() + "/public/profile.html");
+    } else {
+      res.sendStatus(404);
+    }
+  });
 });
 
 // Displays the Book Exchange - (username)'s Books Page
 app.get("/users/:id/books", (req, res) => {
-  res.sendFile(process.cwd() + "/public/books.html");
+  crud.getUser({ _id: req.params.id }).then((user) => {
+    if (user) {
+      res.sendFile(process.cwd() + "/public/books.html");
+    } else {
+      res.sendStatus(404);
+    }
+  });
 });
 
 // Displays the 404 Error Page
