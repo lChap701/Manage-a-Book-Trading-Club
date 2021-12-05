@@ -14,10 +14,10 @@ const Router = BrowserRouter;
 /**
  * Makes an API call
  * @param {string} url    Represents the API URL path
- * @param {string} type   Represents the type of data that is returned (default is 'JSON')
+ * @param {string} type   Represents the type of data that is returned (default is 'text')
  * @returns               Returns the result
  */
-async function callApi(url, type = "JSON") {
+async function callApi(url, type = "text") {
   try {
     let res = await fetch(url);
 
@@ -282,10 +282,17 @@ class BookExchange extends React.Component {
  */
 const Books = (props) => {
   let [books, setBooks] = useState([]);
+  let [msg, setMsg] = useState("");
 
   // Gets all books
   const getBooks = useCallback(async () => {
-    setBooks(await callApi(`${location.origin}/api/books`));
+    let data = await callApi(`${location.origin}/api/books`);
+
+    try {
+      setBooks(JSON.parse(data));
+    } catch (e) {
+      setMsg(data);
+    }
   }, []);
   useEffect(() => getBooks(), []);
 
@@ -302,9 +309,7 @@ const Books = (props) => {
       <div className="panel-body">
         {books.length == 0 ? (
           <div className="item border-top-0 border-bottom-0 p-5">
-            <h4 className="text-muted text-center mt-1">
-              No books are available at this time
-            </h4>
+            <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
           books.map((book) => {
@@ -354,10 +359,17 @@ const Books = (props) => {
  */
 const Requests = () => {
   let [requests, setRequests] = useState([]);
+  let [msg, setMsg] = useState("");
 
   // Gets all requests
   const getRequests = useCallback(async () => {
-    setRequests(await callApi(`${location.origin}/api/requests`));
+    let data = await callApi(`${location.origin}/api/requests`);
+
+    try {
+      setRequests(JSON.parse(data));
+    } catch (e) {
+      setMsg(data);
+    }
   }, []);
   useEffect(() => getRequests(), []);
 
@@ -370,19 +382,35 @@ const Requests = () => {
  */
 const BookRequests = () => {
   const { bookId } = useParams();
-  let [takeBooks, setTakeBooks] = useState([]);
-  let [giveBooks, setGiveBooks] = useState([]);
+  let [requests, setRequests] = useState([]);
+  let [msg, setMsg] = useState("");
 
   // Gets all requests for the book
   const getRequestsForBook = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/books/${bookId}/requests`);
-    setTakeBooks(takeBooks.push([...data.take.books]));
-    setGiveBooks(giveBooks.push([...data.give.books]));
+
+    try {
+      setRequests(JSON.parse(data));
+    } catch (e) {
+      setMsg(data);
+    }
   }, []);
   useEffect(() => getRequestsForBook(), []);
 
   return (
-    <h2>Requests for {takeBooks.find((book) => book._id == bookId).title}</h2>
+    <form
+      action="/requests/new/"
+      method="POST"
+      className="panel scroll shadow-lg"
+    >
+      <div className="panel-header text-white p-1 mx-auto">
+        <h2 className="text-center">
+          Requests for {requests.takes.find((book) => book._id == bookId).title}
+        </h2>
+      </div>
+
+      <div className="panel-header text-white p-1 mx-auto"></div>
+    </form>
   );
 };
 
@@ -395,8 +423,9 @@ const CreateRequest = () => {
 
   // Gets all requested books
   const getRequestedBooks = useCallback(async () => {
-    let json = await callApi(`${location.origin}/session/books`);
-    setRequestedBooks(json);
+    setRequestedBooks(
+      await callApi(`${location.origin}/session/books`, "JSON")
+    );
   }, []);
   useEffect(() => getRequestedBooks(), []);
 
@@ -442,10 +471,17 @@ const CreateRequest = () => {
  */
 const Trades = () => {
   let [trades, setTrades] = useState([]);
+  let [msg, setMsg] = useState("");
 
   // Gets all trades
   const getTrades = useCallback(async () => {
-    setTrades(await callApi(`${location.origin}/api/requests?trades=true`));
+    let data = await callApi(`${location.origin}/api/requests?trades=true`);
+
+    try {
+      setTrades(JSON.parse(data));
+    } catch (e) {
+      setMsg(data);
+    }
   }, []);
   useEffect(() => getTrades(), []);
 
@@ -458,10 +494,17 @@ const Trades = () => {
  */
 const Users = () => {
   let [users, setUsers] = useState([]);
+  let [msg, setMsg] = useState("");
 
   // Gets all users
   const getUsers = useCallback(async () => {
-    setUsers(await callApi(`${location.origin}/api/users`));
+    let data = await callApi(`${location.origin}/api/users`);
+
+    try {
+      setUsers(JSON.parse(data));
+    } catch (e) {
+      setMsg(data);
+    }
   }, []);
   useEffect(() => getUsers(), []);
 
@@ -497,7 +540,7 @@ const Profile = (props) => {
    * Gets the user's profile information
    */
   const getUser = useCallback(async () => {
-    let json = await callApi(`${location.origin}/api/users/${id}`);
+    let json = await callApi(`${location.origin}/api/users/${id}`, "JSON");
 
     // Updates the document
     updateTitleAndMetaTags(
@@ -523,7 +566,10 @@ const Profile = (props) => {
    * @param {String} country    Represents the abbreviated country
    */
   const getCountry = async (country) => {
-    let json = await callApi(`${location.origin}/api/countries/${country}`);
+    let json = await callApi(
+      `${location.origin}/api/countries/${country}`,
+      "JSON"
+    );
     return json.name;
   };
 
@@ -534,7 +580,8 @@ const Profile = (props) => {
    */
   const getState = async (country, state) => {
     let json = await callApi(
-      `${location.origin}/api/countries/${country}/states/${state}`
+      `${location.origin}/api/countries/${country}/states/${state}`,
+      "JSON"
     );
     return json.name;
   };
@@ -605,10 +652,12 @@ const EditProfile = (props) => {
     if (!mounted.current) {
       mounted.current = true;
     } else if (!updated && props.userId.length > 0) {
-      callApi(`${location.origin}/api/users/${props.userId}`).then((data) => {
-        setUser(data);
-        setUpdated(true);
-      });
+      callApi(`${location.origin}/api/users/${props.userId}`, "JSON").then(
+        (data) => {
+          setUser(data);
+          setUpdated(true);
+        }
+      );
     }
   });
 
@@ -652,18 +701,16 @@ const MyBooks = (props) => {
     if (!mounted.current) {
       mounted.current = true;
     } else if (!updated && props.userId.length > 0) {
-      callApi(
-        `${location.origin}/api/users/${props.userId}/books`,
-        "text"
-      ).then((data) => {
-        console.log(data);
-        if (typeof JSON.parse(data) == "object") {
+      callApi(`${location.origin}/api/users/${props.userId}/books`)
+        .then((data) => {
+          console.log(data);
           setBooks(JSON.parse(data));
-        } else {
+          setUpdated(true);
+        })
+        .catch(() => {
           setMsg(data);
-        }
-        setUpdated(true);
-      });
+          setUpdated(true);
+        });
     }
   });
   console.log(books);
