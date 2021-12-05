@@ -18,6 +18,11 @@ module.exports = (app) => {
       .getUsers()
       .populate({ path: "books" })
       .then((users) => {
+        if (!users || users.length == 0) {
+          res.send("There are currently no users available");
+          return;
+        }
+
         users.sort((a, b) => b.createdAt - a.createdAt);
         res.json(
           users.map((user) => {
@@ -131,6 +136,11 @@ module.exports = (app) => {
       .getAllBooks()
       .populate({ path: "user" })
       .then((books) => {
+        if (!books || books.length == 0) {
+          res.send("There are currently no books available");
+          return;
+        }
+
         books.sort((a, b) => b.bumpedOn - a.bumpedOn);
         res.json(
           books.map((book) => {
@@ -177,7 +187,7 @@ module.exports = (app) => {
         .in(book._id)
         .then((requests) => {
           if (!requests || requests.length == 0) {
-            res.send("There are currently no requests");
+            res.send("There are currently no requests at this time");
             return;
           }
 
@@ -248,6 +258,12 @@ module.exports = (app) => {
       .where("traded")
       .equals(traded)
       .then((requests) => {
+        if (!requests || requests.length == 0) {
+          res.send("There are currently no requests at this time");
+          return;
+        }
+
+        // Sorts based on what is suppose to be displayed
         if (!traded || traded == "false") {
           requests.sort((a, b) => b.requestedAt - a.requestedAt);
         } else {
