@@ -307,7 +307,7 @@ const Books = (props) => {
       </div>
 
       <div className="panel-body">
-        {books.length == 0 ? (
+        {msg.length > 0 ? (
           <div className="item border-top-0 border-bottom-0 p-5">
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
@@ -508,7 +508,60 @@ const Users = () => {
   }, []);
   useEffect(() => getUsers(), []);
 
-  return <h2>All Users</h2>;
+  return (
+    <div className="panel shadow-lg scroll my-3">
+      <div className="panel-header text-white p-2">
+        <h2>Users</h2>
+      </div>
+
+      <div className="panel-body p-4">
+        {msg.length > 0 ? (
+          <h4 className="text-center text-muted p-5">{msg}</h4>
+        ) : users.length > 0 ? (
+          <ul className="list-group">
+            {users.map((user) => (
+              <li className="list-group-item">
+                <h4>
+                  <Link to={`${location.pathname}/${user._id}`}>
+                    {user.username}
+                  </Link>
+                </h4>
+                <p className="mb-2">
+                  <b>City:</b> {user.city}
+                  <br />
+                  <b>State:</b> {user.state}
+                  <br />
+                  <b>Country:</b> {user.country}
+                  <br />
+                  <b>Joined:</b> {new Date(user.createdAt).toLocaleString()}
+                </p>
+                {user.books.length > 0 ? (
+                  <span className="badge badge-info badge-pill p-2 mr-2">
+                    {user.books == 1
+                      ? `${user.books} Book`
+                      : `${user.books} Books`}
+                  </span>
+                ) : (
+                  ""
+                )}
+                {user.incomingRequests.length > 0 ? (
+                  <span className="badge badge-warning badge-pill p-2">
+                    {user.incomingRequests == 1
+                      ? `${user.incomingRequests} Incoming Request`
+                      : `${user.incomingRequests} Incoming Requests`}
+                  </span>
+                ) : (
+                  ""
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          ""
+        )}
+      </div>
+    </div>
+  );
 };
 
 /**
