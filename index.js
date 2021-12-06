@@ -111,13 +111,10 @@ app.get("/requests", (req, res) => {
 
 // Form handler for the form on the home page and Book Exchange - My Books page
 app.post("/requests/new/books", (req, res) => {
-  if (!req.body) return;
-  console.log(req.body);
   let ids = [];
   let { books } = req.body;
-  books.forEach((bookId) => ids.push(bookId.replace("book", "")));
+  JSON.parse(books).forEach((bookId) => ids.push(bookId.replace("book", "")));
   req.session.books = ids;
-  console.log(req.session.books);
   res.redirect("../new");
 });
 
