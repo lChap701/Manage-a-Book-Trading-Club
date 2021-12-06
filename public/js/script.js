@@ -829,7 +829,7 @@ const MyBooks = (props) => {
                     </p>
                     <p className="text-muted small m-0">
                       from
-                      <Link to={`${location.pathname}/users/${book.user._id}`}>
+                      <Link to={`/users/${book.user._id}`}>
                         {" "}
                         {book.user.username}
                       </Link>
