@@ -337,15 +337,17 @@ const Books = (props) => {
                   />
                   <label for={`book${book._id}`} className="col-10">
                     <h5 className="my-1">{book.title}</h5>
-                    <p className="mb-1">
+                    <p className="mb-0">
                       <b>{book.description}</b>
                     </p>
                     <p className="text-muted small m-0">
                       from
                       <Link to={`${location.pathname}/users/${book.user._id}`}>
                         {" "}
-                        {book.user.username}
+                        {book.user.username}{" "}
                       </Link>
+                      <br />
+                      added {new Date(book.createdAt).toLocaleString()}
                     </p>
                   </label>
                 </div>
@@ -824,15 +826,17 @@ const MyBooks = (props) => {
                   />
                   <label for={`book${book._id}`} className="col-10">
                     <h5 className="my-1">{book.title}</h5>
-                    <p className="mb-1">
+                    <p className="mb-0">
                       <b>{book.description}</b>
                     </p>
                     <p className="text-muted small m-0">
                       from
                       <Link to={`/users/${book.user._id}`}>
                         {" "}
-                        {book.user.username}
+                        {book.user.username}{" "}
                       </Link>
+                      <br />
+                      added {new Date(book.addedAt).toLocaleString()}
                     </p>
                   </label>
                 </div>
