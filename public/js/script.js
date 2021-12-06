@@ -315,13 +315,26 @@ const Books = (props) => {
           books.map((book) => {
             return (
               <div className="item border-top-0 border-bottom-0">
-                <div className="form-group">
+                <div className="row justify-content-between align-items-center">
                   <input
+                    className="col-2"
                     id={`book${book._id}`}
                     name={`book${book._id}`}
                     type="checkbox"
                   />
-                  <label for={`book${book._id}`}>{book.title}</label>
+                  <label for={`book${book._id}`} className="col-10">
+                    <h4 className="my-2">{book.title}</h4>
+                    <p className="mb-2">
+                      <b>{book.description}</b>
+                    </p>
+                    <p className="text-muted small m-0">
+                      from
+                      <Link to={`${location.pathname}/users/${book.user._id}`}>
+                        {" "}
+                        {book.user.username}
+                      </Link>
+                    </p>
+                  </label>
                 </div>
               </div>
             );
@@ -745,12 +758,14 @@ const MyBooks = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
   let [updated, setUpdated] = useState(false);
+  let [ids, setIds] = useState([]);
   let mounted = useRef();
   console.log(props.userId);
 
   // Gets the user's profile information
   useEffect(() => {
     let text = "";
+
     // Checks if component was mounted and updates component once
     if (!mounted.current) {
       mounted.current = true;
@@ -767,7 +782,6 @@ const MyBooks = (props) => {
         });
     }
   });
-  console.log(books);
 
   return (
     <form
@@ -787,13 +801,26 @@ const MyBooks = (props) => {
           books.map((book) => {
             return (
               <div className="item border-top-0 border-bottom-0">
-                <div className="form-group">
+                <div className="row justify-content-between align-items-center">
                   <input
+                    className="col-2"
                     id={`book${book._id}`}
                     name={`book${book._id}`}
                     type="checkbox"
                   />
-                  <label for={`book${book._id}`}>{book.title}</label>
+                  <label for={`book${book._id}`} className="col-10">
+                    <h4 className="my-2">{book.title}</h4>
+                    <p className="mb-2">
+                      <b>{book.description}</b>
+                    </p>
+                    <p className="text-muted small m-0">
+                      from
+                      <Link to={`${location.pathname}/users/${book.user._id}`}>
+                        {" "}
+                        {book.user.username}
+                      </Link>
+                    </p>
+                  </label>
                 </div>
               </div>
             );
