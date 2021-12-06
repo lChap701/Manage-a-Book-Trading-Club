@@ -257,6 +257,7 @@ class BookExchange extends React.Component {
                 <Books
                   login={this.state.login}
                   ready={this.state.checkedLogin}
+                  userId={this.state.user._id}
                 />
               </Route>
               <Route path="/books/my">
@@ -351,6 +352,11 @@ const Books = (props) => {
                       </p>
                     </label>
                   </div>
+                  {props.login && props.userId == book.user._id ? (
+                    <Options />
+                  ) : (
+                    ""
+                  )}
                 </li>
               );
             })}
@@ -839,6 +845,7 @@ const MyBooks = (props) => {
                       </p>
                     </label>
                   </div>
+                  <Options />
                 </li>
               );
             })}
@@ -1750,6 +1757,24 @@ const Dropdown = (props) => {
           );
         })}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying options for editing or deleting an item
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Options = (props) => {
+  return (
+    <div className="options">
+      <button className="btn btn-primary">
+        <i className="bi bi-pencil-fill"></i>
+      </button>
+      <button className="btn btn-danger">
+        <i className="bi bi-trash-fill"></i>
+      </button>
     </div>
   );
 };

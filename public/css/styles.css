@@ -81,12 +81,33 @@ form[name="Create Request"] {
   width: 240px;
 }
 
-.list-group .list-group-item:first-child {
+.list-group:not(.list-group-flush) .list-group-item:first-child {
   border-bottom: none !important;
 }
 
-.list-group-item:first-child:last-child {
+.list-group-flush .list-group-item:last-child {
+  border-bottom: none !important;
+}
+
+.list-group:not(.list-group-flush) .list-group-item:first-child:last-child {
   border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+}
+
+.options {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 0;
+}
+
+.options .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.options .btn:last-child {
+  border-radius: 0;
 }
 
 .buttons {
