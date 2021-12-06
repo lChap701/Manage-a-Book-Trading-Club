@@ -39,13 +39,12 @@ form[name="Create Request"] {
 /* Panel */
 .panel {
   margin: 20px auto 0;
-  overflow-x: hidden;
 }
 
 .panel.scroll {
   height: auto;
   max-height: 475px;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .panel-header,

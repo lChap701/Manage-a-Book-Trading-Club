@@ -327,7 +327,7 @@ const Books = (props) => {
           books.map((book) => {
             return (
               <div className="item border-top-0 border-bottom-0">
-                <div className="row justify-content-between align-items-center">
+                <div className="row align-items-center mt-2 w-100">
                   <input
                     className="col-2"
                     id={`book${book._id}`}
@@ -336,8 +336,8 @@ const Books = (props) => {
                     onChange={() => setSelectedBooks(getSelectedBooks())}
                   />
                   <label for={`book${book._id}`} className="col-10">
-                    <h4 className="my-2">{book.title}</h4>
-                    <p className="mb-2">
+                    <h5 className="my-1">{book.title}</h5>
+                    <p className="mb-1">
                       <b>{book.description}</b>
                     </p>
                     <p className="text-muted small m-0">
@@ -814,7 +814,7 @@ const MyBooks = (props) => {
           books.map((book) => {
             return (
               <div className="item border-top-0 border-bottom-0">
-                <div className="row justify-content-between align-items-center">
+                <div className="row align-items-center mt-2">
                   <input
                     className="col-2"
                     id={`book${book._id}`}
@@ -823,8 +823,8 @@ const MyBooks = (props) => {
                     onChange={() => setSelectedBooks(getSelectedBooks())}
                   />
                   <label for={`book${book._id}`} className="col-10">
-                    <h4 className="my-2">{book.title}</h4>
-                    <p className="mb-2">
+                    <h5 className="my-1">{book.title}</h5>
+                    <p className="mb-1">
                       <b>{book.description}</b>
                     </p>
                     <p className="text-muted small m-0">
