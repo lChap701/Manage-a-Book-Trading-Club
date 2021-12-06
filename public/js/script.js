@@ -324,7 +324,7 @@ const Books = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <ul className="list-group">
+          <ul className="list-group list-group-flush">
             {books.map((book) => {
               return (
                 <li className="list-group-item">
@@ -812,7 +812,7 @@ const MyBooks = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <ul className="list-group">
+          <ul className="list-group list-group-flush">
             {books.map((book) => {
               return (
                 <li className="list-group-item">
