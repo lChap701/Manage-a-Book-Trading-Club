@@ -327,6 +327,18 @@ const Books = (props) => {
         ) : (
           <ul className="list-group list-group-flush">
             {books.map((book) => {
+              let location = book.user.city == "N/A" ? "" : book.user.city;
+              location += book.user.state == "N/A" ? "" : " " + book.user.state;
+              location +=
+                book.user.country != "N/A"
+                  ? book.user.state != "N/A"
+                    ? ", " + book.user.country
+                    : book.user.city != "N/A"
+                    ? " " + book.user.country
+                    : book.user.country
+                  : book.user.state == "N/A" && book.user.city == "N/A"
+                  ? book.user.country
+                  : "";
               return (
                 <li className="list-group-item">
                   <div className="row align-items-center">
@@ -345,8 +357,9 @@ const Books = (props) => {
                       <p className="text-muted small m-0">
                         from
                         <Link to={`/users/${book.user._id}`}>
-                          {` ${book.user.username}`}
+                          {` ${book.user.username} `}
                         </Link>
+                        in {location}
                         <br />
                         added {new Date(book.createdAt).toLocaleString()}
                       </p>
@@ -820,6 +833,18 @@ const MyBooks = (props) => {
         ) : (
           <ul className="list-group list-group-flush">
             {books.map((book) => {
+              let location = book.user.city == "N/A" ? "" : book.user.city;
+              location += book.user.state == "N/A" ? "" : " " + book.user.state;
+              location +=
+                book.user.country != "N/A"
+                  ? book.user.state != "N/A"
+                    ? ", " + book.user.country
+                    : book.user.city != "N/A"
+                    ? " " + book.user.country
+                    : book.user.country
+                  : book.user.state == "N/A" && book.user.city == "N/A"
+                  ? book.user.country
+                  : "";
               return (
                 <li className="list-group-item">
                   <div className="row align-items-center">
@@ -838,8 +863,9 @@ const MyBooks = (props) => {
                       <p className="text-muted small m-0">
                         from
                         <Link to={`/users/${book.user._id}`}>
-                          {` ${book.user.username}`}
+                          {` ${book.user.username} `}
                         </Link>
+                        in {location}
                         <br />
                         added {new Date(book.addedAt).toLocaleString()}
                       </p>
