@@ -102,30 +102,31 @@ module.exports = (app) => {
             return;
           }
 
-          books.sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn));
-          //console.log(books);
-          res.json({
-            books: books.map((book) => {
-              return {
-                _id: book._id,
-                title: book.title,
-                description: book.description,
-                addedAt: book.addedAt,
-                requests: {
-                  count: book.numOfRequests,
-                  users: book.requests.map((request) => {
-                    return request.giveBooks.map((gb) => gb.user);
-                  }),
-                },
-              };
-            }),
-            user: {
-              username: user.username,
-              city: user.city,
-              state: user.state,
-              country: user.country,
-            },
-          });
+          res.json(
+            books
+              .sort((a, b) => b.bumpedOn - a.bumpedOn)
+              .map((book) => {
+                return {
+                  _id: book._id,
+                  title: book.title,
+                  description: book.description,
+                  addedAt: book.addedAt,
+                  requests: {
+                    count: book.numOfRequests,
+                    users: book.requests.map((request) => {
+                      return request.giveBooks.map((gb) => gb.user);
+                    }),
+                  },
+                  user: {
+                    _id: user._id,
+                    username: user.username,
+                    city: user.city,
+                    state: user.state,
+                    country: user.country,
+                  },
+                };
+              })
+          );
         });
     });
   });
