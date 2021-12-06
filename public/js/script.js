@@ -12,6 +12,17 @@ const {
 const Router = BrowserRouter;
 
 /**
+ * Gets the selected books and adds them to the form
+ * @returns   Returns the selected books in JSON
+ */
+function getSelectedBooks() {
+  let books = [
+    ...document.querySelectorAll("input[type='checkbox']:checked"),
+  ].map((input) => input.id);
+  return JSON.stringify(books);
+}
+
+/**
  * Makes an API call
  * @param {string} url    Represents the API URL path
  * @param {string} type   Represents the type of data that is returned (default is 'text')
@@ -283,6 +294,7 @@ class BookExchange extends React.Component {
 const Books = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
+  let [selectedBooks, setSelectedBooks] = useState("[]");
 
   // Gets all books
   const getBooks = useCallback(async () => {
@@ -321,6 +333,7 @@ const Books = (props) => {
                     id={`book${book._id}`}
                     name={`book${book._id}`}
                     type="checkbox"
+                    onChange={() => setSelectedBooks(getSelectedBooks())}
                   />
                   <label for={`book${book._id}`} className="col-10">
                     <h4 className="my-2">{book.title}</h4>
@@ -340,6 +353,7 @@ const Books = (props) => {
             );
           })
         )}
+        <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
 
       <div className="panel-footer p-2">
@@ -758,9 +772,8 @@ const MyBooks = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
   let [updated, setUpdated] = useState(false);
-  let [ids, setIds] = useState([]);
+  let [selectedBooks, setSelectedBooks] = useState("[]");
   let mounted = useRef();
-  console.log(props.userId);
 
   // Gets the user's profile information
   useEffect(() => {
@@ -807,6 +820,7 @@ const MyBooks = (props) => {
                     id={`book${book._id}`}
                     name={`book${book._id}`}
                     type="checkbox"
+                    onChange={() => setSelectedBooks(getSelectedBooks())}
                   />
                   <label for={`book${book._id}`} className="col-10">
                     <h4 className="my-2">{book.title}</h4>
@@ -822,6 +836,7 @@ const MyBooks = (props) => {
                     </p>
                   </label>
                 </div>
+                <Input id="books" type="text" hidden value={selectedBooks} />
               </div>
             );
           })
@@ -1800,7 +1815,7 @@ const Input = (props) => {
       id={props.id}
       name={props.id}
       type={props.type}
-      list={props.list || null}
+      list={props.list}
       className={`form-control${
         props.readonly && props.value ? "-plaintext" : ""
       }`}
@@ -1809,8 +1824,8 @@ const Input = (props) => {
       placeholder={props.placeholder}
       value={props.value}
       autocomplete={props.list && !props.readonly ? "off" : "on"}
-      onChange={props.onChange || null}
-      aria-describedby={props.validator || null}
+      onChange={props.onChange}
+      aria-describedby={props.validator}
       readOnly={Boolean(props.readonly)}
     />
   );
