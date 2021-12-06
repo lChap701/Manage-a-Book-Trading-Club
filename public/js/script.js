@@ -320,40 +320,41 @@ const Books = (props) => {
 
       <div className="panel-body">
         {msg.length > 0 ? (
-          <div className="item border-top-0 border-bottom-0 p-5">
+          <div className="p-5">
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          books.map((book) => {
-            return (
-              <div className="item border-top-0 border-bottom-0">
-                <div className="row align-items-center mt-2 w-100">
-                  <input
-                    className="col-2"
-                    id={`book${book._id}`}
-                    name={`book${book._id}`}
-                    type="checkbox"
-                    onChange={() => setSelectedBooks(getSelectedBooks())}
-                  />
-                  <label for={`book${book._id}`} className="col-10">
-                    <h5 className="my-1">{book.title}</h5>
-                    <p className="mb-0">
-                      <b>{book.description}</b>
-                    </p>
-                    <p className="text-muted small m-0">
-                      from
-                      <Link to={`${location.pathname}/users/${book.user._id}`}>
-                        {" "}
-                        {book.user.username}{" "}
-                      </Link>
-                      <br />
-                      added {new Date(book.createdAt).toLocaleString()}
-                    </p>
-                  </label>
-                </div>
-              </div>
-            );
-          })
+          <ul className="list-group">
+            {books.map((book) => {
+              return (
+                <li className="list-group-item">
+                  <div className="row align-items-center">
+                    <input
+                      className="col-2"
+                      id={`book${book._id}`}
+                      name={`book${book._id}`}
+                      type="checkbox"
+                      onChange={() => setSelectedBooks(getSelectedBooks())}
+                    />
+                    <label for={`book${book._id}`} className="col-10">
+                      <h5 className="my-1">{book.title}</h5>
+                      <p className="mb-0">
+                        <b>{book.description}</b>
+                      </p>
+                      <p className="text-muted small m-0">
+                        from
+                        <Link to={`/users/${book.user._id}`}>
+                          {` ${book.user.username}`}
+                        </Link>
+                        <br />
+                        added {new Date(book.createdAt).toLocaleString()}
+                      </p>
+                    </label>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         )}
         <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
@@ -437,8 +438,6 @@ const BookRequests = () => {
           Requests for {requests.takes.find((book) => book._id == bookId).title}
         </h2>
       </div>
-
-      <div className="panel-header text-white p-1 mx-auto"></div>
     </form>
   );
 };
@@ -809,42 +808,43 @@ const MyBooks = (props) => {
       </div>
       <div className="panel-body">
         {msg.length > 0 ? (
-          <div className="item border-top-0 border-bottom-0 p-5">
+          <div className="p-5">
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          books.map((book) => {
-            return (
-              <div className="item border-top-0 border-bottom-0">
-                <div className="row align-items-center mt-2">
-                  <input
-                    className="col-2"
-                    id={`book${book._id}`}
-                    name={`book${book._id}`}
-                    type="checkbox"
-                    onChange={() => setSelectedBooks(getSelectedBooks())}
-                  />
-                  <label for={`book${book._id}`} className="col-10">
-                    <h5 className="my-1">{book.title}</h5>
-                    <p className="mb-0">
-                      <b>{book.description}</b>
-                    </p>
-                    <p className="text-muted small m-0">
-                      from
-                      <Link to={`/users/${book.user._id}`}>
-                        {" "}
-                        {book.user.username}{" "}
-                      </Link>
-                      <br />
-                      added {new Date(book.addedAt).toLocaleString()}
-                    </p>
-                  </label>
-                </div>
-                <Input id="books" type="text" hidden value={selectedBooks} />
-              </div>
-            );
-          })
+          <ul className="list-group">
+            {books.map((book) => {
+              return (
+                <li className="list-group-item">
+                  <div className="row align-items-center">
+                    <input
+                      className="col-2"
+                      id={`book${book._id}`}
+                      name={`book${book._id}`}
+                      type="checkbox"
+                      onChange={() => setSelectedBooks(getSelectedBooks())}
+                    />
+                    <label for={`book${book._id}`} className="col-10">
+                      <h5 className="my-1">{book.title}</h5>
+                      <p className="mb-0">
+                        <b>{book.description}</b>
+                      </p>
+                      <p className="text-muted small m-0">
+                        from
+                        <Link to={`/users/${book.user._id}`}>
+                          {` ${book.user.username}`}
+                        </Link>
+                        <br />
+                        added {new Date(book.addedAt).toLocaleString()}
+                      </p>
+                    </label>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         )}
+        <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
       <div className="panel-footer px-3 py-2">
         <input type="submit" className="btn btn-success" value="New Request" />

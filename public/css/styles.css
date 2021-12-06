@@ -81,6 +81,10 @@ form[name="Create Request"] {
   width: 240px;
 }
 
+.list-group .list-group-item:first-child {
+  border-bottom: none !important;
+}
+
 .buttons {
   display: flex;
   justify-content: space-between;
