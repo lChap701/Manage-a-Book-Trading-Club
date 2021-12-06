@@ -359,7 +359,7 @@ const Books = (props) => {
         <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
 
-      <div className="panel-footer p-2">
+      <div className="panel-footer px-3 py-2">
         {!props.ready ? (
           <SpinnerButton class="btn btn-success w-25" />
         ) : !props.login ? (
