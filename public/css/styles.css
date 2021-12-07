@@ -93,6 +93,16 @@ form[name="Create Request"] {
   border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
 }
 
+.no-bg {
+  background: none !important;
+}
+
+.request-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .options {
   position: absolute;
   right: 0;

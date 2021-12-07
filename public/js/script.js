@@ -263,7 +263,9 @@ class BookExchange extends React.Component {
               <Route path="/books/my">
                 <MyBooks userId={this.state.user._id} />
               </Route>
-              <Route exact path="/requests" component={Requests} />
+              <Route exact path="/requests">
+                <Requests userId={this.state.user._id} />
+              </Route>
               <Route path="/requests/new" component={CreateRequest} />
               <Route path="/trades" component={Trades} />
               <Route exact path="/users" component={Users} />
@@ -356,9 +358,10 @@ const Books = (props) => {
 
 /**
  * Component for displaying content on the Requests page
- * @returns   Returns the content that should be displayed
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
  */
-const Requests = () => {
+const Requests = (props) => {
   let [requests, setRequests] = useState([]);
   let [msg, setMsg] = useState("");
 
@@ -374,7 +377,29 @@ const Requests = () => {
   }, []);
   useEffect(() => getRequests(), []);
 
-  return <h2>All Requests</h2>;
+  return (
+    <form
+      action="/requests/new/books"
+      method="POST"
+      className="panel scroll shadow-lg"
+    >
+      <div className="panel-header text-white">
+        <h2 className="text-center">All Requests</h2>
+      </div>
+
+      <div className="panel-body p-4">
+        {msg.length > 0 ? (
+          <h4 className="text-muted text-center mt-2">{msg}</h4>
+        ) : (
+          <RequestListGroup requests={requests} myId={props.userId} />
+        )}
+      </div>
+
+      <div className="panel-footer px-3 py-2">
+        <input className="btn btn-success" type="submit" value="New Request" />
+      </div>
+    </form>
+  );
 };
 
 /**
@@ -1831,6 +1856,104 @@ const Options = (props) => {
         <i className="bi bi-trash-fill"></i>
       </button>
     </div>
+  );
+};
+
+/**
+ * Component for displaying a list group for requests/trades
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const RequestListGroup = (props) => {
+  return (
+    <ul className="list-group">
+      {props.requests.map((request) => (
+        <li className="list-group-item no-bg">
+          <div className="row w-100">
+            {request.gives[0].user._id == props.myId ? (
+              <Link
+                className="text-danger request-link"
+                to={`/requests/${request._id}/cancel`}
+              >
+                Cancel Request
+              </Link>
+            ) : request.takes[0].user._id == props.myId ? (
+              <Link
+                className="text-success request-link"
+                to={`/requests/${request._id}/accept`}
+              >
+                Accept Request
+              </Link>
+            ) : (
+              ""
+            )}
+            <div className="col-6">
+              <small>
+                <Link to={`/users/${request.gives[0].user._id}`}>
+                  {request.gives[0].user.username}
+                </Link>
+                wants to give:
+              </small>
+              <ul className="list-group">
+                {request.gives.map((give) => (
+                  <GiveTakeBooks
+                    _id={give.book._id}
+                    title={give.book.title}
+                    description={give.book.description}
+                    requests={give.book.requests}
+                  />
+                ))}
+              </ul>
+            </div>
+            <div className="col-6">
+              <small>and wants to take:</small>
+              <ul className="list-group">
+                {request.takes.map((take) => (
+                  <GiveTakeBooks
+                    _id={take.book._id}
+                    title={take.book.title}
+                    description={take.book.description}
+                    requests={take.book.requests}
+                    user={take[0].user}
+                  />
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+/**
+ * Component for display books part of a list of books to give/take
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const GiveTakeBooks = (props) => {
+  return (
+    <li className="list-group-item">
+      <small>
+        <Link className="float-right" to={`/books/${props._id}/requests`}>
+          Requests <span className="badge">{props.requests}</span>
+        </Link>
+      </small>
+      <h5 className="my-1">
+        {props.title}
+        {props.user ? (
+          <small className="text-muted">
+            {` from `}
+            <Link to={`/users/${props.user._id}`}>{props.user.username}</Link>
+          </small>
+        ) : (
+          ""
+        )}
+      </h5>
+      <p className="mb-0">
+        <b>{props.description}</b>
+      </p>
+    </li>
   );
 };
 
