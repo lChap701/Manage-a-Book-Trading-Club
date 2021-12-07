@@ -273,7 +273,9 @@ class BookExchange extends React.Component {
               <Route exact path="/users/:id">
                 <Profile myId={this.state.user._id} />
               </Route>
-              <Route path="/users/:id/books" component={UserBooks} />
+              <Route path="/users/:id/books">
+                <UserBooks login={this.state.login} />
+              </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
               <Route path="/logout">
@@ -744,7 +746,7 @@ const MyBooks = (props) => {
   let [updated, setUpdated] = useState(false);
   let mounted = useRef();
 
-  // Gets the user's profile information
+  // Gets the user's books
   useEffect(() => {
     let text = "";
 
@@ -804,33 +806,76 @@ const MyBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const UserBooks = (props) => {
+  const { id } = useParams();
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
-  let [updated, setUpdated] = useState(false);
-  let mounted = useRef();
 
-  // Gets the user's profile information
-  useEffect(() => {
-    let text = "";
+  /**
+   * Gets all of the user's books
+   */
+  const getUserBooks = useCallback(async () => {
+    let data = await callApi(`${location.origin}/api/users/${id}/books`);
 
-    // Checks if component was mounted and updates component once
-    if (!mounted.current) {
-      mounted.current = true;
-    } else if (!updated && props.userId.length > 0) {
-      callApi(`${location.origin}/api/users/${props.userId}/books`)
-        .then((data) => {
-          text = data;
-          setBooks(JSON.parse(data));
-          setUpdated(true);
-        })
-        .catch(() => {
-          setMsg(text);
-          setUpdated(true);
-        });
+    try {
+      const json = JSON.parse(data);
+      setBooks(json);
+
+      // Updates the document
+      updateTitleAndMetaTags(
+        `Book Exchange - ${json.username}'s Books`,
+        `View ${json.username}'s books`,
+        `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}/books`
+      );
+    } catch (e) {
+      setMsg(data);
     }
   });
 
-  return <h2>{props.user.username}'s Books</h2>;
+  // Calls getUserBooks() function once
+  useEffect(() => getUserBooks(), []);
+
+  return (
+    <div>
+      {books.length == 0 ? (
+        <Spinner />
+      ) : (
+        <form
+          className="panel shadow-lg"
+          method="POST"
+          action="/requests/new/books"
+        >
+          <div className="panel-header text-white p-1 mx-auto">
+            <h2 className="text-center">{books[0].username}'s Books</h2>
+          </div>
+          <div className="panel-body">
+            {msg.length > 0 ? (
+              <div className="p-5">
+                <h4 className="text-muted text-center mt-1">{msg}</h4>
+              </div>
+            ) : (
+              <BookListGroup books={books} />
+            )}
+          </div>
+          <div className="panel-footer px-3 py-2">
+            {props.login ? (
+              <div className="buttons">
+                <input
+                  type="submit"
+                  className="btn btn-success"
+                  value="New Request"
+                />
+                <Link className="btn btn-primary ml-2">Add Book</Link>
+              </div>
+            ) : (
+              <Link className="btn btn-success" to="/login">
+                Login to Add Books and Submit Requests
+              </Link>
+            )}
+          </div>
+        </form>
+      )}
+    </div>
+  );
 };
 
 /**
@@ -1485,15 +1530,6 @@ const AccountFormLayout = (props) => {
       </div>
     </div>
   );
-};
-
-/**
- * Component for handling the layout of the forms on the My Books and the (username)'s Books pages
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const UserBooksFormLayout = (props) => {
-  return;
 };
 
 /**
