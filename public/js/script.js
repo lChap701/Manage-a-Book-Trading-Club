@@ -1770,7 +1770,7 @@ const BookListGroup = (props) => {
                   </p>
                 </label>
               </div>
-              {props.myId == book.user._id ? <Options /> : ""}
+              {props.myId == book.user._id ? <Options type="books" /> : ""}
             </li>
           );
         })}
