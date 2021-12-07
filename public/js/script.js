@@ -295,7 +295,6 @@ class BookExchange extends React.Component {
 const Books = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
-  let [selectedBooks, setSelectedBooks] = useState("[]");
 
   // Gets all books
   const getBooks = useCallback(async () => {
@@ -325,57 +324,8 @@ const Books = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <ul className="list-group list-group-flush">
-            {books.map((book) => {
-              let location = book.user.city == "N/A" ? "" : book.user.city;
-              location += book.user.state == "N/A" ? "" : " " + book.user.state;
-              location +=
-                book.user.country != "N/A"
-                  ? book.user.state != "N/A"
-                    ? ", " + book.user.country
-                    : book.user.city != "N/A"
-                    ? " " + book.user.country
-                    : book.user.country
-                  : book.user.state == "N/A" && book.user.city == "N/A"
-                  ? book.user.country
-                  : "";
-              return (
-                <li className="list-group-item">
-                  <div className="row align-items-center">
-                    <input
-                      className="col-2"
-                      id={`book${book._id}`}
-                      name={`book${book._id}`}
-                      type="checkbox"
-                      onChange={() => setSelectedBooks(getSelectedBooks())}
-                    />
-                    <label for={`book${book._id}`} className="col-10">
-                      <h5 className="my-1">{book.title}</h5>
-                      <p className="mb-0">
-                        <b>{book.description}</b>
-                      </p>
-                      <p className="text-muted small m-0">
-                        from
-                        <Link to={`/users/${book.user._id}`}>
-                          {` ${book.user.username} `}
-                        </Link>
-                        in {location}
-                        <br />
-                        added {new Date(book.createdAt).toLocaleString()}
-                      </p>
-                    </label>
-                  </div>
-                  {props.login && props.userId == book.user._id ? (
-                    <Options />
-                  ) : (
-                    ""
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <BookListGroup userId={props.userId} books={books} />
         )}
-        <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
 
       <div className="panel-footer px-3 py-2">
@@ -792,7 +742,6 @@ const MyBooks = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
   let [updated, setUpdated] = useState(false);
-  let [selectedBooks, setSelectedBooks] = useState("[]");
   let mounted = useRef();
 
   // Gets the user's profile information
@@ -831,53 +780,8 @@ const MyBooks = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <ul className="list-group list-group-flush">
-            {books.map((book) => {
-              let location = book.user.city == "N/A" ? "" : book.user.city;
-              location += book.user.state == "N/A" ? "" : " " + book.user.state;
-              location +=
-                book.user.country != "N/A"
-                  ? book.user.state != "N/A"
-                    ? ", " + book.user.country
-                    : book.user.city != "N/A"
-                    ? " " + book.user.country
-                    : book.user.country
-                  : book.user.state == "N/A" && book.user.city == "N/A"
-                  ? book.user.country
-                  : "";
-              return (
-                <li className="list-group-item">
-                  <div className="row align-items-center">
-                    <input
-                      className="col-2"
-                      id={`book${book._id}`}
-                      name={`book${book._id}`}
-                      type="checkbox"
-                      onChange={() => setSelectedBooks(getSelectedBooks())}
-                    />
-                    <label for={`book${book._id}`} className="col-10">
-                      <h5 className="my-1">{book.title}</h5>
-                      <p className="mb-0">
-                        <b>{book.description}</b>
-                      </p>
-                      <p className="text-muted small m-0">
-                        from
-                        <Link to={`/users/${book.user._id}`}>
-                          {` ${book.user.username} `}
-                        </Link>
-                        in {location}
-                        <br />
-                        added {new Date(book.addedAt).toLocaleString()}
-                      </p>
-                    </label>
-                  </div>
-                  <Options />
-                </li>
-              );
-            })}
-          </ul>
+          <BookListGroup userId={props.userId} books={books} />
         )}
-        <Input id="books" type="text" hidden value={selectedBooks} />
       </div>
       <div className="panel-footer px-3 py-2">
         <input type="submit" className="btn btn-success" value="New Request" />
@@ -1783,6 +1687,66 @@ const Dropdown = (props) => {
           );
         })}
       </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying a list group for books
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const BookListGroup = (props) => {
+  let [selectedBooks, setSelectedBooks] = useState("[]");
+
+  return (
+    <div>
+      <ul className="list-group list-group-flush">
+        {props.books.map((book) => {
+          let location = book.user.city == "N/A" ? "" : book.user.city;
+          location += book.user.state == "N/A" ? "" : " " + book.user.state;
+          location +=
+            book.user.country != "N/A"
+              ? book.user.state != "N/A"
+                ? ", " + book.user.country
+                : book.user.city != "N/A"
+                ? " " + book.user.country
+                : book.user.country
+              : book.user.state == "N/A" && book.user.city == "N/A"
+              ? book.user.country
+              : "";
+          return (
+            <li className="list-group-item">
+              <div className="row align-items-center">
+                <input
+                  className="col-2"
+                  id={`book${book._id}`}
+                  name={`book${book._id}`}
+                  type="checkbox"
+                  onChange={() => setSelectedBooks(getSelectedBooks())}
+                />
+                <label for={`book${book._id}`} className="col-10">
+                  <h5 className="my-1">{book.title}</h5>
+                  <p className="mb-0">
+                    <b>{book.description}</b>
+                  </p>
+                  <p className="text-muted small m-0">
+                    from
+                    <Link to={`/users/${book.user._id}`}>
+                      {` ${book.user.username} `}
+                    </Link>
+                    in {location}
+                    <br />
+                    added {new Date(book.createdAt).toLocaleString()}
+                  </p>
+                </label>
+              </div>
+              {props.userId == book.user._id ? <Options /> : ""}
+            </li>
+          );
+        })}
+      </ul>
+      <Input id="books" type="text" hidden value={selectedBooks} />
     </div>
   );
 };
