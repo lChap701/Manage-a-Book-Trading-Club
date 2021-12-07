@@ -996,41 +996,36 @@ suite("Unit Tests", () => {
         .get(`/api/users/${ids.users[0]}/books`)
         .end((err, res) => {
           assert.equal(res.status, 200, "response status should be 200");
-          assert.property(
-            JSON.parse(res.text),
-            "books",
-            "response should return an object with a property of 'books'"
-          );
           assert.isArray(
-            JSON.parse(res.text).books,
-            "the 'books' property should be an array"
+            JSON.parse(res.text),
+            "response should return an array"
           );
           assert.property(
-            JSON.parse(res.text).books[0],
+            JSON.parse(res.text)[0],
             "_id",
-            "the 'books' property should contain objects with a property of '_id'"
+            "response should return an array of objects with a property of '_id'"
           );
           assert.propertyVal(
-            JSON.parse(res.text).books[0],
+            JSON.parse(res.text)[0],
             "title",
             "Dummy Book #1",
-            "the 'books' property should contain an object with a property of 'title' that equals 'Dummy Book #1'"
+            "response should contain an object with a property of 'title' that equals 'Dummy Book #1'"
           );
           assert.propertyVal(
-            JSON.parse(res.text).books[0],
+            JSON.parse(res.text)[0],
             "description",
             "Dummy Text",
-            "the 'books' property should contain an object with a property of 'description' that equals 'Dummy Text'"
+            "response should contain an object with a property of 'description' that equals 'Dummy Text'"
           );
           assert.property(
-            JSON.parse(res.text).books[0],
+            JSON.parse(res.text)[0],
             "requests",
-            "the 'books' property should contain an object with a property of 'requests'"
+            "response should return an array of objects with a property of 'requests'"
           );
           assert.property(
-            JSON.parse(res.text),
+            JSON.parse(res.text)[0],
             "user",
-            "response should return an object with a property of 'user'"
+            "response should return an array of objects with a property of 'user'"
           );
           done();
         });
