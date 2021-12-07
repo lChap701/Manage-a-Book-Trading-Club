@@ -1735,9 +1735,12 @@ const BookListGroup = (props) => {
                     <Link to={`/users/${book.user._id}`}>
                       {` ${book.user.username} `}
                     </Link>
-                    in {location}
+                    {`in ${location}`}
                     <br />
-                    added {new Date(book.createdAt).toLocaleString()}
+                    {"added "}
+                    {book.createdAt
+                      ? new Date(book.createdAt).toLocaleString()
+                      : new Date(book.addedAt).toLocaleString()}
                   </p>
                 </label>
               </div>
