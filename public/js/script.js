@@ -324,7 +324,7 @@ const Books = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <BookListGroup userId={props.userId} books={books} />
+          <BookListGroup myId={props.userId} books={books} />
         )}
       </div>
 
@@ -780,7 +780,7 @@ const MyBooks = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <BookListGroup userId={props.userId} books={books} />
+          <BookListGroup myId={props.userId} books={books} />
         )}
       </div>
       <div className="panel-footer px-3 py-2">
@@ -804,6 +804,32 @@ const MyBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const UserBooks = (props) => {
+  let [books, setBooks] = useState([]);
+  let [msg, setMsg] = useState("");
+  let [updated, setUpdated] = useState(false);
+  let mounted = useRef();
+
+  // Gets the user's profile information
+  useEffect(() => {
+    let text = "";
+
+    // Checks if component was mounted and updates component once
+    if (!mounted.current) {
+      mounted.current = true;
+    } else if (!updated && props.userId.length > 0) {
+      callApi(`${location.origin}/api/users/${props.userId}/books`)
+        .then((data) => {
+          text = data;
+          setBooks(JSON.parse(data));
+          setUpdated(true);
+        })
+        .catch(() => {
+          setMsg(text);
+          setUpdated(true);
+        });
+    }
+  });
+
   return <h2>{props.user.username}'s Books</h2>;
 };
 
@@ -1744,7 +1770,7 @@ const BookListGroup = (props) => {
                   </p>
                 </label>
               </div>
-              {props.userId == book.user._id ? <Options /> : ""}
+              {props.myId == book.user._id ? <Options /> : ""}
             </li>
           );
         })}
