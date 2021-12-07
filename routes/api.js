@@ -194,9 +194,7 @@ module.exports = (app) => {
 
           res.json(
             requests
-              .sort(
-                (a, b) => Date.parse(b.requestedAt) - Date.parse(a.requestedAt)
-              )
+              .sort((a, b) => b.requestedAt - a.requestedAt)
               .map((request) => {
                 return {
                   _id: request._id,
@@ -276,7 +274,7 @@ module.exports = (app) => {
             return {
               _id: request._id,
               gives: request.giveBooks
-                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .sort((a, b) => b.bumpedOn - a.bumpedOn)
                 .map((book) => {
                   return {
                     book: {
@@ -292,7 +290,7 @@ module.exports = (app) => {
                   };
                 }),
               takes: request.takeBooks
-                .sort((a, b) => Date.parse(b.bumpedOn) - Date.parse(a.bumpedOn))
+                .sort((a, b) => b.bumpedOn - a.bumpedOn)
                 .map((book) => {
                   return {
                     book: {
