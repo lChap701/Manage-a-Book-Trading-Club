@@ -263,8 +263,17 @@ class BookExchange extends React.Component {
               <Route path="/books/my">
                 <MyBooks userId={this.state.user._id} />
               </Route>
+              <Route path="/books/:bookId/requests">
+                <BookRequests
+                  login={this.state.login}
+                  userId={this.state.user._id}
+                />
+              </Route>
               <Route exact path="/requests">
-                <Requests userId={this.state.user._id} />
+                <Requests
+                  login={this.state.login}
+                  userId={this.state.user._id}
+                />
               </Route>
               <Route path="/requests/new" component={CreateRequest} />
               <Route path="/trades" component={Trades} />
@@ -386,11 +395,7 @@ const Requests = (props) => {
   useEffect(() => getRequests(), []);
 
   return (
-    <form
-      action="/requests/new/books"
-      method="POST"
-      className="panel scroll shadow-lg"
-    >
+    <div className="panel scroll shadow-lg">
       <div className="panel-header text-white">
         <h2 className="text-center">All Requests</h2>
       </div>
@@ -404,9 +409,17 @@ const Requests = (props) => {
       </div>
 
       <div className="panel-footer px-3 py-2">
-        <input className="btn btn-success" type="submit" value="New Request" />
+        {props.login ? (
+          <Link className="btn btn-success" to="/requests/new">
+            New Request
+          </Link>
+        ) : (
+          <Link className="btn btn-success" to="/login">
+            Login to Submit Requests
+          </Link>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
 
@@ -436,11 +449,7 @@ const BookRequests = () => {
   useEffect(() => getRequestsForBook(), []);
 
   return (
-    <form
-      action="/requests/new/books"
-      method="POST"
-      className="panel scroll shadow-lg"
-    >
+    <div className="panel scroll shadow-lg">
       <div className="panel-header text-white">
         <h2 className="text-center">
           Requests for {requests.takes.find((book) => book._id == bookId).title}
@@ -456,9 +465,17 @@ const BookRequests = () => {
       </div>
 
       <div className="panel-footer px-3 py-2">
-        <input className="btn btn-success" type="submit" value="New Request" />
+        {props.login ? (
+          <Link className="btn btn-success" to="/requests/new">
+            New Request
+          </Link>
+        ) : (
+          <Link className="btn btn-success" to="/login">
+            Login to Submit Requests
+          </Link>
+        )}
       </div>
-    </form>
+    </div>
   );
 };
 
