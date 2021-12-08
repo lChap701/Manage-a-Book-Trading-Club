@@ -331,7 +331,7 @@ const Books = (props) => {
       method="POST"
       className="panel scroll shadow-lg"
     >
-      <div className="panel-header text-white p-1 mx-auto">
+      <div className="panel-header text-white p-1">
         <h2 className="text-center">Books</h2>
       </div>
 
@@ -396,7 +396,7 @@ const Requests = (props) => {
 
   return (
     <div className="panel scroll shadow-lg">
-      <div className="panel-header text-white">
+      <div className="panel-header text-white p-1">
         <h2 className="text-center">All Requests</h2>
       </div>
 
@@ -427,9 +427,10 @@ const Requests = (props) => {
  * Component for displaying content on the Request for (book) page
  * @returns   Returns the content that should be displayed
  */
-const BookRequests = () => {
+const BookRequests = (props) => {
   const { bookId } = useParams();
   let [requests, setRequests] = useState([]);
+  let [bookTitle, setBookTitle] = useState("Unknown Book");
   let [msg, setMsg] = useState("");
 
   /**
@@ -439,7 +440,37 @@ const BookRequests = () => {
     let data = await callApi(`${location.origin}/api/books/${bookId}/requests`);
 
     try {
-      setRequests(JSON.parse(data));
+      const json = JSON.parse(data);
+
+      // Checks if any requests were found
+      if (json.hasOwnProperty("msg")) {
+        // Updates the document
+        updateTitleAndMetaTags(
+          `Book Exchange - Requests for ${json.bookTitle}`,
+          `View all requests for the book ${json.bookTitle}`,
+          `https://Manage-a-Book-Trading-Club.lchap701.repl.co/books/${bookId}/requests`
+        );
+
+        setMsg(json.msg);
+        setBookTitle(json.bookTitle);
+      } else {
+        // Gets the title of the book
+        let title = "";
+        json.forEach((obj) => {
+          let result = obj.takes.find((book) => book._id == bookId);
+          if (result) title = result.title;
+        });
+
+        // Updates the document
+        updateTitleAndMetaTags(
+          `Book Exchange - Requests for ${title}`,
+          `View all requests for the book ${title}`,
+          `https://Manage-a-Book-Trading-Club.lchap701.repl.co/books/${bookId}/requests`
+        );
+
+        setRequests(json);
+        setBookTitle(title);
+      }
     } catch (e) {
       setMsg(data);
     }
@@ -451,9 +482,7 @@ const BookRequests = () => {
   return (
     <div className="panel scroll shadow-lg">
       <div className="panel-header text-white">
-        <h2 className="text-center">
-          Requests for {requests.takes.find((book) => book._id == bookId).title}
-        </h2>
+        <h2 className="text-center">Requests for {bookTitle}</h2>
       </div>
 
       <div className="panel-body p-4">
@@ -1866,11 +1895,40 @@ const BookListGroup = (props) => {
                   onChange={() => setSelectedBooks(getSelectedBooks())}
                 />
                 <label for={`book${book._id}`} className="col-10">
+                  {book.requests.count > 0 ? (
+                    <Link
+                      className="float-right"
+                      to={`/books/${book._id}/requests`}
+                    >
+                      <b>Requests </b>
+                      <span className="badge">{book.requests.count}</span>
+                    </Link>
+                  ) : (
+                    ""
+                  )}
                   <h5 className="my-1">{book.title}</h5>
-                  <p className="mb-0">
-                    <b>{book.description}</b>
-                  </p>
-                  <p className="text-muted small m-0">
+                  <b className="d-block">{book.description}</b>
+                  {book.requests.count > 0 ? (
+                    <span className="float-right">
+                      {"("}
+                      {book.requests.users.map((user, i) => {
+                        return (
+                          <span>
+                            <b>
+                              <Link to={`/users/${user._id}`}>
+                                {user.username}
+                              </Link>
+                            </b>
+                            {i < book.requests.users - 1 ? ", " : ""}
+                          </span>
+                        );
+                      })}
+                      {")"}
+                    </span>
+                  ) : (
+                    ""
+                  )}
+                  <small className="text-muted">
                     from
                     <Link to={`/users/${book.user._id}`}>
                       {` ${book.user.username} `}
@@ -1881,7 +1939,7 @@ const BookListGroup = (props) => {
                     {book.createdAt
                       ? new Date(book.createdAt).toLocaleString()
                       : new Date(book.addedAt).toLocaleString()}
-                  </p>
+                  </small>
                 </label>
               </div>
               {props.myId == book.user._id ? <Options type="books" /> : ""}
