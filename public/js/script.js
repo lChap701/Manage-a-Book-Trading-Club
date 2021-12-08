@@ -425,6 +425,7 @@ const Requests = (props) => {
 
 /**
  * Component for displaying content on the Request for (book) page
+ * @param {*} props     Represents the props that were passed
  * @returns   Returns the content that should be displayed
  */
 const BookRequests = (props) => {
