@@ -1367,10 +1367,17 @@ suite("Unit Tests", () => {
           .get(`/api/books/${ids.books[2]}/requests`)
           .end((err, res) => {
             assert.equal(res.status, 200, "response status should be 200");
-            assert.equal(
-              res.text,
+            assert.propertyVal(
+              JSON.parse(res.text),
+              "msg",
               "There are currently no requests at this time",
-              "response text should return 'There are currently no requests at this time'"
+              "response should return an object with a property of 'msg' that equals 'There are currently no requests at this time'"
+            );
+            assert.propertyVal(
+              JSON.parse(res.text),
+              "bookTitle",
+              "Dummy Book #3",
+              "response should return an object with a property of 'bookTitle' that equals 'Dummy Book #3'"
             );
             done();
           });
