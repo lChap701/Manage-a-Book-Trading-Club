@@ -300,7 +300,9 @@ const Books = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
 
-  // Gets all books
+  /**
+   * Gets all books
+   */
   const getBooks = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/books`);
 
@@ -310,6 +312,8 @@ const Books = (props) => {
       setMsg(data);
     }
   }, []);
+
+  // Calls the getBooks() function once
   useEffect(() => getBooks(), []);
 
   return (
@@ -365,7 +369,9 @@ const Requests = (props) => {
   let [requests, setRequests] = useState([]);
   let [msg, setMsg] = useState("");
 
-  // Gets all requests
+  /**
+   * Gets all requests
+   */
   const getRequests = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/requests`);
 
@@ -376,7 +382,7 @@ const Requests = (props) => {
     }
   }, []);
 
-  // Calls the getRequsts() function once
+  // Calls the getRequests() function once
   useEffect(() => getRequests(), []);
 
   return (
@@ -413,7 +419,9 @@ const BookRequests = () => {
   let [requests, setRequests] = useState([]);
   let [msg, setMsg] = useState("");
 
-  // Gets all requests for the book
+  /**
+   * Gets all requests for the book
+   */
   const getRequestsForBook = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/books/${bookId}/requests`);
 
@@ -423,18 +431,32 @@ const BookRequests = () => {
       setMsg(data);
     }
   }, []);
+
+  // Calls the getRequestsForBook() function once
   useEffect(() => getRequestsForBook(), []);
 
   return (
     <form
-      action="/requests/new/"
+      action="/requests/new/books"
       method="POST"
       className="panel scroll shadow-lg"
     >
-      <div className="panel-header text-white p-1 mx-auto">
+      <div className="panel-header text-white">
         <h2 className="text-center">
           Requests for {requests.takes.find((book) => book._id == bookId).title}
         </h2>
+      </div>
+
+      <div className="panel-body p-4">
+        {msg.length > 0 ? (
+          <h4 className="text-muted text-center mt-2">{msg}</h4>
+        ) : (
+          <RequestListGroup requests={requests} myId={props.userId} />
+        )}
+      </div>
+
+      <div className="panel-footer px-3 py-2">
+        <input className="btn btn-success" type="submit" value="New Request" />
       </div>
     </form>
   );
@@ -447,12 +469,16 @@ const BookRequests = () => {
 const CreateRequest = () => {
   let [requestedBooks, setRequestedBooks] = useState([]);
 
-  // Gets all requested books
+  /**
+   * Gets all requested books
+   */
   const getRequestedBooks = useCallback(async () => {
     setRequestedBooks(
       await callApi(`${location.origin}/session/books`, "JSON")
     );
   }, []);
+
+  // Calls the getRequestedBooks() function once
   useEffect(() => getRequestedBooks(), []);
 
   return (
@@ -499,7 +525,9 @@ const Trades = () => {
   let [trades, setTrades] = useState([]);
   let [msg, setMsg] = useState("");
 
-  // Gets all trades
+  /**
+   * Gets all trades
+   */
   const getTrades = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/requests?trades=true`);
 
@@ -509,6 +537,8 @@ const Trades = () => {
       setMsg(data);
     }
   }, []);
+
+  // Calls the getTrades() function once
   useEffect(() => getTrades(), []);
 
   return <h2>Trades</h2>;
@@ -522,7 +552,9 @@ const Users = () => {
   let [users, setUsers] = useState([]);
   let [msg, setMsg] = useState("");
 
-  // Gets all users
+  /**
+   * Gets all users
+   */
   const getUsers = useCallback(async () => {
     let data = await callApi(`${location.origin}/api/users`);
 
@@ -532,6 +564,8 @@ const Users = () => {
       setMsg(data);
     }
   }, []);
+
+  // Calls the getUsers() function once
   useEffect(() => getUsers(), []);
 
   return (
