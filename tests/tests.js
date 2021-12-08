@@ -920,7 +920,7 @@ suite("Unit Tests", () => {
     });
   });
 
-  suite("Testing /api/books", () => {
+  suite("Testing /api/books (No Requests)", () => {
     test("1)  GET Test", (done) => {
       chai
         .request(app)
@@ -1577,6 +1577,46 @@ suite("Unit Tests", () => {
             done();
           });
       });
+    });
+  });
+
+  suite("Testing /api/books (With Requests)", () => {
+    test("1)  GET Test", (done) => {
+      chai
+        .request(app)
+        .get("/api/books")
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert.isArray(
+            JSON.parse(res.text),
+            "response should return an array"
+          );
+          assert.property(
+            JSON.parse(res.text)[0],
+            "requests",
+            "response should return an array of objects with a property of 'requests'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].requests,
+            "count",
+            "the 'requests' object/property should contain a property of 'count'"
+          );
+          assert.property(
+            JSON.parse(res.text)[0].requests,
+            "users",
+            "the 'requests' object/property should contain a property of 'users'"
+          );
+          assert.isArray(
+            JSON.parse(res.text)[0].requests.users,
+            "the 'users' property should be an array"
+          );
+          assert.isAbove(
+            JSON.parse(res.text)[0].requests.users.length,
+            0,
+            "the 'users' property should contain at least one object"
+          );
+          done();
+        });
     });
   });
 
