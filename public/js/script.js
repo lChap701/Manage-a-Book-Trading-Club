@@ -375,6 +375,8 @@ const Requests = (props) => {
       setMsg(data);
     }
   }, []);
+
+  // Calls the getRequsts() function once
   useEffect(() => getRequests(), []);
 
   return (
