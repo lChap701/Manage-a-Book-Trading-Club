@@ -136,6 +136,10 @@ module.exports = (app) => {
     crud
       .getAllBooks()
       .populate({ path: "user" })
+      .populate({
+        path: "requests",
+        populate: { path: "giveBooks", populate: { path: "user" } },
+      })
       .then((books) => {
         if (!books || books.length == 0) {
           res.send("There are currently no books available");
@@ -151,7 +155,14 @@ module.exports = (app) => {
               description: book.description,
               createdAt: book.addedAt,
               requests: {
-                _ids: book.requests,
+                users: book.requests.map((request) => {
+                  return request.giveBooks.map((book) => {
+                    return {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    };
+                  });
+                }),
                 count: book.numOfRequests,
               },
               user: {
@@ -188,7 +199,10 @@ module.exports = (app) => {
         .in(book._id)
         .then((requests) => {
           if (!requests || requests.length == 0) {
-            res.send("There are currently no requests at this time");
+            res.json({
+              msg: "There are currently no requests at this time",
+              bookTitle: book.title,
+            });
             return;
           }
 
