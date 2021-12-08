@@ -481,7 +481,7 @@ const BookRequests = (props) => {
 
   return (
     <div className="panel scroll shadow-lg">
-      <div className="panel-header text-white">
+      <div className="panel-header text-white p-1">
         <h2 className="text-center">Requests for {bookTitle}</h2>
       </div>
 
@@ -529,7 +529,7 @@ const CreateRequest = () => {
 
   return (
     <div className="panel shadow-lg">
-      <div className="panel-header p-1 mx-auto text-white">
+      <div className="panel-header text-white p-1">
         <h2 className="text-center">Create Request</h2>
       </div>
 
@@ -754,7 +754,7 @@ const Profile = (props) => {
         <Spinner />
       ) : (
         <form className="panel shadow-lg">
-          <div className="panel-header text-white p-1 mx-auto">
+          <div className="panel-header text-white p-1">
             <h2 className="text-center">{user.username}'s Profile</h2>
           </div>
 
@@ -880,7 +880,7 @@ const MyBooks = (props) => {
       method="POST"
       action="/requests/new/books"
     >
-      <div className="panel-header text-white p-1 mx-auto">
+      <div className="panel-header text-white p-1">
         <h2 className="text-center">My Books</h2>
       </div>
       <div className="panel-body">
@@ -951,7 +951,7 @@ const UserBooks = (props) => {
           method="POST"
           action="/requests/new/books"
         >
-          <div className="panel-header text-white p-1 mx-auto">
+          <div className="panel-header text-white p-1">
             <h2 className="text-center">{books[0].username}'s Books</h2>
           </div>
           <div className="panel-body">
@@ -1320,7 +1320,7 @@ class AccountForm extends React.Component {
           ""
         )}
 
-        <div className="panel-header text-white p-1 mx-auto">
+        <div className="panel-header text-white p-1">
           <h2 className="text-center">{this.props.formName}</h2>
         </div>
 
