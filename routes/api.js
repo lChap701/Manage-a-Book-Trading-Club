@@ -272,7 +272,11 @@ module.exports = (app) => {
       .equals(traded)
       .then((requests) => {
         if (!requests || requests.length == 0) {
-          res.send("There are currently no requests at this time");
+          if (!traded || traded == "false") {
+            res.send("There are currently no requests at this time");
+          } else {
+            res.send("No trades have taken place at this time");
+          }
           return;
         }
 

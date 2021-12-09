@@ -144,13 +144,6 @@ module.exports = (app) => {
                 book.save();
               });
 
-              // Ensures the requested books are updated before the response is sent
-              /* if (books[books.length - 1] == id) {
-              req.flash("success", "Created Request");
-              req.session.success = true;
-              res.redirect("/requests");
-            } */
-
               // Updates the new request
               request.requestedAt = new Date();
               request.save();
@@ -179,10 +172,11 @@ module.exports = (app) => {
 
         // Updates all users part of the request
         const { giveBooks, takeBooks } = request;
+        let takers = takeBooks.map((b) => b.user);
         crud
           .getUsers()
           .where("_id")
-          .in([giveBooks[0].user, takeBooks[0].user])
+          .in([giveBooks[0].user, takers])
           .then((users) => {
             users.forEach((user) => {
               let remove =
