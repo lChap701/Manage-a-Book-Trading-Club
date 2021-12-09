@@ -576,7 +576,7 @@ const Trades = () => {
    * Gets all trades
    */
   const getTrades = useCallback(async () => {
-    let data = await callApi(`${location.origin}/api/requests?trades=true`);
+    let data = await callApi(`${location.origin}/api/requests?traded=true`);
 
     try {
       setTrades(JSON.parse(data));
@@ -588,7 +588,21 @@ const Trades = () => {
   // Calls the getTrades() function once
   useEffect(() => getTrades(), []);
 
-  return <h2>Trades</h2>;
+  return (
+    <div className="panel scroll shadow-lg">
+      <div className="panel-header text-white p-1">
+        <h2 className="text-center">All Trades</h2>
+      </div>
+
+      <div className="panel-body p-4">
+        {msg.length > 0 ? (
+          <h4 className="text-muted text-center mt-2">{msg}</h4>
+        ) : (
+          <TradeListGroup trades={trades} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 /**
@@ -1972,7 +1986,7 @@ const Options = (props) => {
 };
 
 /**
- * Component for displaying a list group for requests/trades
+ * Component for displaying a list group for requests
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
@@ -1982,6 +1996,9 @@ const RequestListGroup = (props) => {
       {props.requests.map((request) => (
         <li className="list-group-item no-bg">
           <div className="row w-100">
+            <small className="d-block">
+              <b>Requested</b>: {new Date(request.requestedAt).toLocaleString()}
+            </small>
             {request.gives[0].user._id == props.myId ? (
               <Link
                 className="text-danger request-link"
@@ -2000,12 +2017,12 @@ const RequestListGroup = (props) => {
               ""
             )}
             <div className="col-6">
-              <small>
+              <h6>
                 <Link to={`/users/${request.gives[0].user._id}`}>
                   {request.gives[0].user.username}
                 </Link>
-                wants to give:
-              </small>
+                {" wants to give:"}
+              </h6>
               <ul className="list-group">
                 {request.gives.map((give) => (
                   <GiveTakeBooks
@@ -2018,7 +2035,7 @@ const RequestListGroup = (props) => {
               </ul>
             </div>
             <div className="col-6">
-              <small>and wants to take:</small>
+              <h6>and wants to take:</h6>
               <ul className="list-group">
                 {request.takes.map((take) => (
                   <GiveTakeBooks
@@ -2039,33 +2056,92 @@ const RequestListGroup = (props) => {
 };
 
 /**
- * Component for display books part of a list of books to give/take
+ * Component for display books that were or are to be given/taken
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
 const GiveTakeBooks = (props) => {
   return (
     <li className="list-group-item">
-      <small>
-        <Link className="float-right" to={`/books/${props._id}/requests`}>
-          Requests <span className="badge">{props.requests}</span>
-        </Link>
-      </small>
+      {props.requests > 0 ? (
+        <small>
+          <Link className="float-right" to={`/books/${props._id}/requests`}>
+            Requests <span className="badge">{props.requests}</span>
+          </Link>
+        </small>
+      ) : (
+        ""
+      )}
       <h5 className="my-1">
         {props.title}
         {props.user ? (
-          <small className="text-muted">
-            {` from `}
-            <Link to={`/users/${props.user._id}`}>{props.user.username}</Link>
+          <small>
+            <span className="text-muted"> from</span>
+            <Link to={`/users/${props.user._id}`}> {props.user.username}</Link>
           </small>
         ) : (
           ""
         )}
       </h5>
-      <p className="mb-0">
-        <b>{props.description}</b>
-      </p>
+      <b>{props.description}</b>
     </li>
+  );
+};
+
+/**
+ * Component for displaying completed trades
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const TradeListGroup = (props) => {
+  return (
+    <ul className="list-group">
+      {props.trades.map((trade) => {
+        <li className="list-group-item no-bg">
+          <div className="row w-100">
+            <small className="d-block">
+              <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
+            </small>
+            <div className="col-6">
+              <h6>
+                <Link to={`/users/${trade.takes[0].user._id}`}>
+                  {trade.takes[0].user.username}
+                </Link>
+                {" received:"}
+              </h6>
+              <ul className="list-group">
+                {trade.takes.map((take) => (
+                  <GiveTakeBooks
+                    _id={take.book._id}
+                    title={take.book.title}
+                    description={take.book.description}
+                    requests={take.book.requests}
+                  />
+                ))}
+              </ul>
+            </div>
+            <div className="col-6">
+              <h6>
+                <Link to={`/users/${trade.gives[0].user._id}`}>
+                  {trade.gives[0].user.username}
+                </Link>
+                {" received:"}
+              </h6>
+              <ul className="list-group">
+                {trade.gives.map((give) => (
+                  <GiveTakeBooks
+                    _id={give.book._id}
+                    title={give.book.title}
+                    description={give.book.description}
+                    requests={give.book.requests}
+                  />
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>;
+      })}
+    </ul>
   );
 };
 
