@@ -138,9 +138,18 @@ module.exports = (app) => {
       .populate({ path: "user" })
       .populate({
         path: "requests",
+        match: { traded: { $eq: false } },
         populate: { path: "giveBooks", populate: { path: "user" } },
       })
       .then((books) => {
+        // Gets only requests for books that users wish to take
+        books.forEach((book) => {
+          book.requests = book.requests.filter((request) =>
+            request.takeBooks.find((tb) => String(tb) == String(book._id))
+          );
+        });
+
+        // Checks if any books are available
         if (!books || books.length == 0) {
           res.send("There are currently no books available");
           return;
@@ -155,15 +164,13 @@ module.exports = (app) => {
               description: book.description,
               createdAt: book.addedAt,
               requests: {
-                users: book.requests.map((request) => {
-                  return request.giveBooks.map((book) => {
-                    return {
-                      _id: book.user._id,
-                      username: book.user.username,
-                    };
-                  });
-                }),
                 count: book.numOfRequests,
+                users: book.requests.map((request) => {
+                  return {
+                    _id: request.giveBooks[0].user._id,
+                    username: request.giveBooks[0].user.username,
+                  };
+                }),
               },
               user: {
                 _id: book.user._id,
