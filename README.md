@@ -9,7 +9,6 @@ A project that was created to earn a certificate from freeCodeCamp and allows us
 - GitHub
 - Facebook
 - Twitter
-- Microsoft
 - Google
 
 ## Security
@@ -111,10 +110,6 @@ All URL paths part of this project.
   - Redirects to **/login** or **/signup** when unsuccessful
 - **/auth/twitter** - Where Twitter OAuth to take place
 - **/auth/twitter/callback** - Callback URL path during OAuth
-  - Redirects to **/books** when successful
-  - Redirects to **/login** or **/signup** when unsuccessful
-- **/auth/microsoft** - Where Microsoft OAuth to take place
-- **/auth/microsoft/callback** - Callback URL path during OAuth
   - Redirects to **/books** when successful
   - Redirects to **/login** or **/signup** when unsuccessful
 - **/auth/google** - Where Google OAuth to take place
