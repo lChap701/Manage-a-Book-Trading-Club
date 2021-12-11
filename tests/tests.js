@@ -1591,27 +1591,32 @@ suite("Unit Tests", () => {
             JSON.parse(res.text),
             "response should return an array"
           );
+
+          // Sorts array by the largest number of requests for testing
+          const json = JSON.parse(res.text).sort(
+            (a, b) => b.requests.count - a.requests.count
+          );
           assert.property(
-            JSON.parse(res.text)[0],
+            json[0],
             "requests",
             "response should return an array of objects with a property of 'requests'"
           );
           assert.property(
-            JSON.parse(res.text)[0].requests,
+            json[0].requests,
             "count",
             "the 'requests' object/property should contain a property of 'count'"
           );
           assert.property(
-            JSON.parse(res.text)[0].requests,
+            json[0].requests,
             "users",
             "the 'requests' object/property should contain a property of 'users'"
           );
           assert.isArray(
-            JSON.parse(res.text)[0].requests.users,
+            json[0].requests.users,
             "the 'users' property should be an array"
           );
           assert.isAbove(
-            JSON.parse(res.text)[0].requests.users.length,
+            json[0].requests.users.length,
             0,
             "the 'users' property should contain at least one object"
           );
