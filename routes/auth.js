@@ -123,19 +123,30 @@ module.exports = (app) => {
           takeBooks: takes,
         })
         .then((request) => {
-          // Update referenced books
+          let taker = null;
+          let giver = null;
+
+          // Update referenced books and gets referenced users
           crud
             .getAllBooks()
             .where("_id")
             .in(gives.concat(takes))
             .then((books) => {
               books.forEach((book) => {
-                if (takes.find((b) => b == book._id)) ++book.numOfRequests;
+                if (takes.find((b) => b == book._id)) {
+                  taker = book.user;
+                  ++book.numOfRequests;
+                } else {
+                  giver = book.user;
+                }
+
                 book.requests.push(request);
                 book.save();
               });
 
               // Updates the new request
+              request.giveUser = giver;
+              request.takeUser = taker;
               request.requestedAt = new Date();
               request.save();
 
@@ -163,11 +174,10 @@ module.exports = (app) => {
 
         // Updates all users part of the request
         const { giveBooks, takeBooks } = request;
-        let takers = takeBooks.map((b) => b.user);
         crud
           .getUsers()
           .where("_id")
-          .in([giveBooks[0].user, takers])
+          .in([giveBooks[0].user, takeBooks[0].user])
           .then((users) => {
             users.forEach((user) => {
               let remove =
@@ -236,16 +246,14 @@ module.exports = (app) => {
           .where("_id")
           .in(request.giveBooks.concat(request.takeBooks).map((b) => b._id))
           .then((books) => {
-            books.forEach((b) => {
-              crud.getBook(b).then((book) => {
-                if (String(book.user) == String(request.takeBooks[0].user)) {
-                  --book.numOfRequests;
-                }
-                book.requests = book.requests.filter(
-                  (r) => r.toString() != request._id.toString()
-                );
-                book.save();
-              });
+            books.forEach((book) => {
+              if (String(book.user) == String(request.takeBooks[0].user)) {
+                --book.numOfRequests;
+              }
+              book.requests = book.requests.filter(
+                (r) => r.toString() != request._id.toString()
+              );
+              book.save();
             });
           });
 
