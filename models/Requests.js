@@ -2,12 +2,14 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const requestSchema = new Schema({
+  giveUser: { type: Schema.Types.ObjectId, ref: "Users" },
   giveBooks: [
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
     },
   ],
+  takeUser: { type: Schema.Types.ObjectId, ref: "Users" },
   takeBooks: [
     {
       type: Schema.Types.ObjectId,
