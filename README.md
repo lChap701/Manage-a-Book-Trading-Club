@@ -150,7 +150,7 @@ All URL paths part of this project.
 [GitHub OAuth](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app) \
 [Facebook OAuth](https://www.twilio.com/blog/facebook-oauth-login-node-js-app-passport-js) \
 [Twitter OAuth](https://medium.com/swlh/setting-up-twitter-oauth-with-node-and-passport-js-2298296b237c) \
-[Microsoft/Google OAuth](https://dev.to/asim_ansari7/setting-up-social-logins-with-node-js-and-passport-js-1m16) \
+[Google OAuth](https://dev.to/asim_ansari7/setting-up-social-logins-with-node-js-and-passport-js-1m16) \
 [Country State City API](https://countrystatecity.in/docs/) \
 [Zippopotamus API](https://docs.zippopotam.us/) \
 [LocationIQ's Autocomplete API](https://locationiq.com/docs#autocomplete)
