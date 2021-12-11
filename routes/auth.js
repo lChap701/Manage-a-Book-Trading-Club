@@ -92,15 +92,7 @@ module.exports = (app) => {
     "/auth/google/callback",
     passport.authenticate("google", oauthOptions)
   );
-
-  // Handles Microsoft OAuth
-  app.get("/auth/microsoft", passport.authenticate("microsoft"));
-
-  // Callback URL for Microsoft OAuth
-  app.get(
-    "/auth/microsoft/callback",
-    passport.authenticate("microsoft", oauthOptions)
-  );
+ass
 
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
   app
