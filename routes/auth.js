@@ -92,7 +92,6 @@ module.exports = (app) => {
     "/auth/google/callback",
     passport.authenticate("google", oauthOptions)
   );
-ass
 
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
   app
