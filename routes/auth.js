@@ -213,6 +213,20 @@ module.exports = (app) => {
             });
           });
 
+        // Updates all requests for the same book(s) that have not been accepted (if any exist)
+        crud
+          .getRequests()
+          .where("_id")
+          .ne(request._id)
+          .where("takeBooks")
+          .in(takeBooks)
+          .then((requests) => {
+            requests.forEach((request) => {
+              request.takeUser = giveBooks[0].user;
+              request.save();
+            });
+          });
+
         // Updates the request
         crud
           .updateRequest(request._id)
