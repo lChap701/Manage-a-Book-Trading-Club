@@ -273,8 +273,10 @@ module.exports = (app) => {
 
     crud
       .getRequests()
-      .populate({ path: "giveBooks", populate: { path: "user" } })
-      .populate({ path: "takeBooks", populate: { path: "user" } })
+      .populate({ path: "giveBooks" })
+      .populate({ path: "giveUser" })
+      .populate({ path: "takeBooks" })
+      .populate({ path: "takeUser" })
       .where("traded")
       .equals(traded)
       .then((requests) => {
@@ -301,6 +303,8 @@ module.exports = (app) => {
               gives: request.giveBooks
                 .sort((a, b) => b.bumpedOn - a.bumpedOn)
                 .map((book) => {
+                  let user =
+                    traded == "true" ? request.takeUser : request.giveUser;
                   return {
                     book: {
                       _id: book._id,
@@ -309,14 +313,16 @@ module.exports = (app) => {
                       requests: book.numOfRequests,
                     },
                     user: {
-                      _id: book.user._id,
-                      username: book.user.username,
+                      _id: user._id,
+                      username: user.username,
                     },
                   };
                 }),
               takes: request.takeBooks
                 .sort((a, b) => b.bumpedOn - a.bumpedOn)
                 .map((book) => {
+                  let user =
+                    traded == "true" ? request.giveUser : request.takeUser;
                   return {
                     book: {
                       _id: book._id,
@@ -325,8 +331,8 @@ module.exports = (app) => {
                       requests: book.numOfRequests,
                     },
                     user: {
-                      _id: book.user._id,
-                      username: book.user.username,
+                      _id: user._id,
+                      username: user.username,
                     },
                   };
                 }),
