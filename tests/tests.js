@@ -1261,7 +1261,7 @@ suite("Unit Tests", () => {
           assert.property(
             JSON.parse(res.text)[0],
             "requestedAt",
-            "response should return an array containing an object with a property of 'requesredAt'"
+            "response should return an array containing an object with a property of 'requestedAt'"
           );
           done();
           ids.requests.push(JSON.parse(res.text)[2]._id);
