@@ -50,6 +50,7 @@ module.exports = () => {
 
       return user ? cb(user) : cb(false);
     } catch (err) {
+      console.log(err);
       return cb(err);
     }
   };
