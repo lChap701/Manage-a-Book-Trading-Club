@@ -2,14 +2,12 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const requestSchema = new Schema({
-  giveUser: { type: Schema.Types.ObjectId, ref: "Users" },
   giveBooks: [
     {
       type: Schema.Types.ObjectId,
       ref: "Books",
     },
   ],
-  takeUser: { type: Schema.Types.ObjectId, ref: "Users" },
   takeBooks: [
     {
       type: Schema.Types.ObjectId,
@@ -17,6 +15,7 @@ const requestSchema = new Schema({
     },
   ],
   traded: { type: Boolean, default: false },
+  trade: { type: Schema.Types.ObjectId, ref: "Trades" },
   requestedAt: Date,
   tradedAt: Date,
 });
