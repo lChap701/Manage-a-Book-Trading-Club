@@ -1645,7 +1645,9 @@ suite("Unit Tests", () => {
 
     // Deletes all test requests
     ids.requests.forEach((id) => {
-      crud.deleteRequest(id).catch((err) => console.log(err));
+      crud.deleteRequest(id).then(() => {
+        crud.deleteTrades(id).catch((err) => console.log(err));
+      }).catch((err) => console.log(err));
     });
 
     // Gives enough time for the code above to be executed
