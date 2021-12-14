@@ -123,9 +123,6 @@ module.exports = (app) => {
           takeBooks: takes,
         })
         .then((request) => {
-          let taker = null;
-          let giver = null;
-
           // Update referenced books and gets referenced users
           crud
             .getAllBooks()
@@ -133,20 +130,12 @@ module.exports = (app) => {
             .in(gives.concat(takes))
             .then((books) => {
               books.forEach((book) => {
-                if (takes.find((b) => b == book._id)) {
-                  taker = book.user;
-                  ++book.numOfRequests;
-                } else {
-                  giver = book.user;
-                }
-
+                if (takes.find((b) => b == book._id)) ++book.numOfRequests;
                 book.requests.push(request);
                 book.save();
               });
 
               // Updates the new request
-              request.giveUser = giver;
-              request.takeUser = taker;
               request.requestedAt = new Date();
               request.save();
 
@@ -213,24 +202,20 @@ module.exports = (app) => {
             });
           });
 
-        // Updates all requests for the same book(s) that have not been accepted (if any exist)
+        // Adds the trade to the DB
         crud
-          .getRequests()
-          .where("_id")
-          .ne(request._id)
-          .where("takeBooks")
-          .in(takeBooks)
-          .then((requests) => {
-            requests.forEach((request) => {
-              request.takeUser = giveBooks[0].user;
-              request.save();
-            });
-          });
+          .addTrade({
+            gaveUser: giveBooks[0].user,
+            tookUser: takeBooks[0].user,
+            request: request._id,
+          })
+          .then((trade) => {
+            // Updates the request
+            request.traded = true;
+            request.trade = trade;
+            request.tradedAt = new Date();
+            request.save();
 
-        // Updates the request
-        crud
-          .updateRequest(request._id)
-          .then(() => {
             req.session.success = true;
             req.flash("success", "Accepted Request");
             res.redirect("..");
