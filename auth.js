@@ -64,9 +64,7 @@ module.exports = () => {
     const account = {
       id: profile.id,
       username: profile.username,
-      name: profile.displayName,
       url: profile.profileUrl,
-      photos: profile.photos,
       provider: profile.provider,
     };
 
