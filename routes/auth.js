@@ -205,8 +205,8 @@ module.exports = (app) => {
         // Adds the trade to the DB
         crud
           .addTrade({
-            gaveUser: giveBooks[0].user,
-            tookUser: takeBooks[0].user,
+            gaveUser: takeBooks[0].user,
+            tookUser: giveBooks[0].user,
             request: request._id,
           })
           .then((trade) => {

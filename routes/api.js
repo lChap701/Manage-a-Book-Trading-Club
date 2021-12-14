@@ -311,7 +311,7 @@ module.exports = (app) => {
                 .map((book) => {
                   let user =
                     traded == "true"
-                      ? request.trade.tookUser
+                      ? request.trade.gaveUser
                       : request.giveBooks[0].user;
                   return {
                     book: {
@@ -331,7 +331,7 @@ module.exports = (app) => {
                 .map((book) => {
                   let user =
                     traded == "true"
-                      ? request.trade.gaveUser
+                      ? request.trade.tookUser
                       : request.takeBooks[0].user;
                   return {
                     book: {
