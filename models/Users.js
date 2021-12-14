@@ -29,15 +29,13 @@ const userSchema = new Schema(
           type: String,
           required: [() => this.oauth, "{PATH} is required"],
         },
-        name: String,
         url: {
           type: String,
           required: [() => this.oauth, "{PATH} is required"],
         },
-        photos: [{ value: String }],
         provider: {
           type: String,
-          enum: ["github", "facebook", "twitter", "google", "microsoft"],
+          enum: ["github", "facebook", "twitter", "google"],
           required: [() => this.oauth, "{PATH} is required"],
         },
       },
