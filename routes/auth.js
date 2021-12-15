@@ -150,11 +150,11 @@ module.exports = (app) => {
     });
 
   // Routing for allowing requests to be accepted and books to be traded
-  app.get("/requests/:requestId/accept", loggedOut, (req, res) => {
+  app.get("/requests/:requestId/accept/:id", loggedOut, (req, res) => {
     crud
       .getRequest(req.params.requestId)
       .populate({ path: "giveBooks" })
-      .populate({ path: "takeBooks" })
+      .populate({ path: "takeBooks", match: { user: { $eq: req.params.id } } })
       .then((request) => {
         if (!request) {
           res.sendStatus(404);
@@ -218,7 +218,7 @@ module.exports = (app) => {
 
             req.session.success = true;
             req.flash("success", "Accepted Request");
-            res.redirect("..");
+            res.redirect("/requests");
           })
           .catch((ex) => {
             console.log(ex);
