@@ -1400,16 +1400,18 @@ suite("Unit Tests", () => {
     });
   });
 
-  suite("Testing /requests/:requestId/accept", () => {
+  suite("Testing /requests/:requestId/accept/:id", () => {
     test("1)  GET Test", (done) => {
-      agent.get(`/requests/${ids.requests[0]}/accept`).end((err, res) => {
-        assert.equal(res.status, 200, "response status should be 200");
-        assert(
-          res.text.match(/<title>Book Exchange - All Requests<\/title>/),
-          "response text should contain '<title>Book Exchange - All Requests</title>'"
-        );
-        done();
-      });
+      agent
+        .get(`/requests/${ids.requests[0]}/accept/${ids.users[1]}`)
+        .end((err, res) => {
+          assert.equal(res.status, 200, "response status should be 200");
+          assert(
+            res.text.match(/<title>Book Exchange - All Requests<\/title>/),
+            "response text should contain '<title>Book Exchange - All Requests</title>'"
+          );
+          done();
+        });
     });
   });
 
@@ -1645,9 +1647,12 @@ suite("Unit Tests", () => {
 
     // Deletes all test requests
     ids.requests.forEach((id) => {
-      crud.deleteRequest(id).then(() => {
-        crud.deleteTrades(id).catch((err) => console.log(err));
-      }).catch((err) => console.log(err));
+      crud
+        .deleteRequest(id)
+        .then(() => {
+          crud.deleteTrades(id).catch((err) => console.log(err));
+        })
+        .catch((err) => console.log(err));
     });
 
     // Gives enough time for the code above to be executed
