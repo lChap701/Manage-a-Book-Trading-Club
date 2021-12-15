@@ -2018,10 +2018,10 @@ const RequestListGroup = (props) => {
               >
                 Cancel Request
               </Link>
-            ) : request.takes[0].user._id == props.myId ? (
+            ) : request.takes.find((take) => take.user._id == props.myId) ? (
               <Link
                 className="text-success request-link"
-                to={`/requests/${request._id}/accept`}
+                to={`/requests/${request._id}/accept/${props.myId}`}
               >
                 Accept Request
               </Link>
