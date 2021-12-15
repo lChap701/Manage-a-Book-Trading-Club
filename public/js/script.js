@@ -931,6 +931,7 @@ const UserBooks = (props) => {
   const { id } = useParams();
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
+  let [username, setUsername] = useState("");
 
   /**
    * Gets all of the user's books
@@ -940,7 +941,6 @@ const UserBooks = (props) => {
 
     try {
       const json = JSON.parse(data);
-      setBooks(json);
 
       // Updates the document
       updateTitleAndMetaTags(
@@ -948,7 +948,19 @@ const UserBooks = (props) => {
         `View ${json.username}'s books`,
         `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}/books`
       );
+
+      setUsername(json.username);
+      setBooks(json);
     } catch (e) {
+      // Updates the document and gets the username of the user
+      const json = await callApi(`${location.origin}/api/users/${id}`, "JSON");
+      updateTitleAndMetaTags(
+        `Book Exchange - ${json.username}'s Books`,
+        `View ${json.username}'s books`,
+        `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}/books`
+      );
+
+      setUsername(json.username);
       setMsg(data);
     }
   });
@@ -958,7 +970,7 @@ const UserBooks = (props) => {
 
   return (
     <div>
-      {books.length == 0 ? (
+      {msg.length == 0 && books.length == 0 ? (
         <Spinner />
       ) : (
         <form
@@ -967,7 +979,7 @@ const UserBooks = (props) => {
           action="/requests/new/books"
         >
           <div className="panel-header text-white p-1">
-            <h2 className="text-center">{books[0].username}'s Books</h2>
+            <h2 className="text-center">{username}'s Books</h2>
           </div>
           <div className="panel-body">
             {msg.length > 0 ? (
