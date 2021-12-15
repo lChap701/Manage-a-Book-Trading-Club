@@ -68,7 +68,7 @@ All URL paths part of this project.
     - Redirects to **/books** when logged out
 - **/requests/new/books** - Form handler for the form in **/books**
   - Redirects to **/requests/new**
-- **/requests/:requestId/accept** - Accepts requests/trades
+- **/requests/:requestId/accept/:id** - Accepts requests/trades
   - When successful, redirects to **/requests**
 - **/requests/:requestId/cancel** - Cancels requests/declines trades
   - When successful, redirects to **/requests**
