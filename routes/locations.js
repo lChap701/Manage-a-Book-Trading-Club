@@ -17,6 +17,58 @@ const locationIq = axios.create({
 });
 
 /**
+ * Filters and sorts states
+ * @param {Array} states    Represents an array of states
+ * @returns                 Returns a cleaned up array of states
+ */
+const stateCleanUp = (states) => {
+  return states
+    .filter(
+      (state) =>
+        (!state.name.includes("Island") &&
+          !state.name.includes("Atoll") &&
+          !state.name.includes("Reef") &&
+          !state.name.includes("Guam") &&
+          !state.name.includes("American Samoa")) ||
+        state.name.includes("Rhode Island")
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((state) => {
+      return {
+        name: state.name,
+        abbr: state.iso2,
+        country: state.country_code,
+      };
+    });
+};
+
+/**
+ * Filters and sorts states
+ * @param {Array} cities      Represents an array of cities
+ * @param {String} cntyAbbr   Represents the abbreviation of a country
+ * @param {String} stAbbr     Represents the abbreviation of a state (defaults to "")
+ * @returns                   Returns a cleaned up array of cities
+ */
+const cityCleanUp = (cities, cntyAbbr, stAbbr = "") => {
+  return cities
+    .filter(
+      (city) =>
+        !city.name.includes("County") &&
+        !city.name.includes("Parish") &&
+        !city.name.includes("River") &&
+        !city.name.includes("Lake")
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((city) => {
+      return {
+        name: city.name,
+        state: stAbbr.toUpperCase(),
+        country: cntyAbbr.toUpperCase(),
+      };
+    });
+};
+
+/**
  * Module for retrieving addresses, cities, states, countries, and zip code
  * @module ./routes/locations
  *
@@ -71,15 +123,7 @@ const locations = {
     countryStateCity
       .get("/states")
       .then((resp) => {
-        res.json(
-          resp.data.map((state) => {
-            return {
-              name: state.name,
-              abbr: state.iso2,
-              country: state.country_code,
-            };
-          })
-        );
+        res.json(stateCleanUp(resp.data));
       })
       .catch((err) => console.log(err));
   },
@@ -87,15 +131,7 @@ const locations = {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states`)
       .then((resp) => {
-        res.json(
-          resp.data.map((state) => {
-            return {
-              name: state.name,
-              abbr: state.iso2,
-              country: cntyAbbr.toUpperCase(),
-            };
-          })
-        );
+        res.json(stateCleanUp(resp.data));
       })
       .catch((err) => console.log(err));
   },
@@ -104,13 +140,15 @@ const locations = {
       .get(`/${cntyAbbr}/${zipPostal}`)
       .then((resp) => {
         res.json(
-          resp.data.places.map((place) => {
-            return {
-              name: place.state,
-              abbr: place["state abbreviation"],
-              country: resp.data["country abbreviation"],
-            };
-          })
+          resp.data.places
+            .sort((a, b) => a.state.localeCompare(b.state))
+            .map((place) => {
+              return {
+                name: place.state,
+                abbr: place["state abbreviation"],
+                country: resp.data["country abbreviation"],
+              };
+            })
         );
       })
       .catch((err) => console.log(err));
@@ -131,14 +169,7 @@ const locations = {
     countryStateCity
       .get(`/countries/${cntyAbbr}/cities`)
       .then((resp) => {
-        res.json(
-          resp.data.map((city) => {
-            return {
-              name: city.name,
-              country: cntyAbbr.toUpperCase(),
-            };
-          })
-        );
+        res.json(cityCleanUp(resp.data, cntyAbbr));
       })
       .catch((err) => console.log(err));
   },
@@ -146,15 +177,7 @@ const locations = {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states/${stAbbr}/cities`)
       .then((resp) => {
-        res.json(
-          resp.data.map((city) => {
-            return {
-              name: city.name,
-              state: stAbbr.toUpperCase(),
-              country: cntyAbbr.toUpperCase(),
-            };
-          })
-        );
+        res.json(cityCleanUp(resp.data, cntyAbbr, stAbbr));
       })
       .catch((err) => console.log(err));
   },
@@ -163,13 +186,15 @@ const locations = {
       .get(`/${cntyAbbr}/${zipPostal}`)
       .then((resp) => {
         res.json(
-          resp.data.places.map((place) => {
-            return {
-              name: place["place name"],
-              state: place["state abbreviation"],
-              country: cntyAbbr.toUpperCase(),
-            };
-          })
+          resp.data.places
+            .sort((a, b) => a["place name"].localeCompare(b["place name"]))
+            .map((place) => {
+              return {
+                name: place["place name"],
+                state: place["state abbreviation"],
+                country: cntyAbbr.toUpperCase(),
+              };
+            })
         );
       })
       .catch((err) => console.log(err));
