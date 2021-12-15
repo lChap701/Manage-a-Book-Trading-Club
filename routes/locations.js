@@ -18,10 +18,11 @@ const locationIq = axios.create({
 
 /**
  * Filters and sorts states
- * @param {Array} states    Represents an array of states
- * @returns                 Returns a cleaned up array of states
+ * @param {Array} states      Represents an array of states
+ * @param {String} cntyAbbr   Represents the abbreviated country (defaults to "")
+ * @returns                   Returns a cleaned up array of states
  */
-const stateCleanUp = (states) => {
+const stateCleanUp = (states, cntyAbbr) => {
   return states
     .filter(
       (state) =>
@@ -37,7 +38,7 @@ const stateCleanUp = (states) => {
       return {
         name: state.name,
         abbr: state.iso2,
-        country: state.country_code,
+        country: state.country_code || cntyAbbr.toUpperCase(),
       };
     });
 };
@@ -131,7 +132,7 @@ const locations = {
     countryStateCity
       .get(`/countries/${cntyAbbr}/states`)
       .then((resp) => {
-        res.json(stateCleanUp(resp.data));
+        res.json(stateCleanUp(resp.data, cntyAbbr));
       })
       .catch((err) => console.log(err));
   },
