@@ -154,28 +154,33 @@ module.exports = (app) => {
     crud
       .getRequest(req.params.requestId)
       .populate({ path: "giveBooks" })
-      .populate({ path: "takeBooks", match: { user: { $eq: req.params.id } } })
+      .populate({ path: "takeBooks" })
       .then((request) => {
         if (!request) {
           res.sendStatus(404);
           return;
         }
 
-        // Updates all users part of the request
+        // Gets books part of the request
         const { giveBooks, takeBooks } = request;
+        let acceptedBooks = takeBooks.filter(
+          (tb) => tb.user.toString() == req.params.id
+        );
+
+        // Updates all users that have accepted the request
         crud
           .getUsers()
           .where("_id")
-          .in([giveBooks[0].user, takeBooks[0].user])
+          .in([giveBooks[0].user, req.params.id])
           .then((users) => {
             users.forEach((user) => {
               let remove =
                 user._id.toString() == giveBooks[0].user.toString()
                   ? new Set(giveBooks.map((book) => book._id.toString()))
-                  : new Set(takeBooks.map((book) => book._id.toString()));
+                  : new Set(acceptedBooks.map((book) => book._id.toString()));
               let add =
                 user._id.toString() == giveBooks[0].user.toString()
-                  ? takeBooks.map((book) => book._id)
+                  ? acceptedBooks.map((book) => book._id)
                   : giveBooks.map((book) => book._id);
               user.books = user.books.filter((book) => !remove.has(book));
               user.books.push(...add);
@@ -190,12 +195,14 @@ module.exports = (app) => {
           .in(giveBooks.concat(takeBooks).map((b) => b._id))
           .then((books) => {
             books.forEach((book) => {
-              if (String(book.user) == String(takeBooks[0].user)) {
+              if (
+                takeBooks.find((tb) => String(tb.user) == String(book.user))
+              ) {
                 --book.numOfRequests;
               }
 
               book.user =
-                book.user.toString() == takeBooks[0].user.toString()
+                book.user.toString() == req.params.id
                   ? giveBooks[0].user
                   : takeBooks[0].user;
               book.save();
