@@ -204,7 +204,7 @@ module.exports = (app) => {
               book.user =
                 book.user.toString() == req.params.id
                   ? giveBooks[0].user
-                  : takeBooks[0].user;
+                  : acceptedBooks[0].user;
               book.save();
             });
           });
@@ -212,7 +212,7 @@ module.exports = (app) => {
         // Adds the trade to the DB
         crud
           .addTrade({
-            gaveUser: takeBooks[0].user,
+            gaveUser: acceptedBooks[0].user,
             tookUser: giveBooks[0].user,
             request: request._id,
           })
