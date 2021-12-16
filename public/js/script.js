@@ -426,7 +426,7 @@ const Requests = (props) => {
 /**
  * Component for displaying content on the Request for (book) page
  * @param {*} props     Represents the props that were passed
- * @returns   Returns the content that should be displayed
+ * @returns             Returns the content that should be displayed
  */
 const BookRequests = (props) => {
   const { bookId } = useParams();
@@ -514,7 +514,8 @@ const BookRequests = (props) => {
  * @returns   Returns the content that should be displayed
  */
 const CreateRequest = () => {
-  let [requestedBooks, setRequestedBooks] = useState([]);
+  let [requestedBooks, setRequestedBooks] = useState({});
+  console.log(requestedBooks);
 
   /**
    * Gets all requested books
@@ -534,31 +535,83 @@ const CreateRequest = () => {
         <h2 className="text-center">Create Request</h2>
       </div>
 
-      <div className="panel-body">
-        {requestedBooks.map((book) => {
-          <div className="item" id={book._id}>
-            {book.name}
-          </div>;
-        })}
+      <div className="panel-body px-2 py-3">
+        {requestedBooks.gives && requestedBooks.takes ? (
+          <div className="row w-100">
+            <div className="col-6">
+              <h5>
+                <Link to={`/users/${requestedBooks.gives[0].user._id}`}>
+                  {requestedBooks.gives[0].user.username}
+                </Link>
+                {" wants to give:"}
+              </h5>
+              <ul className="list-group">
+                {requestedBooks.gives.map((give) => {
+                  return give.book ? (
+                    <GiveTakeBooks
+                      _id={give.book._id}
+                      title={give.book.title}
+                      description={give.book.description}
+                    />
+                  ) : (
+                    ""
+                  );
+                })}
+              </ul>
+              <button className="btn btn-info mt-2">Edit Books to Give</button>
+            </div>
+            <div className="col-6">
+              <h5>and wants to take:</h5>
+              <ul className="list-group">
+                {requestedBooks.takes.map((take) => (
+                  <GiveTakeBooks
+                    _id={take.book._id}
+                    title={take.book.title}
+                    description={take.book.description}
+                    user={takes[0].user}
+                  />
+                ))}
+              </ul>
+               <button className="btn btn-info mt-2">Edit Books to Take</button>
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="panel-footer p-2">
-        <form name="Create Request" action="/requests/create" method="POST">
-          <Input
-            id="takes"
-            name="takes"
-            type="text"
-            hidden
-            required
-            value={JSON.stringify(requestedBooks)}
-          />
-          <Input id="gives" name="gives" type="text" hidden required value="" />
-          <input
-            type="submit"
-            class="btn btn-success w-100"
-            value="Submit Request"
-          />
-        </form>
+        {requestedBooks.takes ? (
+          <form name="Create Request" action="/requests/create" method="POST">
+            <input
+              id="takes"
+              name="takes"
+              type="text"
+              hidden
+              required
+              value={JSON.stringify(
+                requestedBooks.takes.map((b) => b._id) || []
+              )}
+            />
+            <input
+              id="gives"
+              name="gives"
+              type="text"
+              hidden
+              required
+              value={JSON.stringify(
+                requestedBooks.gives.map((b) => b._id) || []
+              )}
+            />
+            <input
+              type="submit"
+              class="btn btn-success w-100"
+              value="Submit Request"
+            />
+          </form>
+        ) : (
+          <SpinnerButton class="btn btn-success w-100" />
+        )}
       </div>
     </div>
   );
@@ -1998,6 +2051,39 @@ const Options = (props) => {
 };
 
 /**
+ * Component for display books that were or are to be given/taken
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const GiveTakeBooks = (props) => {
+  return (
+    <li className="list-group-item">
+      {props.requests > 0 ? (
+        <small>
+          <Link className="float-right" to={`/books/${props._id}/requests`}>
+            Requests <span className="badge">{props.requests}</span>
+          </Link>
+        </small>
+      ) : (
+        ""
+      )}
+      <h5 className="my-1">
+        {props.title}
+        {props.user ? (
+          <small>
+            <span className="text-muted"> from</span>
+            <Link to={`/users/${props.user._id}`}> {props.user.username}</Link>
+          </small>
+        ) : (
+          ""
+        )}
+      </h5>
+      <b>{props.description}</b>
+    </li>
+  );
+};
+
+/**
  * Component for displaying a list group for requests
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -2064,39 +2150,6 @@ const RequestListGroup = (props) => {
         </li>
       ))}
     </ul>
-  );
-};
-
-/**
- * Component for display books that were or are to be given/taken
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const GiveTakeBooks = (props) => {
-  return (
-    <li className="list-group-item">
-      {props.requests > 0 ? (
-        <small>
-          <Link className="float-right" to={`/books/${props._id}/requests`}>
-            Requests <span className="badge">{props.requests}</span>
-          </Link>
-        </small>
-      ) : (
-        ""
-      )}
-      <h5 className="my-1">
-        {props.title}
-        {props.user ? (
-          <small>
-            <span className="text-muted"> from</span>
-            <Link to={`/users/${props.user._id}`}> {props.user.username}</Link>
-          </small>
-        ) : (
-          ""
-        )}
-      </h5>
-      <b>{props.description}</b>
-    </li>
   );
 };
 
