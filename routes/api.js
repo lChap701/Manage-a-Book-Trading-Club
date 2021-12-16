@@ -268,7 +268,7 @@ module.exports = (app) => {
   app.route("/api/requests").get((req, res) => {
     let { traded } = req.query;
 
-    // Set to default value
+    // Sets default value
     if (!traded) traded = false;
 
     crud
