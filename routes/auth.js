@@ -149,6 +149,69 @@ module.exports = (app) => {
         });
     });
 
+  // Displays available books to select to be given/taken during trade requests
+  app.get("/requests/new/books/select", loggedOut, (req, res) => {
+    const { to } = req.query;
+
+    // Displays an error message
+    if (to != "give" && to != "take" && to) {
+      res.send("'to' should be unset or set to 'give' or 'take'");
+      return;
+    }
+
+    // Get books based on 'to'
+    const filter = to != "take" ? req.user._id : { $ne: req.user._id };
+    crud
+      .getBooks(filter)
+      .populate({ path: "user" })
+      .populate({
+        path: "requests",
+        match: { traded: { $eq: false } },
+        populate: { path: "giveBooks", populate: { path: "user" } },
+      })
+      .then((books) => {
+        // Gets only requests for books that users wish to take
+        books.forEach((book) => {
+          book.requests = book.requests.filter((request) =>
+            request.takeBooks.find((tb) => String(tb) == String(book._id))
+          );
+        });
+
+        // Checks if any books are available
+        if (!books || books.length == 0) {
+          res.send("There are currently no books available");
+          return;
+        }
+
+        books.sort((a, b) => b.bumpedOn - a.bumpedOn);
+        res.json(
+          books.map((book) => {
+            return {
+              _id: book._id,
+              title: book.title,
+              description: book.description,
+              requests: {
+                count: book.numOfRequests,
+                users: book.requests.map((request) => {
+                  return {
+                    _id: request.giveBooks[0].user._id,
+                    username: request.giveBooks[0].user.username,
+                  };
+                }),
+              },
+              user: {
+                _id: book.user._id,
+                username: book.user.username,
+                city: book.user.city || "N/A",
+                state: book.user.state || "N/A",
+                country: book.user.country || "N/A",
+              },
+            };
+          })
+        );
+      });
+  });
+
   // Routing for allowing requests to be accepted and books to be traded
   app.get("/requests/:requestId/accept/:id", loggedOut, (req, res) => {
     crud
