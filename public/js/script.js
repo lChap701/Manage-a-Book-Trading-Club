@@ -571,7 +571,7 @@ const CreateRequest = () => {
                   />
                 ))}
               </ul>
-               <button className="btn btn-info mt-2">Edit Books to Take</button>
+              <button className="btn btn-info mt-2">Edit Books to Take</button>
             </div>
           </div>
         ) : (
@@ -1945,7 +1945,7 @@ const Dropdown = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const BookListGroup = (props) => {
-  let [selectedBooks, setSelectedBooks] = useState("[]");
+  let [selectedBooks, setSelectedBooks] = useState(props.booksInUse || "[]");
 
   return (
     <div>
@@ -1971,6 +1971,9 @@ const BookListGroup = (props) => {
                   id={`book${book._id}`}
                   name={`book${book._id}`}
                   type="checkbox"
+                  checked={Boolean(
+                    JSON.parse(selectedBooks).find((sb) => sb.includes(book._id))
+                  )}
                   onChange={() => setSelectedBooks(getSelectedBooks())}
                 />
                 <label for={`book${book._id}`} className="col-10">
@@ -2046,6 +2049,101 @@ const Options = (props) => {
         <i className="bi bi-trash-fill"></i>
       </button>
     </div>
+  );
+};
+
+/**
+ * Component for displaying a form for selecting books to use for trades
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const SelectBooksForm = (props) => {
+  let [books, setBooks] = useState([]);
+
+  /**
+   * Gets books to give/take during trades and selects books that are in use
+   */
+  const getBooksToUse = useCallback(async () => {
+    let json = await callApi(
+      `${location.origin}/requests/new/books/select?to=${props.to}`,
+      "JSON"
+    );
+    setBooks(json);
+  }, []);
+
+  // Calls getBooksToUse() function once
+  useEffect(() => getBooksToUse(), []);
+
+  /**
+   * Handles form submission
+   * @param {SubmitEvent} e    Represents the event that occurred
+   */
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    try {
+      let res = await fetch("/requests/new/books", {
+        method: method,
+        body: JSON.stringify(selectedBooks),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      location.href = res.url;
+    } catch (e) {
+      alert(err.message);
+      console.error(err);
+    }
+  };
+
+  return (
+    <form
+      name={props.formName}
+      className="modal fade"
+      tabindex="-1"
+      id={props.id}
+      role="dialog"
+      aria-labelledby={`${props.id}Label`}
+      aria-hidden="true"
+      onSubmit={submitForm}
+    >
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id={`${props.id}Label`}>
+              {`${props.formName}`}
+            </h5>
+            <button
+              type="button"
+              className="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div className="modal-body">
+            <BookListGroup
+              books={books}
+              booksInUse={JSON.stringify(
+                props.booksInUse.map((sb) => `${sb._id}`)
+              )}
+            />
+          </div>
+
+          <div className="modal-footer">
+            <input type="submit" className="btn btn-primary" value="Continue" />
+            <input
+              type="button"
+              className="btn btn-danger"
+              data-dismiss="modal"
+              value="Cancel"
+            />
+          </div>
+        </div>
+      </div>
+    </form>
   );
 };
 
