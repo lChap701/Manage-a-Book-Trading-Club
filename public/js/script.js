@@ -341,7 +341,7 @@ const Books = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <BookListGroup myId={props.userId} books={books} />
+          <BookListGroup flush={true} myId={props.userId} books={books} />
         )}
       </div>
 
@@ -515,6 +515,7 @@ const BookRequests = (props) => {
  */
 const CreateRequest = () => {
   let [requestedBooks, setRequestedBooks] = useState({});
+  let [err, setErr] = useState("");
 
   /**
    * Gets all requested books
@@ -528,8 +529,29 @@ const CreateRequest = () => {
   // Calls the getRequestedBooks() function once
   useEffect(() => getRequestedBooks(), []);
 
+  /**
+   * Handles form validation and form submission
+   * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
+   */
+  const submitForm = async(e) => {
+    e.preventDefault();
+
+    // Submits the form and gets the result
+    let res = await sendData(requestedBooks);
+
+    // Checks if a new page should be displayed or if an error occurred
+    if (res.includes("http")) {
+      location.href = res;
+    } else {
+      setErr(res);
+    }
+  }
+
   return (
     <div className="panel shadow-lg">
+      {err.length > 0 ? <Alert class="alert alert-danger" msg={err} /> : ""}
+
       <div className="panel-header text-white p-1">
         <h2 className="text-center">Create Request</h2>
       </div>
@@ -546,32 +568,56 @@ const CreateRequest = () => {
               </h5>
               <ul className="list-group">
                 {requestedBooks.gives.map((give) => {
-                  return give.book ? (
+                  return give._id ? (
                     <GiveTakeBooks
-                      _id={give.book._id}
-                      title={give.book.title}
-                      description={give.book.description}
+                      _id={give._id}
+                      title={give.title}
+                      description={give.description}
                     />
                   ) : (
                     ""
                   );
                 })}
               </ul>
-              <button className="btn btn-info mt-2">Edit Books to Give</button>
+              <button
+                className="btn btn-info mt-2"
+                data-toggle="modal"
+                data-target="#giveBooksModal"
+              >
+                Edit Books to Give
+              </button>
+              <SelectBooksForm
+                id="giveBooksModal"
+                formName="Select Books to Give"
+                booksInUse={requestedBooks.gives}
+                to="give"
+              />
             </div>
             <div className="col-6">
               <h5>and wants to take:</h5>
               <ul className="list-group">
                 {requestedBooks.takes.map((take) => (
                   <GiveTakeBooks
-                    _id={take.book._id}
-                    title={take.book.title}
-                    description={take.book.description}
-                    user={takes[0].user}
+                    _id={take._id}
+                    title={take.title}
+                    description={take.description}
+                    user={requestedBooks.takes[0].user}
                   />
                 ))}
               </ul>
-              <button className="btn btn-info mt-2">Edit Books to Take</button>
+              <button
+                className="btn btn-info mt-2"
+                data-toggle="modal"
+                data-target="#takeBooksModal"
+              >
+                Edit Books to Take
+              </button>
+              <SelectBooksForm
+                id="takeBooksModal"
+                formName="Select Books to Take"
+                booksInUse={requestedBooks.takes}
+                to="take"
+              />
             </div>
           </div>
         ) : (
@@ -580,8 +626,8 @@ const CreateRequest = () => {
       </div>
 
       <div className="panel-footer p-2">
-        {requestedBooks.takes ? (
-          <form name="Create Request" action="/requests/create" method="POST">
+        {requestedBooks.gives && requestedBooks.takes ? (
+          <form name="Create Request" onSubmit={submitForm}>
             <input
               id="takes"
               name="takes"
@@ -956,7 +1002,7 @@ const MyBooks = (props) => {
             <h4 className="text-muted text-center mt-1">{msg}</h4>
           </div>
         ) : (
-          <BookListGroup myId={props.userId} books={books} />
+          <BookListGroup flush={true} myId={props.userId} books={books} />
         )}
       </div>
       <div className="panel-footer px-3 py-2">
@@ -1949,7 +1995,7 @@ const BookListGroup = (props) => {
 
   return (
     <div>
-      <ul className="list-group list-group-flush">
+      <ul className={`list-group${props.flush ? " list-group-flush" : ""}`}>
         {props.books.map((book) => {
           let location = book.user.city == "N/A" ? "" : book.user.city;
           location += book.user.state == "N/A" ? "" : " " + book.user.state;
@@ -1972,7 +2018,9 @@ const BookListGroup = (props) => {
                   name={`book${book._id}`}
                   type="checkbox"
                   checked={Boolean(
-                    JSON.parse(selectedBooks).find((sb) => sb.includes(book._id))
+                    JSON.parse(selectedBooks).find((sb) =>
+                      sb.includes(book._id)
+                    )
                   )}
                   onChange={() => setSelectedBooks(getSelectedBooks())}
                 />
@@ -2016,11 +2064,17 @@ const BookListGroup = (props) => {
                       {` ${book.user.username} `}
                     </Link>
                     {`in ${location}`}
-                    <br />
-                    {"added "}
-                    {book.createdAt
-                      ? new Date(book.createdAt).toLocaleString()
-                      : new Date(book.addedAt).toLocaleString()}
+                    {!book.createdAt && !book.addedAt ? (
+                      ""
+                    ) : (
+                      <span>
+                        <br />
+                        {"added "}
+                        {book.createdAt
+                          ? new Date(book.createdAt).toLocaleString()
+                          : new Date(book.addedAt).toLocaleString()}
+                      </span>
+                    )}
                   </small>
                 </label>
               </div>
@@ -2074,30 +2128,10 @@ const SelectBooksForm = (props) => {
   // Calls getBooksToUse() function once
   useEffect(() => getBooksToUse(), []);
 
-  /**
-   * Handles form submission
-   * @param {SubmitEvent} e    Represents the event that occurred
-   */
-  const submitForm = async (e) => {
-    e.preventDefault();
-
-    try {
-      let res = await fetch("/requests/new/books", {
-        method: method,
-        body: JSON.stringify(selectedBooks),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      location.href = res.url;
-    } catch (e) {
-      alert(err.message);
-      console.error(err);
-    }
-  };
-
   return (
     <form
+      action="/requests/new/books"
+      method="POST"
       name={props.formName}
       className="modal fade"
       tabindex="-1"
@@ -2105,7 +2139,6 @@ const SelectBooksForm = (props) => {
       role="dialog"
       aria-labelledby={`${props.id}Label`}
       aria-hidden="true"
-      onSubmit={submitForm}
     >
       <div className="modal-dialog" role="document">
         <div className="modal-content">

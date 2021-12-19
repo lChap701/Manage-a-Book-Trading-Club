@@ -17,7 +17,8 @@ module.exports = (app) => {
 
   // Routing for getting requested books during trades
   app.get("/session/books", (req, res) => {
-    if (!req.session.books) {
+    console.log(req.session.books);
+    if (!req.session.books || req.session.books.length == 0) {
       res.json({
         gives: [{ user: { _id: req.user._id, username: req.user.username } }],
         takes: [],
@@ -33,7 +34,11 @@ module.exports = (app) => {
       .then((books) => {
         res.json({
           gives: books
-            .filter((book) => req.session.books.indexOf(book._id.toString()) > -1)
+            .filter(
+              (book) =>
+                req.session.books.indexOf(book._id.toString()) > -1 &&
+                String(book.user._id) == String(req.user._id)
+            )
             .map((book) => {
               return {
                 _id: book._id,
@@ -45,8 +50,12 @@ module.exports = (app) => {
                 },
               };
             }),
-          takes: req.session.books
-            .filter((book) => req.session.books.indexOf(book) == -1)
+          takes: books
+            .filter(
+              (book) =>
+                req.session.books.indexOf(book._id.toString()) > -1 &&
+                String(book.user._id) != String(req.user._id)
+            )
             .map((book) => {
               return {
                 _id: book._id,
