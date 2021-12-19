@@ -66,8 +66,9 @@ All URL paths part of this project.
   - Displays the _createRequests.html_ file
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
-- **/requests/new/books** - Form handler for the form in **/books**
+- **/requests/new/books** - Form handler for the form in **/books** and **/books/my**
   - Redirects to **/requests/new**
+- **/requests/new/books/select** - Gets books available to be given or taken during trades
 - **/requests/:requestId/accept/:id** - Accepts requests/trades
   - When successful, redirects to **/requests**
 - **/requests/:requestId/cancel** - Cancels requests/declines trades
