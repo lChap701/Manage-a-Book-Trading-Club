@@ -33,7 +33,7 @@ module.exports = (app) => {
       .then((books) => {
         res.json({
           gives: books
-            .filter((book) => req.user.books.indexOf(book._id.toString()) > -1)
+            .filter((book) => req.session.books.indexOf(book._id.toString()) > -1)
             .map((book) => {
               return {
                 _id: book._id,
@@ -46,7 +46,7 @@ module.exports = (app) => {
               };
             }),
           takes: req.session.books
-            .filter((book) => req.user.books.indexOf(book) == -1)
+            .filter((book) => req.session.books.indexOf(book) == -1)
             .map((book) => {
               return {
                 _id: book._id,
