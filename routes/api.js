@@ -257,6 +257,7 @@ module.exports = (app) => {
                         },
                       };
                     }),
+                  requestedAt: request.requestedAt,
                 };
               })
           );
