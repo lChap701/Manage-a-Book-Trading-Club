@@ -1068,15 +1068,16 @@ const UserBooks = (props) => {
 
     try {
       const json = JSON.parse(data);
+      console.log(json);
 
       // Updates the document
       updateTitleAndMetaTags(
-        `Book Exchange - ${json.username}'s Books`,
-        `View ${json.username}'s books`,
+        `Book Exchange - ${json[0].user.username}'s Books`,
+        `View ${json[0].user.username}'s books`,
         `https://Manage-a-Book-Trading-Club.lchap701.repl.co/users/${id}/books`
       );
 
-      setUsername(json.username);
+      setUsername(json[0].user.username);
       setBooks(json);
     } catch (e) {
       // Updates the document and gets the username of the user
@@ -1119,14 +1120,11 @@ const UserBooks = (props) => {
           </div>
           <div className="panel-footer px-3 py-2">
             {props.login ? (
-              <div className="buttons">
-                <input
-                  type="submit"
-                  className="btn btn-success"
-                  value="New Request"
-                />
-                <Link className="btn btn-primary ml-2">Add Book</Link>
-              </div>
+              <input
+                type="submit"
+                className="btn btn-success"
+                value="New Request"
+              />
             ) : (
               <Link className="btn btn-success" to="/login">
                 Login to Add Books and Submit Requests

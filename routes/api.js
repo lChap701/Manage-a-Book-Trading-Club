@@ -95,7 +95,11 @@ module.exports = (app) => {
 
       crud
         .getBooks(user)
-        .populate({ path: "requests" })
+        .populate({
+          path: "requests",
+          match: { traded: { $eq: false } },
+          populate: { path: "giveBooks", populate: { path: "user" } },
+        })
         .then((books) => {
           if (!books || books.length == 0) {
             res.send("No books have been added yet");
@@ -114,7 +118,10 @@ module.exports = (app) => {
                   requests: {
                     count: book.numOfRequests,
                     users: book.requests.map((request) => {
-                      return request.giveBooks.map((gb) => gb.user);
+                      return {
+                        _id: request.giveBooks[0].user._id,
+                        username: request.giveBooks[0].user.username,
+                      };
                     }),
                   },
                   user: {
