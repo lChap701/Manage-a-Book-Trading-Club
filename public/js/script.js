@@ -534,7 +534,6 @@ const BookRequests = (props) => {
 const CreateRequest = () => {
   let [requestedBooks, setRequestedBooks] = useState({});
   let [err, setErr] = useState("");
-  console.log(requestedBooks);
 
   /**
    * Gets all requested books
