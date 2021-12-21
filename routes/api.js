@@ -25,7 +25,8 @@ module.exports = (app) => {
 
         users.sort((a, b) => b.createdAt - a.createdAt);
         res.json(
-          users.map((user) => {            return {
+          users.map((user) => {
+            return {
               _id: user._id,
               username: user.username,
               city: user.city || "N/A",
