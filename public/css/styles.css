@@ -60,13 +60,12 @@ form[name="Create Request"] {
 .panel-body {
   background: #f9f9f9;
   min-height: 100px;
-  height: auto;
-  max-height: 350px;
+  max-height: 450px;
   overflow: auto;
 }
 
-.panel-body .item {
-  margin: 0;
+.panel-body .list-group-flush .list-group-item:last-child {
+  margin-bottom: 0 !important;
 }
 
 .panel-footer {
