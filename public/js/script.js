@@ -534,7 +534,7 @@ const CreateRequest = () => {
    * @param {SubmitEvent} e   Represents the event that occurred
    * @returns                 Returns nothing or is void
    */
-  const submitForm = async(e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
 
     // Submits the form and gets the result
@@ -546,7 +546,7 @@ const CreateRequest = () => {
     } else {
       setErr(res);
     }
-  }
+  };
 
   return (
     <div className="panel shadow-lg">
@@ -1992,6 +1992,7 @@ const Dropdown = (props) => {
  */
 const BookListGroup = (props) => {
   let [selectedBooks, setSelectedBooks] = useState(props.booksInUse || "[]");
+  console.log(props);
 
   return (
     <div>
