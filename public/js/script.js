@@ -2054,22 +2054,14 @@ const BookListGroup = (props) => {
                 />
                 <label for={`book${book._id}`} className="col-10">
                   {book.requests.count > 0 ? (
-                    <Link
-                      className="float-right"
-                      to={`/books/${book._id}/requests`}
-                    >
-                      <b>Requests </b>
-                      <span className="badge  badge-primary">
-                        {book.requests.count}
-                      </span>
-                    </Link>
-                  ) : (
-                    ""
-                  )}
-                  <h5 className="my-1">{book.title}</h5>
-                  <b className="d-block">{book.description}</b>
-                  {book.requests.count > 0 ? (
                     <span className="float-right">
+                      <Link to={`/books/${book._id}/requests`}>
+                        <b>Requests </b>
+                        <span className="badge badge-primary">
+                          {book.requests.count}
+                        </span>
+                      </Link>
+                      <br />
                       {"("}
                       {book.requests.users.map((user, i) => {
                         return (
@@ -2088,6 +2080,8 @@ const BookListGroup = (props) => {
                   ) : (
                     ""
                   )}
+                  <h5 className="my-1">{book.title}</h5>
+                  <b className="d-block">{book.description}</b>
                   <small className="text-muted">
                     from
                     <Link to={`/users/${book.user._id}`}>
