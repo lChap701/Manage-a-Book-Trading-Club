@@ -398,7 +398,6 @@ const Requests = (props) => {
    */
   const getSuccess = async () => {
     let data = await callApi(`${location.origin}/session/success`);
-    console.log(data);
     setSuccess(data);
   };
 
