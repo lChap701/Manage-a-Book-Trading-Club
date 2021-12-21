@@ -2271,7 +2271,7 @@ const RequestListGroup = (props) => {
                     title={take.book.title}
                     description={take.book.description}
                     requests={take.book.requests}
-                    user={take[0].user}
+                    user={request.takes[0].user}
                   />
                 ))}
               </ul>
