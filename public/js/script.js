@@ -12,17 +12,6 @@ const {
 const Router = BrowserRouter;
 
 /**
- * Gets the selected books and adds them to the form
- * @returns   Returns the selected books in JSON
- */
-function getSelectedBooks() {
-  let books = [
-    ...document.querySelectorAll("input[type='checkbox']:checked"),
-  ].map((input) => input.id);
-  return JSON.stringify(books);
-}
-
-/**
  * Makes an API call
  * @param {string} url    Represents the API URL path
  * @param {string} type   Represents the type of data that is returned (default is 'text')
@@ -1068,7 +1057,6 @@ const UserBooks = (props) => {
 
     try {
       const json = JSON.parse(data);
-      console.log(json);
 
       // Updates the document
       updateTitleAndMetaTags(
@@ -2021,6 +2009,17 @@ const Dropdown = (props) => {
  */
 const BookListGroup = (props) => {
   let [selectedBooks, setSelectedBooks] = useState(props.booksInUse || "[]");
+
+  /**
+   * Gets the selected books and adds them to the form
+   * @returns   Returns the selected books in JSON
+   */
+  const getSelectedBooks = () => {
+    let books = [
+      ...document.querySelectorAll("input[type='checkbox']:checked"),
+    ].map((input) => input.id);
+    return JSON.stringify(books);
+  };
 
   return (
     <div>
