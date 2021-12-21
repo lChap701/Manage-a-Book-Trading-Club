@@ -711,7 +711,7 @@ const Trades = () => {
       </div>
 
       <div className="panel-body p-4">
-        {msg.length > 0 ? (
+        {msg.length > 0 && trades.length == 0 ? (
           <h4 className="text-muted text-center mt-2">{msg}</h4>
         ) : (
           <TradeListGroup trades={trades} />
@@ -2317,49 +2317,51 @@ const TradeListGroup = (props) => {
   return (
     <ul className="list-group">
       {props.trades.map((trade) => {
-        <li className="list-group-item no-bg pb-4">
-          <small className="d-block mb-2">
-            <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
-          </small>
-          <div className="row">
-            <div className="col-6">
-              <h6>
-                <Link to={`/users/${trade.takes[0].user._id}`}>
-                  {trade.takes[0].user.username}
-                </Link>
-                {" received:"}
-              </h6>
-              <ul className="list-group">
-                {trade.takes.map((take) => (
-                  <GiveTakeBooks
-                    _id={take.book._id}
-                    title={take.book.title}
-                    description={take.book.description}
-                    requests={take.book.requests}
-                  />
-                ))}
-              </ul>
+        return (
+          <li className="list-group-item no-bg pb-4">
+            <small className="d-block mb-2">
+              <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
+            </small>
+            <div className="row">
+              <div className="col-6">
+                <h6>
+                  <Link to={`/users/${trade.takes[0].user._id}`}>
+                    {trade.takes[0].user.username}
+                  </Link>
+                  {" received:"}
+                </h6>
+                <ul className="list-group">
+                  {trade.takes.map((take) => (
+                    <GiveTakeBooks
+                      _id={take.book._id}
+                      title={take.book.title}
+                      description={take.book.description}
+                      requests={take.book.requests}
+                    />
+                  ))}
+                </ul>
+              </div>
+              <div className="col-6">
+                <h6>
+                  <Link to={`/users/${trade.gives[0].user._id}`}>
+                    {trade.gives[0].user.username}
+                  </Link>
+                  {" received:"}
+                </h6>
+                <ul className="list-group">
+                  {trade.gives.map((give) => (
+                    <GiveTakeBooks
+                      _id={give.book._id}
+                      title={give.book.title}
+                      description={give.book.description}
+                      requests={give.book.requests}
+                    />
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="col-6">
-              <h6>
-                <Link to={`/users/${trade.gives[0].user._id}`}>
-                  {trade.gives[0].user.username}
-                </Link>
-                {" received:"}
-              </h6>
-              <ul className="list-group">
-                {trade.gives.map((give) => (
-                  <GiveTakeBooks
-                    _id={give.book._id}
-                    title={give.book.title}
-                    description={give.book.description}
-                    requests={give.book.requests}
-                  />
-                ))}
-              </ul>
-            </div>
-          </div>
-        </li>;
+          </li>
+        );
       })}
     </ul>
   );
