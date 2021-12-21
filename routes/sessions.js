@@ -78,6 +78,8 @@ module.exports = (app) => {
     if (req.session.success) {
       req.session.success = false;
       res.send(req.flash("success")[0]);
+    } else {
+      res.send("");
     }
   });
 };

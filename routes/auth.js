@@ -135,7 +135,7 @@ module.exports = (app) => {
               request.save();
 
               // Removes books from session
-              //delete req.sesssion.books;
+              delete req.session.books;
 
               // Displays success message
               req.flash("success", "Created Request");

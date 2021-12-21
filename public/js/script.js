@@ -377,6 +377,7 @@ const Books = (props) => {
 const Requests = (props) => {
   let [requests, setRequests] = useState([]);
   let [msg, setMsg] = useState("");
+  let [success, setSuccess] = useState("");
 
   /**
    * Gets all requests
@@ -386,38 +387,55 @@ const Requests = (props) => {
 
     try {
       setRequests(JSON.parse(data));
+      getSuccess();
     } catch (e) {
       setMsg(data);
     }
   }, []);
 
+  /**
+   * Gets success messages
+   */
+  const getSuccess = async () => {
+    let data = await callApi(`${location.origin}/session/success`);
+    console.log(data);
+    setSuccess(data);
+  };
+
   // Calls the getRequests() function once
   useEffect(() => getRequests(), []);
 
   return (
-    <div className="panel shadow-lg">
-      <div className="panel-header text-white p-1">
-        <h2 className="text-center">All Requests</h2>
-      </div>
+    <div>
+      {success.length > 0 ? (
+        <Alert class="alert alert-success" msg={success} />
+      ) : (
+        ""
+      )}
+      <div className="panel shadow-lg">
+        <div className="panel-header text-white p-1">
+          <h2 className="text-center">All Requests</h2>
+        </div>
 
-      <div className="panel-body p-4">
-        {msg.length > 0 ? (
-          <h4 className="text-muted text-center mt-2">{msg}</h4>
-        ) : (
-          <RequestListGroup requests={requests} myId={props.userId} />
-        )}
-      </div>
+        <div className="panel-body p-4">
+          {msg.length > 0 ? (
+            <h4 className="text-muted text-center mt-2">{msg}</h4>
+          ) : (
+            <RequestListGroup requests={requests} myId={props.userId} />
+          )}
+        </div>
 
-      <div className="panel-footer px-3 py-2">
-        {props.login ? (
-          <Link className="btn btn-success" to="/requests/new">
-            New Request
-          </Link>
-        ) : (
-          <Link className="btn btn-success" to="/login">
-            Login to Submit Requests
-          </Link>
-        )}
+        <div className="panel-footer px-3 py-2">
+          {props.login ? (
+            <Link className="btn btn-success" to="/requests/new">
+              New Request
+            </Link>
+          ) : (
+            <Link className="btn btn-success" to="/login">
+              Login to Submit Requests
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -516,6 +534,7 @@ const BookRequests = (props) => {
 const CreateRequest = () => {
   let [requestedBooks, setRequestedBooks] = useState({});
   let [err, setErr] = useState("");
+  console.log(requestedBooks);
 
   /**
    * Gets all requested books
@@ -538,7 +557,10 @@ const CreateRequest = () => {
     e.preventDefault();
 
     // Submits the form and gets the result
-    let res = await sendData(requestedBooks);
+    let res = await sendData({
+      gives: JSON.parse(document.querySelector("input#gives").value),
+      takes: JSON.parse(document.querySelector("input#takes").value),
+    });
 
     // Checks if a new page should be displayed or if an error occurred
     if (res.includes("http")) {
@@ -549,114 +571,116 @@ const CreateRequest = () => {
   };
 
   return (
-    <div className="panel shadow-lg">
+    <div>
       {err.length > 0 ? <Alert class="alert alert-danger" msg={err} /> : ""}
 
-      <div className="panel-header text-white p-1">
-        <h2 className="text-center">Create Request</h2>
-      </div>
+      <div className="panel shadow-lg">
+        <div className="panel-header text-white p-1">
+          <h2 className="text-center">Create Request</h2>
+        </div>
 
-      <div className="panel-body px-2 py-3">
-        {requestedBooks.gives && requestedBooks.takes ? (
-          <div className="row w-100">
-            <div className="col-6">
-              <h5>
-                <Link to={`/users/${requestedBooks.gives[0].user._id}`}>
-                  {requestedBooks.gives[0].user.username}
-                </Link>
-                {" wants to give:"}
-              </h5>
-              <ul className="list-group">
-                {requestedBooks.gives.map((give) => {
-                  return give._id ? (
+        <div className="panel-body px-2 py-3">
+          {requestedBooks.gives && requestedBooks.takes ? (
+            <div className="row w-100">
+              <div className="col-6">
+                <h5>
+                  <Link to={`/users/${requestedBooks.gives[0].user._id}`}>
+                    {requestedBooks.gives[0].user.username}
+                  </Link>
+                  {" wants to give:"}
+                </h5>
+                <ul className="list-group">
+                  {requestedBooks.gives.map((give) => {
+                    return give._id ? (
+                      <GiveTakeBooks
+                        _id={give._id}
+                        title={give.title}
+                        description={give.description}
+                      />
+                    ) : (
+                      ""
+                    );
+                  })}
+                </ul>
+                <button
+                  className="btn btn-info mt-2"
+                  data-toggle="modal"
+                  data-target="#giveBooksModal"
+                >
+                  Edit Books to Give
+                </button>
+                <SelectBooksForm
+                  id="giveBooksModal"
+                  formName="Select Books to Give"
+                  booksInUse={requestedBooks.gives}
+                  to="give"
+                />
+              </div>
+              <div className="col-6">
+                <h5>and wants to take:</h5>
+                <ul className="list-group">
+                  {requestedBooks.takes.map((take) => (
                     <GiveTakeBooks
-                      _id={give._id}
-                      title={give.title}
-                      description={give.description}
+                      _id={take._id}
+                      title={take.title}
+                      description={take.description}
+                      user={requestedBooks.takes[0].user}
                     />
-                  ) : (
-                    ""
-                  );
-                })}
-              </ul>
-              <button
-                className="btn btn-info mt-2"
-                data-toggle="modal"
-                data-target="#giveBooksModal"
-              >
-                Edit Books to Give
-              </button>
-              <SelectBooksForm
-                id="giveBooksModal"
-                formName="Select Books to Give"
-                booksInUse={requestedBooks.gives}
-                to="give"
-              />
+                  ))}
+                </ul>
+                <button
+                  className="btn btn-info mt-2"
+                  data-toggle="modal"
+                  data-target="#takeBooksModal"
+                >
+                  Edit Books to Take
+                </button>
+                <SelectBooksForm
+                  id="takeBooksModal"
+                  formName="Select Books to Take"
+                  booksInUse={requestedBooks.takes}
+                  to="take"
+                />
+              </div>
             </div>
-            <div className="col-6">
-              <h5>and wants to take:</h5>
-              <ul className="list-group">
-                {requestedBooks.takes.map((take) => (
-                  <GiveTakeBooks
-                    _id={take._id}
-                    title={take.title}
-                    description={take.description}
-                    user={requestedBooks.takes[0].user}
-                  />
-                ))}
-              </ul>
-              <button
-                className="btn btn-info mt-2"
-                data-toggle="modal"
-                data-target="#takeBooksModal"
-              >
-                Edit Books to Take
-              </button>
-              <SelectBooksForm
-                id="takeBooksModal"
-                formName="Select Books to Take"
-                booksInUse={requestedBooks.takes}
-                to="take"
-              />
-            </div>
-          </div>
-        ) : (
-          ""
-        )}
-      </div>
+          ) : (
+            ""
+          )}
+        </div>
 
-      <div className="panel-footer p-2">
-        {requestedBooks.gives && requestedBooks.takes ? (
-          <form name="Create Request" onSubmit={submitForm}>
-            <input
-              id="takes"
-              name="takes"
-              type="text"
-              hidden
-              required
-              value={JSON.stringify(
-                requestedBooks.takes.map((b) => b._id) || []
-              )}
-            />
-            <input
-              id="gives"
-              name="gives"
-              type="text"
-              hidden
-              required
-              value={JSON.stringify(
-                requestedBooks.gives.map((b) => b._id) || []
-              )}
-            />
-            <input
-              type="submit"
-              class="btn btn-success w-100"
-              value="Submit Request"
-            />
-          </form>
-        ) : (
-          <SpinnerButton class="btn btn-success w-100" />
-        )}
+        <div className="panel-footer p-2">
+          {requestedBooks.gives && requestedBooks.takes ? (
+            <form name="Create Request" onSubmit={submitForm}>
+              <input
+                id="takes"
+                name="takes"
+                type="text"
+                hidden
+                value={JSON.stringify(
+                  requestedBooks.takes.map((b) => b._id) || []
+                )}
+              />
+              <input
+                id="gives"
+                name="gives"
+                type="text"
+                hidden
+                value={JSON.stringify(
+                  requestedBooks.gives
+                    .filter((b) => b.hasOwnProperty("_id"))
+                    .map((b) => b._id) || []
+                )}
+              />
+              <input
+                type="submit"
+                class="btn btn-success w-100"
+                value="Submit Request"
+              />
+            </form>
+          ) : (
+            <SpinnerButton class="btn btn-success w-100" />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1433,92 +1457,94 @@ class AccountForm extends React.Component {
 
   render() {
     return (
-      <form
-        onSubmit={this.submitForm}
-        className="panel shadow-lg"
-        name={this.props.formName}
-        novalidate="true"
-      >
+      <div>
         {this.state.errs[3] != "" ? (
           <Alert class="alert alert-danger" msg={this.state.errs[3]} />
         ) : (
           ""
         )}
 
-        <div className="panel-header text-white p-1">
-          <h2 className="text-center">{this.props.formName}</h2>
-        </div>
-
-        {this.props.formName == "Login" ? (
-          <LoginFormLayout
-            username={this.state.username}
-            saveUsername={this.saveUsername}
-            password={this.state.password}
-            savePassword={this.savePassword}
-            errs={this.state.errs}
-          />
-        ) : (
-          <AccountFormLayout
-            username={this.state.username}
-            saveUsername={this.saveUsername}
-            password={this.state.password}
-            savePassword={this.savePassword}
-            errs={this.state.errs}
-            email={this.state.email}
-            saveEmail={this.saveEmail}
-            name={this.state.name}
-            saveName={this.saveName}
-            address={this.state.address}
-            addressOpts={this.state.options.addresses}
-            saveAddress={this.saveAddress}
-            city={this.state.city}
-            cityOpts={this.state.options.cities}
-            saveCity={this.saveCity}
-            state={this.state.state}
-            stateOpts={this.state.options.states}
-            saveState={this.saveState}
-            country={this.state.country}
-            countryOpts={this.state.options.countries}
-            saveCountry={this.saveCountry}
-            zipPostal={this.state.zipPostal}
-            zipPostalOpts={this.state.options.zipPostalCodes}
-            saveZipPostalCode={this.saveZipPostalCode}
-            hidePassword={this.props.formName == "Edit Profile"}
-            loaded={
-              this.state.options.states.length > 0 &&
-              this.state.options.countries.length > 0
-            }
-          />
-        )}
-
-        <div className="panel-footer px-3 py-2">
-          {(this.state.options.states.length > 0 &&
-            this.state.options.countries.length > 0) ||
-          this.props.formName == "Login" ? (
-            <input
-              className="btn btn-success w-100"
-              type="submit"
-              value={
-                this.props.formName == "Edit Profile"
-                  ? "Update Profile"
-                  : this.props.formName
-              }
-            />
-          ) : (
-            <SpinnerButton class="btn btn-success w-100" />
-          )}
+        <form
+          onSubmit={this.submitForm}
+          className="panel shadow-lg"
+          name={this.props.formName}
+          novalidate="true"
+        >
+          <div className="panel-header text-white p-1">
+            <h2 className="text-center">{this.props.formName}</h2>
+          </div>
 
           {this.props.formName == "Login" ? (
-            <div className="mt-2">
-              <Link className="text-white" to="/signup">
-                Sign Up
-              </Link>
-            </div>
+            <LoginFormLayout
+              username={this.state.username}
+              saveUsername={this.saveUsername}
+              password={this.state.password}
+              savePassword={this.savePassword}
+              errs={this.state.errs}
+            />
           ) : (
-            ""
+            <AccountFormLayout
+              username={this.state.username}
+              saveUsername={this.saveUsername}
+              password={this.state.password}
+              savePassword={this.savePassword}
+              errs={this.state.errs}
+              email={this.state.email}
+              saveEmail={this.saveEmail}
+              name={this.state.name}
+              saveName={this.saveName}
+              address={this.state.address}
+              addressOpts={this.state.options.addresses}
+              saveAddress={this.saveAddress}
+              city={this.state.city}
+              cityOpts={this.state.options.cities}
+              saveCity={this.saveCity}
+              state={this.state.state}
+              stateOpts={this.state.options.states}
+              saveState={this.saveState}
+              country={this.state.country}
+              countryOpts={this.state.options.countries}
+              saveCountry={this.saveCountry}
+              zipPostal={this.state.zipPostal}
+              zipPostalOpts={this.state.options.zipPostalCodes}
+              saveZipPostalCode={this.saveZipPostalCode}
+              hidePassword={this.props.formName == "Edit Profile"}
+              loaded={
+                this.state.options.states.length > 0 &&
+                this.state.options.countries.length > 0
+              }
+            />
           )}
-        </div>
-      </form>
+
+          <div className="panel-footer px-3 py-2">
+            {(this.state.options.states.length > 0 &&
+              this.state.options.countries.length > 0) ||
+            this.props.formName == "Login" ? (
+              <input
+                className="btn btn-success w-100"
+                type="submit"
+                value={
+                  this.props.formName == "Edit Profile"
+                    ? "Update Profile"
+                    : this.props.formName
+                }
+              />
+            ) : (
+              <SpinnerButton class="btn btn-success w-100" />
+            )}
+
+            {this.props.formName == "Login" ? (
+              <div className="mt-2">
+                <Link className="text-white" to="/signup">
+                  Sign Up
+                </Link>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+        </form>
+      </div>
     );
   }
 }
