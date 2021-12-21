@@ -17,7 +17,6 @@ module.exports = (app) => {
 
   // Routing for getting requested books during trades
   app.get("/session/books", (req, res) => {
-    console.log(req.session.books);
     if (!req.session.books || req.session.books.length == 0) {
       res.json({
         gives: [{ user: { _id: req.user._id, username: req.user.username } }],
