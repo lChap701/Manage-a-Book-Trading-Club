@@ -97,12 +97,7 @@ module.exports = (app) => {
   app
     .route("/requests/new")
     .get(loggedOut, (req, res) => {
-      if (req.session.error) {
-        req.session.error = false;
-        res.send(req.flash("error")[0]);
-      } else {
-        res.sendFile(process.cwd() + "/public/createRequests.html");
-      }
+      res.sendFile(process.cwd() + "/public/createRequests.html");
     })
     .post((req, res) => {
       const { gives, takes } = req.body;
@@ -139,6 +134,10 @@ module.exports = (app) => {
               request.requestedAt = new Date();
               request.save();
 
+              // Removes books from session
+              //delete req.sesssion.books;
+
+              // Displays success message
               req.flash("success", "Created Request");
               req.session.success = true;
               res.redirect("/requests");

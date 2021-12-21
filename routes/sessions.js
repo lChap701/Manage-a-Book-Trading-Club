@@ -31,24 +31,27 @@ module.exports = (app) => {
       .where("_id")
       .in(req.session.books)
       .then((books) => {
+        let giveBooks = books.filter(
+          (book) =>
+            req.session.books.indexOf(book._id.toString()) > -1 &&
+            String(book.user._id) == String(req.user._id)
+        );
+
         res.json({
-          gives: books
-            .filter(
-              (book) =>
-                req.session.books.indexOf(book._id.toString()) > -1 &&
-                String(book.user._id) == String(req.user._id)
-            )
-            .map((book) => {
-              return {
-                _id: book._id,
-                title: book.title,
-                description: book.description,
-                user: {
-                  _id: book.user._id,
-                  username: book.user.username,
-                },
-              };
-            }),
+          gives:
+            giveBooks.length == 0
+              ? [{ user: { _id: req.user._id, username: req.user.username } }]
+              : giveBooks.map((book) => {
+                  return {
+                    _id: book._id,
+                    title: book.title,
+                    description: book.description,
+                    user: {
+                      _id: book.user._id,
+                      username: book.user.username,
+                    },
+                  };
+                }),
           takes: books
             .filter(
               (book) =>
