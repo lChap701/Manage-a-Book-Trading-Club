@@ -783,7 +783,7 @@ const Users = () => {
                   <br />
                   <b>Joined:</b> {new Date(user.createdAt).toLocaleString()}
                 </p>
-                {user.books.length > 0 ? (
+                {user.books > 0 ? (
                   <span className="badge badge-info badge-pill p-2 mr-2">
                     {user.books == 1
                       ? `${user.books} Book`
@@ -792,7 +792,7 @@ const Users = () => {
                 ) : (
                   ""
                 )}
-                {user.incomingRequests.length > 0 ? (
+                {user.incomingRequests > 0 ? (
                   <span className="badge badge-warning badge-pill p-2">
                     {user.incomingRequests == 1
                       ? `${user.incomingRequests} Incoming Request`

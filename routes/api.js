@@ -16,7 +16,7 @@ module.exports = (app) => {
   app.get("/api/users", (req, res) => {
     crud
       .getUsers()
-      .populate({ path: "books" })
+      .populate({ path: "books", select: "numOfRequests" })
       .then((users) => {
         if (!users || users.length == 0) {
           res.send("There are currently no users available");
@@ -25,8 +25,7 @@ module.exports = (app) => {
 
         users.sort((a, b) => b.createdAt - a.createdAt);
         res.json(
-          users.map((user) => {
-            return {
+          users.map((user) => {            return {
               _id: user._id,
               username: user.username,
               city: user.city || "N/A",
@@ -35,9 +34,7 @@ module.exports = (app) => {
               books: user.books.length,
               incomingRequests:
                 user.books.length > 0
-                  ? user.books.reduce(
-                      (b1, b2) => b1.numOfRequests + b2.numOfRequests
-                    )
+                  ? user.books.reduce((acc, b) => acc + b.numOfRequests, 0)
                   : 0,
               createdAt: user.createdAt,
             };
