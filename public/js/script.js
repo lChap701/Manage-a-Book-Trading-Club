@@ -2055,7 +2055,9 @@ const BookListGroup = (props) => {
                       to={`/books/${book._id}/requests`}
                     >
                       <b>Requests </b>
-                      <span className="badge">{book.requests.count}</span>
+                      <span className="badge  badge-primary">
+                        {book.requests.count}
+                      </span>
                     </Link>
                   ) : (
                     ""
@@ -2215,7 +2217,8 @@ const GiveTakeBooks = (props) => {
       {props.requests > 0 ? (
         <small>
           <Link className="float-right" to={`/books/${props._id}/requests`}>
-            Requests <span className="badge">{props.requests}</span>
+            Requests{" "}
+            <span className="badge badge-primary">{props.requests}</span>
           </Link>
         </small>
       ) : (
@@ -2246,11 +2249,11 @@ const RequestListGroup = (props) => {
   return (
     <ul className="list-group">
       {props.requests.map((request) => (
-        <li className="list-group-item no-bg">
-          <div className="row w-100">
-            <small className="d-block">
+        <li className="list-group-item no-bg pb-4">
+          <small className="d-block mb-2">
               <b>Requested</b>: {new Date(request.requestedAt).toLocaleString()}
             </small>
+          <div className="row">
             {request.gives[0].user._id == props.myId ? (
               <Link
                 className="text-danger request-link"
@@ -2316,11 +2319,11 @@ const TradeListGroup = (props) => {
   return (
     <ul className="list-group">
       {props.trades.map((trade) => {
-        <li className="list-group-item no-bg">
-          <div className="row w-100">
-            <small className="d-block">
+        <li className="list-group-item no-bg pb-4">
+          <small className="d-block mb-2">
               <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
             </small>
+          <div className="row">
             <div className="col-6">
               <h6>
                 <Link to={`/users/${trade.takes[0].user._id}`}>

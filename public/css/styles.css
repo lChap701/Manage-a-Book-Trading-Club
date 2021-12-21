@@ -96,8 +96,8 @@ form[name="Create Request"] {
 
 .request-link {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0.75rem;
+  right: 1.25rem;
 }
 
 .options {
