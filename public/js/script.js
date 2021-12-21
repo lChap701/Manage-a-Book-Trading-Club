@@ -499,30 +499,36 @@ const BookRequests = (props) => {
   useEffect(() => getRequestsForBook(), []);
 
   return (
-    <div className="panel shadow-lg">
-      <div className="panel-header text-white p-1">
-        <h2 className="text-center">Requests for {bookTitle}</h2>
-      </div>
+    <div>
+      {props.userId.length == 0 ? (
+        <Spinner />
+      ) : (
+        <div className="panel shadow-lg">
+          <div className="panel-header text-white p-1">
+            <h2 className="text-center">Requests for {bookTitle}</h2>
+          </div>
 
-      <div className="panel-body p-4">
-        {msg.length > 0 ? (
-          <h4 className="text-muted text-center mt-2">{msg}</h4>
-        ) : (
-          <RequestListGroup requests={requests} myId={props.userId} />
-        )}
-      </div>
+          <div className="panel-body p-4">
+            {msg.length > 0 ? (
+              <h4 className="text-muted text-center mt-2">{msg}</h4>
+            ) : (
+              <RequestListGroup requests={requests} myId={props.userId} />
+            )}
+          </div>
 
-      <div className="panel-footer px-3 py-2">
-        {props.login ? (
-          <Link className="btn btn-success" to="/requests/new">
-            New Request
-          </Link>
-        ) : (
-          <Link className="btn btn-success" to="/login">
-            Login to Submit Requests
-          </Link>
-        )}
-      </div>
+          <div className="panel-footer px-3 py-2">
+            {props.login ? (
+              <Link className="btn btn-success" to="/requests/new">
+                New Request
+              </Link>
+            ) : (
+              <Link className="btn btn-success" to="/login">
+                Login to Submit Requests
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -2252,8 +2258,8 @@ const RequestListGroup = (props) => {
       {props.requests.map((request) => (
         <li className="list-group-item no-bg pb-4">
           <small className="d-block mb-2">
-              <b>Requested</b>: {new Date(request.requestedAt).toLocaleString()}
-            </small>
+            <b>Requested</b>: {new Date(request.requestedAt).toLocaleString()}
+          </small>
           <div className="row">
             {request.gives[0].user._id == props.myId ? (
               <Link
@@ -2322,8 +2328,8 @@ const TradeListGroup = (props) => {
       {props.trades.map((trade) => {
         <li className="list-group-item no-bg pb-4">
           <small className="d-block mb-2">
-              <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
-            </small>
+            <b>Traded</b>: {new Date(trade.tradedAt).toLocaleString()}
+          </small>
           <div className="row">
             <div className="col-6">
               <h6>
