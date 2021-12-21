@@ -41,12 +41,6 @@ form[name="Create Request"] {
   margin: 20px auto 0;
 }
 
-.panel.scroll {
-  height: auto;
-  max-height: 475px;
-  overflow: auto;
-}
-
 .panel-header,
 .panel-footer {
   background: #3496ff;
@@ -66,6 +60,9 @@ form[name="Create Request"] {
 .panel-body {
   background: #f9f9f9;
   min-height: 100px;
+  height: auto;
+  max-height: 350px;
+  overflow: auto;
 }
 
 .panel-body .item {

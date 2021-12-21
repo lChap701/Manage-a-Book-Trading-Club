@@ -329,7 +329,7 @@ const Books = (props) => {
     <form
       action="/requests/new/books"
       method="POST"
-      className="panel scroll shadow-lg"
+      className="panel shadow-lg"
     >
       <div className="panel-header text-white p-1">
         <h2 className="text-center">Books</h2>
@@ -395,7 +395,7 @@ const Requests = (props) => {
   useEffect(() => getRequests(), []);
 
   return (
-    <div className="panel scroll shadow-lg">
+    <div className="panel shadow-lg">
       <div className="panel-header text-white p-1">
         <h2 className="text-center">All Requests</h2>
       </div>
@@ -481,7 +481,7 @@ const BookRequests = (props) => {
   useEffect(() => getRequestsForBook(), []);
 
   return (
-    <div className="panel scroll shadow-lg">
+    <div className="panel shadow-lg">
       <div className="panel-header text-white p-1">
         <h2 className="text-center">Requests for {bookTitle}</h2>
       </div>
@@ -687,7 +687,7 @@ const Trades = () => {
   useEffect(() => getTrades(), []);
 
   return (
-    <div className="panel scroll shadow-lg">
+    <div className="panel shadow-lg">
       <div className="panel-header text-white p-1">
         <h2 className="text-center">All Trades</h2>
       </div>
@@ -728,7 +728,7 @@ const Users = () => {
   useEffect(() => getUsers(), []);
 
   return (
-    <div className="panel shadow-lg scroll my-3">
+    <div className="panel shadow-lg my-3">
       <div className="panel-header text-white p-2">
         <h2>Users</h2>
       </div>
@@ -1992,7 +1992,6 @@ const Dropdown = (props) => {
  */
 const BookListGroup = (props) => {
   let [selectedBooks, setSelectedBooks] = useState(props.booksInUse || "[]");
-  console.log(props);
 
   return (
     <div>
