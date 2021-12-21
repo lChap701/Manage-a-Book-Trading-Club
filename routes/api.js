@@ -120,9 +120,9 @@ module.exports = (app) => {
                   user: {
                     _id: user._id,
                     username: user.username,
-                    city: user.city,
-                    state: user.state,
-                    country: user.country,
+                    city: user.city || "N/A",
+                    state: user.state || "N/A",
+                    country: user.country || "N/A",
                   },
                 };
               })
