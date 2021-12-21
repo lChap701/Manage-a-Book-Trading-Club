@@ -448,7 +448,7 @@ const Requests = (props) => {
 const BookRequests = (props) => {
   const { bookId } = useParams();
   let [requests, setRequests] = useState([]);
-  let [bookTitle, setBookTitle] = useState("Unknown Book");
+  let [bookTitle, setBookTitle] = useState("");
   let [msg, setMsg] = useState("");
 
   /**
@@ -475,8 +475,8 @@ const BookRequests = (props) => {
         // Gets the title of the book
         let title = "";
         json.forEach((obj) => {
-          let result = obj.takes.find((book) => book._id == bookId);
-          if (result) title = result.title;
+          let result = obj.takes.find((b) => b.book._id == bookId);
+          if (result) title = result.book.title;
         });
 
         // Updates the document
@@ -491,6 +491,7 @@ const BookRequests = (props) => {
       }
     } catch (e) {
       setMsg(data);
+      setBookTitle("Unknown Book");
     }
   }, []);
 
