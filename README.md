@@ -71,9 +71,15 @@ All URL paths part of this project.
 - **/requests/new/books** - Form handler for the main form in **/books** and **/books/my**
   - Redirects to **/requests/new**
 - **/requests/new/books/select** - Gets books available to be given or taken during trades
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
 - **/requests/:requestId/accept/:id** - Accepts requests/trades
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
   - When successful, redirects to **/requests**
 - **/requests/:requestId/cancel** - Cancels requests/declines trades
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
   - When successful, redirects to **/requests**
 
 ### Trades Path
@@ -99,7 +105,9 @@ All URL paths part of this project.
 ### Login and Signup Paths
 
 - **/login** - Allows users to login
+  - Redirects to **/books** when the user is logged in
 - **/signup** - Allows users to create accounts
+  - Redirects to **/books** when the user is logged in
 
 ### OAuth Paths
 
