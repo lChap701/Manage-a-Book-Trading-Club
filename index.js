@@ -104,6 +104,59 @@ app.get("/books/:bookId/requests", (req, res) => {
   });
 });
 
+// Form handler for the Edit Book form/modal
+app.put("/books/:bookId/update", (req, res) => {
+  crud.getUser(req.body.user).then((user) => {
+    if (!user) {
+      res.send("Unknown user");
+      return;
+    }
+
+    if (user.books.indexOf(req.params.bookId) == -1) {
+      res.send("User doesn't have book " + req.params.bookId);
+      return;
+    }
+
+    crud
+      .updateBook(req.params.bookId, {
+        title: req.body.title,
+        description: req.body.description,
+      })
+      .then(() => res.send("success"))
+      .catch((ex) => {
+        let error = "Title must be unique";
+
+        if (ex.errors) {
+          Object.keys(ex.errors).forEach((field) => {
+            if (ex.errors[field]) error = ex.errors[field].message;
+          });
+        }
+
+        res.send(error);
+      });
+  });
+});
+
+// Form handler for the Delete Book form/modal
+app.put("/books/:bookId/delete", (req, res) => {
+  crud.getUser(req.body.user).then((user) => {
+    if (!user) {
+      res.send("Unknown user");
+      return;
+    }
+
+    if (user.books.indexOf(req.params.bookId) == -1) {
+      res.send("User doesn't have book " + req.params.bookId);
+      return;
+    }
+
+    crud
+      .deleteBook(req.params.bookId)
+      .then(() => res.send("success"))
+      .catch((ex) => res.send(ex.message));
+  });
+});
+
 // Displays the Book Exchange - All Requests Page
 app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
