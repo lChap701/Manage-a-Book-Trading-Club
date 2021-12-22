@@ -1888,7 +1888,8 @@ class BookForm extends React.Component {
                 id="title"
                 label="Title"
                 type="text"
-                required
+                required={!Boolean(this.props.readonly)}
+                readonly={Boolean(this.props.readonly)}
                 value={this.state.title}
                 onChange={this.saveTitle}
                 validator="titleFeedback"
@@ -1901,7 +1902,8 @@ class BookForm extends React.Component {
                 label="Description"
                 type="text"
                 placeholder="Author, condition..."
-                required
+                required={!Boolean(this.props.readonly)}
+                readonly={Boolean(this.props.readonly)}
                 value={this.state.description}
                 onChange={this.saveDescription}
                 validator="descFeedback"
@@ -2102,7 +2104,15 @@ const BookListGroup = (props) => {
                   </small>
                 </label>
               </div>
-              {props.myId == book.user._id ? <Options type="books" /> : ""}
+              {props.myId == book.user._id ? (
+                <Options
+                  myId={props.myId}
+                  title={book.title}
+                  description={book.description}
+                />
+              ) : (
+                ""
+              )}
             </li>
           );
         })}
@@ -2113,19 +2123,44 @@ const BookListGroup = (props) => {
 };
 
 /**
- * Component for displaying options for editing or deleting an item
+ * Component for displaying options for editing or deleting a book
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
 const Options = (props) => {
   return (
     <div className="options">
-      <button className="btn btn-primary">
+      <button
+        type="button"
+        className="btn btn-primary"
+        data-toggle="modal"
+        data-target="#editBookModal"
+      >
         <i className="bi bi-pencil-fill"></i>
       </button>
-      <button className="btn btn-danger">
+      <BookForm
+        id="editBookModal"
+        formName="Edit Book"
+        userId={props.myId}
+        title={props.title}
+        description={props.description}
+      />
+      <button
+        type="button"
+        className="btn btn-danger"
+        data-toggle="modal"
+        data-target="#deleteBookModal"
+      >
         <i className="bi bi-trash-fill"></i>
       </button>
+      <BookForm
+        id="deleteBookModal"
+        formName="Delete Book"
+        userId={props.myId}
+        title={props.title}
+        description={props.description}
+        readonly={true}
+      />
     </div>
   );
 };

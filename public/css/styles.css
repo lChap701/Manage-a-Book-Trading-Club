@@ -106,13 +106,13 @@ form[name="Create Request"] {
   padding: 0;
 }
 
-.options .btn:first-child {
+.options button.btn:first-child {
   border-top-right-radius: 0;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
-.options .btn:last-child {
+.options button.btn:not(:first-child) {
   border-radius: 0;
 }
 
