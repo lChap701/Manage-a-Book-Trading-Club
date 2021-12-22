@@ -106,7 +106,7 @@ app.get("/books/:bookId/requests", (req, res) => {
 
 // Form handler for the Edit Book form/modal
 app.put("/books/:bookId/update", (req, res) => {
-  crud.getUser(req.body.user).then((user) => {
+  crud.getUser({ _id: req.body.user }).then((user) => {
     if (!user) {
       res.send("Unknown user");
       return;
@@ -138,8 +138,8 @@ app.put("/books/:bookId/update", (req, res) => {
 });
 
 // Form handler for the Delete Book form/modal
-app.put("/books/:bookId/delete", (req, res) => {
-  crud.getUser(req.body.user).then((user) => {
+app.delete("/books/:bookId/delete", (req, res) => {
+  crud.getUser({ _id: req.body.user }).then((user) => {
     if (!user) {
       res.send("Unknown user");
       return;
@@ -152,8 +152,17 @@ app.put("/books/:bookId/delete", (req, res) => {
 
     crud
       .deleteBook(req.params.bookId)
-      .then(() => res.send("success"))
-      .catch((ex) => res.send(ex.message));
+      .then(() => {
+        user.books = user.books.filter(
+          (b) => b.toString() != req.params.bookId
+        );
+        user.save();
+        res.send("success");
+      })
+      .catch((ex) => {
+        res.send(ex.message);
+        console.log(ex.message);
+      });
   });
 });
 

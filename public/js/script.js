@@ -1845,6 +1845,8 @@ class BookForm extends React.Component {
         ? await this.sendToUrl(data, "DELETE")
         : await sendData(data);
 
+    console.log(res);
+
     // Checks if the page should reload
     if (res == "success") {
       location.reload();
@@ -1859,7 +1861,7 @@ class BookForm extends React.Component {
    * Sends data to form handlers for the Edit Book and Delete Book forms
    * @param {*} data            Represents the data that should be submitted
    * @param {String} method     Represents the HTTP method to use
-   * @returns                   Returns the new URL to redirect to or an error message
+   * @returns                   Returns a message
    */
   async sendToUrl(data, method) {
     try {
@@ -1867,8 +1869,7 @@ class BookForm extends React.Component {
         method == "PUT"
           ? `/books/${this.state._id}/update`
           : `/books/${this.state._id}/delete`;
-
-      console.log(location.href);
+      console.log(URL);
 
       const res = await fetch(URL, {
         method: method,
@@ -1881,17 +1882,9 @@ class BookForm extends React.Component {
       console.log(res);
 
       // Ensures that an error message is displayed
-      if (!res.ok) {
-        // Allows for redirects to the user's profile
-        if (method != "PUT") {
-          throw new Error(`Request failed: ${res.status}`);
-        } else if (res.url != `${location.href}`) {
-          throw new Error(`Request failed: ${res.status}`);
-        }
-      }
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
-      // Determines if an error message or a new URL was returned
-      return location.href == res.url ? await res.text() : res.url;
+      return await res.text();
     } catch (err) {
       alert(err.message);
       console.error(err);
