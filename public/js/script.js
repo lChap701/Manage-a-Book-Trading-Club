@@ -1782,7 +1782,7 @@ const AccountFormLayout = (props) => {
 };
 
 /**
- * Component for displaying and handling forms on the My Books page
+ * Component for displaying and handling forms on the home page and the My Books page
  */
 class BookForm extends React.Component {
   constructor(props) {
@@ -1790,8 +1790,9 @@ class BookForm extends React.Component {
 
     // States
     this.state = {
-      title: this.props.title || "",
-      description: this.props.description || "",
+      _id: props._id || "",
+      title: props.title || "",
+      description: props.description || "",
       errs: ["Title is required", "Description is required"],
     };
 
@@ -1799,6 +1800,7 @@ class BookForm extends React.Component {
     this.saveTitle = this.saveTitle.bind(this);
     this.saveDescription = this.saveDescription.bind(this);
     this.submitForm = this.submitForm.bind(this);
+    this.sendToUrl = this.sendToUrl.bind(this);
   }
 
   /**
@@ -1838,9 +1840,9 @@ class BookForm extends React.Component {
     // Submits the form and gets the result
     let res =
       this.props.formName == "Edit Book"
-        ? await sendData(data, "PUT")
+        ? await this.sendToUrl(data, "PUT")
         : this.props.formName == "Delete Book"
-        ? await sendData(data, "DELETE")
+        ? await this.sendToUrl(data, "DELETE")
         : await sendData(data);
 
     // Checks if the page should reload
@@ -1850,6 +1852,49 @@ class BookForm extends React.Component {
       let { errs } = this.state;
       errs[0] = res;
       this.setState({ errs: errs });
+    }
+  }
+
+  /**
+   * Sends data to form handlers for the Edit Book and Delete Book forms
+   * @param {*} data            Represents the data that should be submitted
+   * @param {String} method     Represents the HTTP method to use
+   * @returns                   Returns the new URL to redirect to or an error message
+   */
+  async sendToUrl(data, method) {
+    try {
+      const URL =
+        method == "PUT"
+          ? `/books/${this.state._id}/update`
+          : `/books/${this.state._id}/delete`;
+
+      console.log(location.href);
+
+      const res = await fetch(URL, {
+        method: method,
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log(res);
+
+      // Ensures that an error message is displayed
+      if (!res.ok) {
+        // Allows for redirects to the user's profile
+        if (method != "PUT") {
+          throw new Error(`Request failed: ${res.status}`);
+        } else if (res.url != `${location.href}`) {
+          throw new Error(`Request failed: ${res.status}`);
+        }
+      }
+
+      // Determines if an error message or a new URL was returned
+      return location.href == res.url ? await res.text() : res.url;
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
     }
   }
 
@@ -2107,6 +2152,7 @@ const BookListGroup = (props) => {
               {props.myId == book.user._id ? (
                 <Options
                   myId={props.myId}
+                  _id={book._id}
                   title={book.title}
                   description={book.description}
                 />
@@ -2142,6 +2188,7 @@ const Options = (props) => {
         id="editBookModal"
         formName="Edit Book"
         userId={props.myId}
+        _id={props._id}
         title={props.title}
         description={props.description}
       />
@@ -2157,6 +2204,7 @@ const Options = (props) => {
         id="deleteBookModal"
         formName="Delete Book"
         userId={props.myId}
+        _id={props._id}
         title={props.title}
         description={props.description}
         readonly={true}
