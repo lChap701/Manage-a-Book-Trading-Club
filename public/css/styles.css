@@ -217,7 +217,6 @@ form[name="Create Request"] {
 
   .dropdown-item {
     color: rgba(255, 255, 255, 0.5) !important;
-    padding: 0.125rem 1.25rem !important;
   }
 
   .dropdown-item:focus,
