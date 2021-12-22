@@ -244,7 +244,9 @@ module.exports = (app) => {
                 user._id.toString() == giveBooks[0].user.toString()
                   ? acceptedBooks.map((book) => book._id)
                   : giveBooks.map((book) => book._id);
-              user.books = user.books.filter((book) => !remove.has(book));
+              user.books = user.books.filter(
+                (book) => !remove.has(book.toString())
+              );
               user.books.push(...add);
               user.save();
             });
