@@ -64,6 +64,22 @@ form[name="Create Request"] {
   overflow: auto;
 }
 
+.panel-body::-webkit-scrollbar {
+  width: 12px;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: #81beff;
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+  background: #68b1ff;
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: #cee5ff;
+}
+
 .panel-body .list-group-flush .list-group-item:last-child {
   margin-bottom: 0 !important;
 }
