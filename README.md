@@ -56,7 +56,7 @@ All URL paths part of this project.
 - **/books/:bookId/requests** - Shows all requests for books
   - Displays the _books.html_ file
 - **/books/my** - Shows the user their books
-  - Displays the same file as **/books/:bookId/requests**
+  - Displays the _myBooks.html_
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
 
