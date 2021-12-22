@@ -1845,8 +1845,6 @@ class BookForm extends React.Component {
         ? await this.sendToUrl(data, "DELETE")
         : await sendData(data);
 
-    console.log(res);
-
     // Checks if the page should reload
     if (res == "success") {
       location.reload();
@@ -1869,7 +1867,6 @@ class BookForm extends React.Component {
         method == "PUT"
           ? `/books/${this.state._id}/update`
           : `/books/${this.state._id}/delete`;
-      console.log(URL);
 
       const res = await fetch(URL, {
         method: method,
@@ -1878,8 +1875,6 @@ class BookForm extends React.Component {
           "Content-Type": "application/json",
         },
       });
-
-      console.log(res);
 
       // Ensures that an error message is displayed
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
