@@ -51,6 +51,8 @@ All URL paths part of this project.
 
 - **/books** - Shows all books
   - Displays the _index.html_ file
+- **/books/:bookId/update** - Form handler for the Edit Book form
+- **/books/:bookId/delete** - Form handler for the Delete Book form
 - **/books/:bookId/requests** - Shows all requests for books
   - Displays the _books.html_ file
 - **/books/my** - Shows the user their books
@@ -66,7 +68,7 @@ All URL paths part of this project.
   - Displays the _createRequests.html_ file
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
-- **/requests/new/books** - Form handler for the form in **/books** and **/books/my**
+- **/requests/new/books** - Form handler for the main form in **/books** and **/books/my**
   - Redirects to **/requests/new**
 - **/requests/new/books/select** - Gets books available to be given or taken during trades
 - **/requests/:requestId/accept/:id** - Accepts requests/trades
