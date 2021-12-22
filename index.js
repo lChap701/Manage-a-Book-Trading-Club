@@ -109,7 +109,7 @@ app.get("/requests", (req, res) => {
   res.sendFile(process.cwd() + "/public/requests.html");
 });
 
-// Form handler for the form on the home page and Book Exchange - My Books page
+// Form handler for the main form on the home page and Book Exchange - My Books page
 app.post("/requests/new/books", (req, res) => {
   let ids = [];
   let { books } = req.body;
