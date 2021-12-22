@@ -54,7 +54,7 @@ All URL paths part of this project.
 - **/books/:bookId/update** - Form handler for the Edit Book form
 - **/books/:bookId/delete** - Form handler for the Delete Book form
 - **/books/:bookId/requests** - Shows all requests for books
-  - Displays the _books.html_ file
+  - Displays the _bookRequests.html_ file
 - **/books/my** - Shows the user their books
   - Displays the _myBooks.html_
   - Requires the user to be logged in
