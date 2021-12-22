@@ -204,3 +204,24 @@ form[name="Create Request"] {
     transform: translateX(150%);
   }
 }
+
+/* Media Queries */
+@media screen and (max-width: 991px) {
+  .dropdown-menu {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .dropdown-item {
+    color: rgba(255, 255, 255, 0.5) !important;
+    padding: 0.125rem 1.25rem !important;
+  }
+
+  .dropdown-item:focus,
+  .dropdown-item:hover {
+    background: none !important;
+  }
+}

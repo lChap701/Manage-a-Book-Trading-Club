@@ -2020,7 +2020,12 @@ const Dropdown = (props) => {
         {props.dropLinkText}
       </a>
 
-      <div className="dropdown-menu" aria-labelledby={props.id}>
+      <div
+        className={`dropdown-menu${
+          props.id == "userDropdownMenuLink" ? " dropdown-menu-right" : ""
+        }`}
+        aria-labelledby={props.id}
+      >
         {props.links.map((link) => {
           return (
             <NavLink
