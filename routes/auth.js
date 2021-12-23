@@ -185,18 +185,25 @@ module.exports = (app) => {
         books.sort((a, b) => b.bumpedOn - a.bumpedOn);
         res.json(
           books.map((book) => {
+            // Converts the objects to string to stay unique
+            let users = [
+              ...new Set(
+                book.requests.map((request) => {
+                  return JSON.stringify({
+                    _id: request.giveBooks[0].user._id.toString(),
+                    username: request.giveBooks[0].user.username,
+                  });
+                })
+              ),
+            ];
+
             return {
               _id: book._id,
               title: book.title,
               description: book.description,
               requests: {
                 count: book.numOfRequests,
-                users: book.requests.map((request) => {
-                  return {
-                    _id: request.giveBooks[0].user._id,
-                    username: request.giveBooks[0].user.username,
-                  };
-                }),
+                users: users.map((user) => JSON.parse(user)),
               },
               user: {
                 _id: book.user._id,
