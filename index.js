@@ -139,32 +139,52 @@ app.put("/books/:bookId/update", (req, res) => {
 
 // Form handler for the Delete Book form/modal
 app.delete("/books/:bookId/delete", (req, res) => {
-  crud.getUser({ _id: req.body.user }).then((user) => {
-    if (!user) {
-      res.send("Unknown user");
+  crud.getBook(req.params.bookId).then((book) => {
+    if (!book) {
+      res.send("Unknown book");
       return;
     }
 
-    if (user.books.find((b) => b.toString() == req.params.bookId)) {
-      res.send("User doesn't have book " + req.params.bookId);
-      return;
-    }
+    crud.getUser({ _id: req.body.user }).then((user) => {
+      if (!user) {
+        res.send("Unknown user");
+        return;
+      }
 
-    crud
-      .deleteBook(req.params.bookId)
-      .then(() => {
-        // Updates referenced user
-        user.books = user.books.filter(
-          (b) => b.toString() != req.params.bookId
-        );
-        user.save();
+      if (user.books.indexOf(req.params.bookId) == -1) {
+        res.send("User doesn't have book " + req.params.bookId);
+        return;
+      }
 
-        res.send("success");
-      })
-      .catch((ex) => {
-        res.send(ex.message);
-        console.log(ex.message);
-      });
+      // Deletes all requests/trades that use this book (if any have occurred)
+      if (book.requests.length > 0) {
+        crud
+          .deleteRequests(book.requests)
+          .then(() => {
+            crud
+              .deleteTrades({ $in: book.requests })
+              .catch((ex) => console.log(ex));
+          })
+          .catch((ex) => console.log(ex));
+      }
+
+      // Deletes the book
+      crud
+        .deleteBook(book._id)
+        .then(() => {
+          // Updates referenced user
+          user.books = user.books.filter(
+            (b) => b.toString() != book._id.toString()
+          );
+          user.save();
+
+          res.send("success");
+        })
+        .catch((ex) => {
+          res.send(ex.message);
+          console.log(ex.message);
+        });
+    });
   });
 });
 
