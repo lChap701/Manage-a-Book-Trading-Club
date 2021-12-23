@@ -25,6 +25,7 @@ const crud = {
   deleteUser: (id) => Users.deleteOne({ _id: id }),
   deleteBook: (id) => Books.deleteOne({ _id: id }),
   deleteRequest: (id) => Requests.deleteOne({ _id: id }),
+  deleteRequests: (ids) => Requests.deleteMany({}).where("_id").in(ids),
   deleteTrades: (request) => Trades.deleteMany({ request: request }),
 };
 
