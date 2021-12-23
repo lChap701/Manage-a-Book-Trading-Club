@@ -145,7 +145,7 @@ app.delete("/books/:bookId/delete", (req, res) => {
       return;
     }
 
-    if (user.books.indexOf(req.params.bookId) == -1) {
+    if (user.books.find((b) => b.toString() == req.params.bookId)) {
       res.send("User doesn't have book " + req.params.bookId);
       return;
     }
@@ -153,10 +153,12 @@ app.delete("/books/:bookId/delete", (req, res) => {
     crud
       .deleteBook(req.params.bookId)
       .then(() => {
+        // Updates referenced user
         user.books = user.books.filter(
           (b) => b.toString() != req.params.bookId
         );
         user.save();
+
         res.send("success");
       })
       .catch((ex) => {
