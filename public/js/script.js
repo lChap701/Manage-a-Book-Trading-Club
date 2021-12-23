@@ -147,6 +147,14 @@ class BookExchange extends React.Component {
       <div>
         {/* 'forceRefresh' is set to true in order to allow the browser to reload */}
         <Router forceRefresh>
+          <Prompt
+            message={(location, action) => {
+              if (action === "POP") {
+                return `Are you sure you want to go to ${location.pathname}? You will need to reload the page.`;
+              }
+            }}
+          />
+
           <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-info">
               <div className="container">
