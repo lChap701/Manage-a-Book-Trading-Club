@@ -95,7 +95,7 @@ module.exports = (app) => {
 
   // Displays the Book Exchange - Reset Password Page
   app.get("/password/reset", loggedOut, (req, res) => {
-    res.sendFile(process.cwd());
+    res.sendFile(process.cwd() + "/public/passwordReset.html");
   });
 
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
