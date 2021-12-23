@@ -2103,7 +2103,7 @@ const BookListGroup = (props) => {
                 <label for={`book${book._id}`} className="col-10">
                   {book.requests.count > 0 ? (
                     <span className="float-right">
-                      <Link to={`/books/${book._id}/requests`}>
+                      <Link className="float-right" to={`/books/${book._id}/requests`}>
                         <b>Requests </b>
                         <span className="badge badge-primary">
                           {book.requests.count}
