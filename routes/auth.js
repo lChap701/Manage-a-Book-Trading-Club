@@ -93,6 +93,11 @@ module.exports = (app) => {
     passport.authenticate("google", oauthOptions)
   );
 
+  // Displays the Book Exchange - Reset Password Page
+  app.get("/password/reset", loggedOut, (req, res) => {
+    res.sendFile(process.cwd());
+  });
+
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
   app
     .route("/requests/new")
