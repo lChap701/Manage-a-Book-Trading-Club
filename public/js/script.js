@@ -2119,7 +2119,7 @@ const BookListGroup = (props) => {
                                 {user.username}
                               </Link>
                             </b>
-                            {i < book.requests.users - 1 ? ", " : ""}
+                            {i < book.requests.users.length - 1 ? ", " : ""}
                           </span>
                         );
                       })}
