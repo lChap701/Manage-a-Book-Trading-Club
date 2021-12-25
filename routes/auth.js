@@ -94,9 +94,31 @@ module.exports = (app) => {
   );
 
   // Displays the Book Exchange - Reset Password Page
-  app.get("/password/reset", loggedIn, (req, res) => {
-    res.sendFile(process.cwd() + "/public/passwordReset.html");
-  });
+  app
+    .route("/password/reset")
+    .get(loggedIn, (req, res) => {
+      res.sendFile(process.cwd() + "/public/passwordReset.html");
+    })
+    .put((req, res) => {
+      crud.getUser({ username: req.body.username }).then((user) => {
+        if (!user) {
+          res.send("Unknown user");
+          return;
+        }
+
+        crud
+          .updateUser(user._id, { password: req.body.password })
+          .then(() => {
+            req.session.success = true;
+            req.flash("success", "Changed Password");
+            res.redirect("/login");
+          })
+          .catch((ex) => {
+            console.log(ex.message);
+            res.send(ex.message);
+          });
+      });
+    });
 
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
   app
