@@ -73,17 +73,7 @@ async function sendData(data, method = "POST") {
     console.log(res);
 
     // Ensures that an error message is displayed
-    if (!res.ok) {
-      // Allows for redirects to the user's profile and the Login page
-      if (method != "PUT" || !location.href.includes("users")) {
-        throw new Error(`Request failed: ${res.status}`);
-      } else if (
-        res.url != `${location.origin}/users/${data._id}` ||
-        res.url != `${location.origin}/login`
-      ) {
-        throw new Error(`Request failed: ${res.status}`);
-      }
-    }
+    if (!res.ok) throw new Error(`Request failed: ${res.status}`);
 
     // Determines if an error message or a new URL was returned
     return location.href == res.url ? await res.text() : res.url;

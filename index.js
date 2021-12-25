@@ -213,15 +213,20 @@ app.get("/users", (req, res) => {
 });
 
 // Displays the Book Exchange - (username)'s Profile Page
-app.get("/users/:id", (req, res) => {
-  crud.getUser({ _id: req.params.id }).then((user) => {
-    if (user) {
-      res.sendFile(process.cwd() + "/public/profile.html");
-    } else {
-      res.sendStatus(404);
-    }
+app
+  .route("/users/:id")
+  .get((req, res) => {
+    crud.getUser({ _id: req.params.id }).then((user) => {
+      if (user) {
+        res.sendFile(process.cwd() + "/public/profile.html");
+      } else {
+        res.sendStatus(404);
+      }
+    });
+  })
+  .put((req, res) => {
+    res.sendFile(process.cwd() + "/public/profile.html");
   });
-});
 
 // Displays the Book Exchange - (username)'s Books Page
 app.get("/users/:id/books", (req, res) => {
