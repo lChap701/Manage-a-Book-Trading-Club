@@ -1200,12 +1200,17 @@ class AccountForm extends React.Component {
    * Gets initial data for country and state input fields
    */
   componentDidMount() {
-    if (this.props.formName == "Login") {
+    if (this.props.formName == "Login") this.getSuccessMsg();
+
+    if (this.props.formName != "Login" && this.props.formName != "Reset Password") {
+      this.getStates();
+      this.getCountries();
     }
-    this.getStates();
-    this.getCountries();
   }
 
+  /**
+   * Gets success message
+   */
   getSuccessMsg() {
     callApi(`${location.origin}/session/success`).then((data) => {
       this.setState({
@@ -1633,7 +1638,6 @@ const LoginFormLayout = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const ResetPasswordFormLayout = (props) => {
-  console.log(props);
   return (
     <div className="panel-body border-top-0 border-bottom-0 p-3">
       <InputControl
