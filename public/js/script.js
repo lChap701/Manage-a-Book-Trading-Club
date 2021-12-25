@@ -286,6 +286,7 @@ class BookExchange extends React.Component {
               </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
+              <Route path="/password/reset" component={ResetPassword} />
               <Route path="/logout">
                 <Redirect to="/books" />
               </Route>
@@ -826,6 +827,14 @@ const Signup = () => {
 };
 
 /**
+ * Component for displaying content on the Reset Password page
+ * @returns     Returns the content that should be displayed
+ */
+const ResetPassword = () => {
+  return <AccountForm formName="Reset Password" />;
+};
+
+/**
  * Component for displaying content on the (username)'s Profile page
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -1134,7 +1143,7 @@ const UserBooks = (props) => {
 };
 
 /**
- * Component for displaying and handling forms on the Login, Sign Up, and Edit Profile pages
+ * Component for displaying and handling forms on the Login, Sign Up, Reset Password, and Edit Profile pages
  */
 class AccountForm extends React.Component {
   constructor(props) {
@@ -1165,9 +1174,11 @@ class AccountForm extends React.Component {
         countries: [],
         zipPostalCodes: [],
       },
+      success: "",
     };
 
     // Functions
+    this.getSuccessMsg = this.getSuccessMsg.bind(this);
     this.getAddresses = this.getAddresses.bind(this);
     this.getCities = this.getCities.bind(this);
     this.getStates = this.getStates.bind(this);
@@ -1189,8 +1200,18 @@ class AccountForm extends React.Component {
    * Gets initial data for country and state input fields
    */
   componentDidMount() {
+    if (this.props.formName == "Login") {
+    }
     this.getStates();
     this.getCountries();
+  }
+
+  getSuccessMsg() {
+    callApi(`${location.origin}/session/success`).then((data) => {
+      this.setState({
+        success: data,
+      });
+    });
   }
 
   /**
@@ -1428,7 +1449,10 @@ class AccountForm extends React.Component {
         : { _id: this.state._id, username: this.state.username };
 
     // For when users try to sign up or update their account
-    if (this.props.formName != "Login") {
+    if (
+      this.props.formName != "Login" &&
+      this.props.formName != "Reset Password"
+    ) {
       data.email = this.state.email;
       data.name = this.state.name;
       data.address = this.state.address;
@@ -1459,6 +1483,8 @@ class AccountForm extends React.Component {
       <div>
         {this.state.errs[3] != "" ? (
           <Alert class="alert alert-danger" msg={this.state.errs[3]} />
+        ) : this.state.success != "" ? (
+          <Alert class="alert alert-success" msg={this.state.success} />
         ) : (
           ""
         )}
@@ -1475,6 +1501,14 @@ class AccountForm extends React.Component {
 
           {this.props.formName == "Login" ? (
             <LoginFormLayout
+              username={this.state.username}
+              saveUsername={this.saveUsername}
+              password={this.state.password}
+              savePassword={this.savePassword}
+              errs={this.state.errs}
+            />
+          ) : this.props.formName == "Reset Password" ? (
+            <ResetPasswordFormLayout
               username={this.state.username}
               saveUsername={this.saveUsername}
               password={this.state.password}
@@ -1518,7 +1552,8 @@ class AccountForm extends React.Component {
           <div className="panel-footer px-3 py-2">
             {(this.state.options.states.length > 0 &&
               this.state.options.countries.length > 0) ||
-            this.props.formName == "Login" ? (
+            this.props.formName == "Login" ||
+            this.props.formName == "Reset Password" ? (
               <input
                 className="btn btn-success w-100"
                 type="submit"
@@ -1536,6 +1571,15 @@ class AccountForm extends React.Component {
               <div className="mt-2">
                 <Link className="text-white" to="/signup">
                   Sign Up
+                </Link>
+                <Link className="text-white float-right" to="/password/reset">
+                  Forgot Password?
+                </Link>
+              </div>
+            ) : this.props.formName == "Reset Password" ? (
+              <div className="mt-2">
+                <Link className="text-white" to="/login">
+                  Login
                 </Link>
               </div>
             ) : (
@@ -1572,6 +1616,42 @@ const LoginFormLayout = (props) => {
         containerClass="form-group"
         id="psw"
         label="Password"
+        type="password"
+        required
+        value={props.password}
+        onChange={props.savePassword}
+        validator="pswFeedback"
+        err={props.errs[1]}
+      />
+    </div>
+  );
+};
+
+/**
+ * Component for handling the layout of the Reset Password form
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const ResetPasswordFormLayout = (props) => {
+  console.log(props);
+  return (
+    <div className="panel-body border-top-0 border-bottom-0 p-3">
+      <InputControl
+        containerClass="form-group"
+        id="uname"
+        label="Username"
+        type="text"
+        required
+        value={props.username}
+        onChange={props.saveUsername}
+        validator="unameFeedback"
+        err={props.errs[0]}
+      />
+
+      <InputControl
+        containerClass="form-group"
+        id="psw"
+        label="New Password"
         type="password"
         required
         value={props.password}
@@ -2103,7 +2183,10 @@ const BookListGroup = (props) => {
                 <label for={`book${book._id}`} className="col-10">
                   {book.requests.count > 0 ? (
                     <span className="float-right">
-                      <Link className="float-right" to={`/books/${book._id}/requests`}>
+                      <Link
+                        className="float-right"
+                        to={`/books/${book._id}/requests`}
+                      >
                         <b>Requests </b>
                         <span className="badge badge-primary">
                           {book.requests.count}
