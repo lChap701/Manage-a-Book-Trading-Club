@@ -1,3 +1,4 @@
+require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const CryptoJS = require("crypto-js");
 const passport = require("passport");
@@ -41,7 +42,10 @@ module.exports = (app) => {
         failureFlash: "Invalid username or password",
         successRedirect: "/books",
       })
-    );
+    )
+    .put((req, res) => {
+      res.sendFile(process.cwd() + "/public/login.html");
+    });
 
   // Displays and handles POST requests for the Book Exchange - Sign Up Page
   app
@@ -101,13 +105,18 @@ module.exports = (app) => {
     })
     .put((req, res) => {
       crud.getUser({ username: req.body.username }).then((user) => {
-        if (!user) {
-          res.send("Unknown user");
+        if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
+          res.send("Invalid username or password");
           return;
         }
 
         crud
-          .updateUser(user._id, { password: req.body.password })
+          .updateUser(user._id, {
+            password: bcrypt.hashSync(
+              req.body.newPassword,
+              parseInt(process.env.SALT_ROUNDS)
+            ),
+          })
           .then(() => {
             req.session.success = true;
             req.flash("success", "Changed Password");

@@ -74,10 +74,13 @@ async function sendData(data, method = "POST") {
 
     // Ensures that an error message is displayed
     if (!res.ok) {
-      // Allows for redirects to the user's profile
+      // Allows for redirects to the user's profile and the Login page
       if (method != "PUT" || !location.href.includes("users")) {
         throw new Error(`Request failed: ${res.status}`);
-      } else if (res.url != `${location.origin}/users/${data._id}`) {
+      } else if (
+        res.url != `${location.origin}/users/${data._id}` ||
+        res.url != `${location.origin}/login`
+      ) {
         throw new Error(`Request failed: ${res.status}`);
       }
     }
@@ -1154,6 +1157,7 @@ class AccountForm extends React.Component {
       _id: props._id || "",
       username: props.username || "",
       password: "",
+      newPassword: "",
       email: props.email || "",
       name: props.name || "",
       address: props.address || "",
@@ -1186,6 +1190,7 @@ class AccountForm extends React.Component {
     this.getZipPostalCodes = this.getZipPostalCodes.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
+    this.saveNewPassword = this.saveNewPassword.bind(this);
     this.saveEmail = this.saveEmail.bind(this);
     this.saveName = this.saveName.bind(this);
     this.saveAddress = this.saveAddress.bind(this);
@@ -1202,7 +1207,10 @@ class AccountForm extends React.Component {
   componentDidMount() {
     if (this.props.formName == "Login") this.getSuccessMsg();
 
-    if (this.props.formName != "Login" && this.props.formName != "Reset Password") {
+    if (
+      this.props.formName != "Login" &&
+      this.props.formName != "Reset Password"
+    ) {
       this.getStates();
       this.getCountries();
     }
@@ -1357,6 +1365,14 @@ class AccountForm extends React.Component {
   savePassword(e) {
     this.setState({ password: e.target.value });
   }
+
+  /**
+   * Saves the new password while the user is typing
+   * @param {InputControlEvent} e    Represents the event that occurred
+   */
+  saveNewPassword(e) {
+    this.setState({ newPassword: e.target.value });
+  }
   /**
    * Saves the user's email while the user is typing
    * @param {InputControlEvent} e    Represents the event that occurred
@@ -1453,6 +1469,13 @@ class AccountForm extends React.Component {
           }
         : { _id: this.state._id, username: this.state.username };
 
+    // For when users try to reset their password
+    if (this.props.formName == "Reset Password") {
+      data.newPassword = this.state.newPassword;
+    }
+
+    console.log(data);
+
     // For when users try to sign up or update their account
     if (
       this.props.formName != "Login" &&
@@ -1469,7 +1492,8 @@ class AccountForm extends React.Component {
 
     // Submits the form and gets the result
     let res =
-      this.props.formName == "Edit Profile"
+      this.props.formName == "Edit Profile" ||
+      this.props.formName == "Reset Password"
         ? await sendData(data, "PUT")
         : await sendData(data);
 
@@ -1516,8 +1540,10 @@ class AccountForm extends React.Component {
             <ResetPasswordFormLayout
               username={this.state.username}
               saveUsername={this.saveUsername}
-              password={this.state.password}
-              savePassword={this.savePassword}
+              oldPassword={this.state.password}
+              saveOldPassword={this.savePassword}
+              newPassword={this.state.newPassword}
+              saveNewPassword={this.saveNewPassword}
               errs={this.state.errs}
             />
           ) : (
@@ -1652,17 +1678,31 @@ const ResetPasswordFormLayout = (props) => {
         err={props.errs[0]}
       />
 
-      <InputControl
-        containerClass="form-group"
-        id="psw"
-        label="New Password"
-        type="password"
-        required
-        value={props.password}
-        onChange={props.savePassword}
-        validator="pswFeedback"
-        err={props.errs[1]}
-      />
+      <div className="row">
+        <InputControl
+          containerClass="form-group col"
+          id="oldPsw"
+          label="Old Password"
+          type="password"
+          required
+          value={props.oldPassword}
+          onChange={props.saveOldPassword}
+          validator="oldPswFeedback"
+          err={props.errs[1]}
+        />
+
+        <InputControl
+          containerClass="form-group col"
+          id="newPsw"
+          label="New Password"
+          type="password"
+          required
+          value={props.newPassword}
+          onChange={props.saveNewPassword}
+          validator="newPswFeedback"
+          err={props.errs[1]}
+        />
+      </div>
     </div>
   );
 };
