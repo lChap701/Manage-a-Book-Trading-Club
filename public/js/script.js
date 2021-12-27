@@ -1168,6 +1168,7 @@ class AccountForm extends React.Component {
         countries: [],
         zipPostalCodes: [],
       },
+      rememberMe: true,
       success: "",
     };
 
@@ -1188,6 +1189,7 @@ class AccountForm extends React.Component {
     this.saveState = this.saveState.bind(this);
     this.saveCountry = this.saveCountry.bind(this);
     this.saveZipPostalCode = this.saveZipPostalCode.bind(this);
+    this.updateRememberMe = this.updateRememberMe.bind(this);
     this.submitForm = this.submitForm.bind(this);
   }
 
@@ -1441,6 +1443,16 @@ class AccountForm extends React.Component {
   }
 
   /**
+   * Updates the 'Remember me' checkbox
+   * @param {InputControlEvent} e    Represents the event that occurred
+   */
+  updateRememberMe(e) {
+    this.setState({
+      rememberMe: e.target.checked,
+    });
+  }
+
+  /**
    * Handles form validation and form submission
    * @param {SubmitEvent} e   Represents the event that occurred
    * @returns                 Returns nothing or is void
@@ -1525,6 +1537,8 @@ class AccountForm extends React.Component {
               password={this.state.password}
               savePassword={this.savePassword}
               errs={this.state.errs}
+              remember={this.state.rememberMe}
+              updateRemember={this.updateRememberMe}
             />
           ) : this.props.formName == "Reset Password" ? (
             <ResetPasswordFormLayout
@@ -1591,7 +1605,7 @@ class AccountForm extends React.Component {
             {this.props.formName == "Login" ? (
               <div className="mt-2">
                 <Link className="text-white" to="/signup">
-                  Sign Up
+                  Don't have an account?
                 </Link>
                 <Link className="text-white float-right" to="/password/reset">
                   Forgot Password?
@@ -1644,6 +1658,20 @@ const LoginFormLayout = (props) => {
         validator="pswFeedback"
         err={props.errs[1]}
       />
+
+      <div className="form-check-inline">
+        <input
+          name="remember-me"
+          id="remember-me"
+          className="form-check-input"
+          type="checkbox"
+          checked={props.remember}
+          onClick={props.updateRemember}
+        />
+        <label for="remember-me" className="form-check-label">
+          Remember me
+        </label>
+      </div>
     </div>
   );
 };
