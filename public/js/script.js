@@ -2634,7 +2634,7 @@ const InputControl = (props) => {
         required={Boolean(props.required)}
         value={props.value}
         placeholder={props.placeholder || null}
-        autocomplete={props.list && !props.readonly ? "off" : "on"}
+        autocomplete={props.list || props.readonly ? "off" : "on"}
         onChange={props.onChange || null}
         aria-describedby={props.validator || null}
         readonly={Boolean(props.readonly)}
