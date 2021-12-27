@@ -101,13 +101,17 @@ All URL paths part of this project.
   - Displays the _editProfile.html_ file
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
+  - When successful, redirects to **/users/:id**
 
-### Login and Signup Paths
+### Login, Signup, and Passwords Paths
 
 - **/login** - Allows users to login
   - Redirects to **/books** when the user is logged in
 - **/signup** - Allows users to create accounts
+  - Redirects to **/books** when the user is logged in or has signed up
+- **/password/reset** - Allows users to reset their password
   - Redirects to **/books** when the user is logged in
+  - When successful, redirects to **/login**
 
 ### OAuth Paths
 
