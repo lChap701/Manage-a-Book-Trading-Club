@@ -212,7 +212,7 @@ app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
 });
 
-// Displays the Book Exchange - (username)'s Profile Page
+// Displays and handles PUT requests for the Book Exchange - (username)'s Profile Page 
 app
   .route("/users/:id")
   .get((req, res) => {

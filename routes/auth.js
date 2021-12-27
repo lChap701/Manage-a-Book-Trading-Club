@@ -23,7 +23,7 @@ module.exports = (app) => {
   // Finishes setting up Passport
   auth();
 
-  // Displays and handles POST requests for the Book Exchange - Login Page
+  // Displays and handles POST/PUT requests for the Book Exchange - Login Page
   app
     .route("/login")
     .get(loggedIn, (req, res) => {
