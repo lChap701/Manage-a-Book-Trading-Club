@@ -15,6 +15,24 @@ form[name="Create Request"] {
   margin: 0;
 }
 
+.seperator {
+  display: flex;
+  align-items: center;
+  margin: 0.5em 0;
+}
+
+.seperator::before {
+  margin-left: 0;
+}
+
+.seperator::before,
+.seperator::after {
+  content: "";
+  flex: 0 1 100%;
+  border-bottom: 1px solid #6c757d;
+  margin: 0 10px;
+}
+
 .dropdown-item:hover {
   color: #fff !important;
   background: #007bff !important;
@@ -60,7 +78,7 @@ form[name="Create Request"] {
 .panel-body {
   background: #f9f9f9;
   min-height: 100px;
-  max-height: 450px;
+  max-height: 475px;
   overflow: auto;
 }
 

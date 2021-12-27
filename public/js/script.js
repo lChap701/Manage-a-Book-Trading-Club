@@ -1552,6 +1552,7 @@ class AccountForm extends React.Component {
             />
           ) : (
             <AccountFormLayout
+              allowSocialMedia={this.props.formName == "Sign Up"}
               username={this.state.username}
               saveUsername={this.saveUsername}
               password={this.state.password}
@@ -1635,6 +1636,8 @@ class AccountForm extends React.Component {
 const LoginFormLayout = (props) => {
   return (
     <div className="panel-body border-top-0 border-bottom-0 p-3">
+      <SocialMedia btnText="Login with social media" />
+
       <InputControl
         containerClass="form-group"
         id="uname"
@@ -1733,6 +1736,21 @@ const ResetPasswordFormLayout = (props) => {
 const AccountFormLayout = (props) => {
   return (
     <div className="panel-body border-top-0 border-bottom-0 p-3">
+      {props.allowSocialMedia ? (
+        props.loaded ? (
+          <SocialMedia btnText="Sign up with social media" />
+        ) : (
+          <div>
+            <SpinnerButton class="btn btn-info w-100" />
+            <div className="seperator text-secondary">
+              <span>or</span>
+            </div>
+          </div>
+        )
+      ) : (
+        ""
+      )}
+
       <div className="row">
         {props.loaded ? (
           <InputControl
@@ -1926,6 +1944,25 @@ const AccountFormLayout = (props) => {
         ) : (
           ""
         )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying and handling the Social Media modal
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const SocialMedia = (props) => {
+  return (
+    <div>
+      <button className="btn btn-info w-100" type="button">
+        {props.btnText}
+      </button>
+
+      <div className="seperator text-secondary">
+        <span>or</span>
       </div>
     </div>
   );
