@@ -2630,7 +2630,6 @@ const InputControl = (props) => {
         name={props.id}
         type={props.type}
         list={props.list || null}
-        hidden={Boolean(props.hidden)}
         required={Boolean(props.required)}
         value={props.value}
         placeholder={props.placeholder || null}
