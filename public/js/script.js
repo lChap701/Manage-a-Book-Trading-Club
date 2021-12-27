@@ -2309,7 +2309,7 @@ const BookListGroup = (props) => {
           );
         })}
       </ul>
-      <Input id="books" type="text" hidden value={selectedBooks} />
+      <input id="books" name="books" type="text" hidden value={selectedBooks} />
     </div>
   );
 };
@@ -2665,11 +2665,10 @@ const Input = (props) => {
       className={`form-control${
         props.readonly && props.value ? "-plaintext" : ""
       }`}
-      hidden={Boolean(props.hidden)}
       required={Boolean(props.required)}
       placeholder={props.placeholder}
       value={props.value}
-      autocomplete={props.list && !props.readonly ? "off" : "on"}
+      autocomplete={props.autocomplete || null}
       onChange={props.onChange}
       aria-describedby={props.validator}
       readOnly={Boolean(props.readonly)}
