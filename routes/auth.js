@@ -89,7 +89,10 @@ module.exports = (app) => {
   );
 
   // Handles Google OAuth
-  app.get("/auth/google", passport.authenticate("google"));
+  app.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["email", "profile"] })
+  );
 
   // Callback URL for Google OAuth
   app.get(

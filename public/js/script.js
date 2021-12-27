@@ -1957,12 +1957,58 @@ const AccountFormLayout = (props) => {
 const SocialMedia = (props) => {
   return (
     <div>
-      <button className="btn btn-info w-100" type="button">
+      <button
+        className="btn btn-info w-100"
+        type="button"
+        data-toggle="modal"
+        data-target="#socialMediaModal"
+      >
         {props.btnText}
       </button>
 
       <div className="seperator text-secondary">
         <span>or</span>
+      </div>
+
+      <div
+        className="modal fade"
+        tabindex="-1"
+        id="socialMediaModal"
+        role="dialog"
+        aria-labelledby="socialMediaLabel"
+        aria-hidden="true"
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="socialMediaLabel">
+                {props.btnText.includes("Login")
+                  ? "Login with..."
+                  : "Sign up with..."}
+              </h5>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <Link to="/auth/github"></Link>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-danger float-right"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
