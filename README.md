@@ -161,7 +161,7 @@ All URL paths part of this project.
 ## Resources
 
 [Favicon Generator](https://favicon.io/favicon-generator/) \
-[Social Buttons for Bootstrap](https://lipis.github.io/bootstrap-social/) /
+[Social Buttons for Bootstrap](https://lipis.github.io/bootstrap-social/) \
 [React Router Setup](https://www.pluralsight.com/guides/using-react-router-with-cdn-links) \
 [GitHub OAuth](https://docs.github.com/en/developers/apps/building-oauth-apps/creating-an-oauth-app) \
 [Facebook OAuth](https://www.twilio.com/blog/facebook-oauth-login-node-js-app-passport-js) \
