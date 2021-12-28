@@ -1996,9 +1996,41 @@ const SocialMedia = (props) => {
               </button>
             </div>
             <div className="modal-body">
-              <Link to="/auth/github"></Link>
+              <Link
+                to="/auth/google"
+                className="btn btn-lg btn-block btn-social btn-outline-primary"
+              >
+                <i className="bi bi-google"></i>
+                Google
+              </Link>
+              <Link
+                to="/auth/facebook"
+                className="btn btn-lg btn-block btn-social btn-facebook"
+              >
+                <i className="bi bi-facebook"></i>
+                Facebook
+              </Link>
+              <Link
+                to="/auth/twitter"
+                className="btn btn-lg btn-block btn-social btn-twitter"
+              >
+                <i className="bi bi-twitter"></i>
+                Twitter
+              </Link>
+
+              <div className="seperator text-secondary">
+                <span>Developers</span>
+              </div>
+
+              <Link
+                to="/auth/github"
+                className="btn btn-lg btn-block btn-social btn-github"
+              >
+                <i className="bi bi-github"></i>
+                GitHub
+              </Link>
             </div>
-            <div class="modal-footer">
+            <div className="modal-footer">
               <button
                 type="button"
                 class="btn btn-danger float-right"
