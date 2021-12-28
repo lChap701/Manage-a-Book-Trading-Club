@@ -38,6 +38,13 @@ form[name="Create Request"] {
   background: #007bff !important;
 }
 
+.btn-social .bi::before {
+  font-size: 28px;
+  display: flex;
+  justify-content: center;
+  padding: 9px 0;
+}
+
 /* Spinner Loader */
 .overlay {
   background: rgba(0, 0, 0, 0.9);
