@@ -68,6 +68,10 @@ const crud = require("./crud");
 app.use("/css", express.static(process.cwd() + "/public/css"));
 app.use("/js", express.static(process.cwd() + "/public/js"));
 app.use("/favicon.io", express.static(process.cwd() + "/public/favicon.io"));
+app.use(
+  "/bootstrap-social",
+  express.static(process.cwd() + "/public/bootstrap-social")
+);
 
 // Passport/OAuth Routing
 const passport = require("passport");
