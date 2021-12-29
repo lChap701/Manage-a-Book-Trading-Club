@@ -92,22 +92,42 @@ module.exports = (app) => {
       }
 
       crud
-        .getBooks(user)
+        .getBooks(user._id)
         .populate({
           path: "requests",
           match: { traded: { $eq: false } },
           populate: { path: "giveBooks", populate: { path: "user" } },
         })
         .then((books) => {
+          // Gets only requests for books that users wish to take
+          books.forEach((book) => {
+            book.requests = book.requests.filter((request) =>
+              request.takeBooks.find((tb) => String(tb) == String(book._id))
+            );
+          });
+
+          // Checks if any books are available
           if (!books || books.length == 0) {
             res.send("No books have been added yet");
             return;
           }
 
+          books.sort((a, b) => b.bumpedOn - a.bumpedOn);
           res.json(
             books
-              .sort((a, b) => b.bumpedOn - a.bumpedOn)
               .map((book) => {
+                // Converts the objects to string to stay unique
+                let users = [
+                  ...new Set(
+                    book.requests.map((request) => {
+                      return JSON.stringify({
+                        _id: request.giveBooks[0].user._id.toString(),
+                        username: request.giveBooks[0].user.username,
+                      });
+                    })
+                  ),
+                ];
+
                 return {
                   _id: book._id,
                   title: book.title,
@@ -115,12 +135,7 @@ module.exports = (app) => {
                   addedAt: book.addedAt,
                   requests: {
                     count: book.numOfRequests,
-                    users: book.requests.map((request) => {
-                      return {
-                        _id: request.giveBooks[0].user._id,
-                        username: request.giveBooks[0].user.username,
-                      };
-                    }),
+                    users: users.map((user) => JSON.parse(user)),
                   },
                   user: {
                     _id: user._id,
@@ -225,9 +240,9 @@ module.exports = (app) => {
             return;
           }
 
+          requests.sort((a, b) => b.requestedAt - a.requestedAt);
           res.json(
             requests
-              .sort((a, b) => b.requestedAt - a.requestedAt)
               .map((request) => {
                 return {
                   _id: request._id,
