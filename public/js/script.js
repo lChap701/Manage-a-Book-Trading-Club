@@ -1612,10 +1612,13 @@ class AccountForm extends React.Component {
                   Forgot Password?
                 </Link>
               </div>
-            ) : this.props.formName == "Reset Password" ? (
+            ) : this.props.formName == "Reset Password" ||
+              this.props.formName == "Sign Up" ? (
               <div className="mt-2">
                 <Link className="text-white" to="/login">
-                  Login
+                  {this.props.formName == "Reset Password"
+                    ? "Remember Password?"
+                    : "Have an account?"}
                 </Link>
               </div>
             ) : (
@@ -2031,11 +2034,7 @@ const SocialMedia = (props) => {
               </Link>
             </div>
             <div className="modal-footer">
-              <button
-                type="button"
-                class="btn btn-danger float-right"
-                data-dismiss="modal"
-              >
+              <button type="button" class="btn btn-danger" data-dismiss="modal">
                 Cancel
               </button>
             </div>
