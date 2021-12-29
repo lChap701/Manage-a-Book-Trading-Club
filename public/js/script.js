@@ -491,7 +491,7 @@ const BookRequests = (props) => {
 
   return (
     <div>
-      {props.userId.length == 0 ? (
+      {props.userId.length == 0 && bookTitle.length == 0 ? (
         <Spinner />
       ) : (
         <div className="panel shadow-lg">
