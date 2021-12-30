@@ -1621,6 +1621,12 @@ class AccountForm extends React.Component {
                     : "Have an account?"}
                 </Link>
               </div>
+            ) : this.props.formName == "Edit Profile" ? (
+              <div className="mt-2">
+                <Link className="text-white" to={`/users/${this.state._id}`}>
+                  Cancel
+                </Link>
+              </div>
             ) : (
               ""
             )}
