@@ -91,9 +91,8 @@ module.exports = () => {
         try {
           console.log("User " + username + " attempted to log in.");
           const user = await crud.getUser({ username: username });
-          console.log(user.validateSync());
           req.session.error =
-            !user || !bcrypt.compareSync(password, user.password) || user.validateSync();
+            !user || !bcrypt.compareSync(password, user.password);
           return req.session.error ? done(null, false) : done(null, user);
         } catch (err) {
           return done(err);
