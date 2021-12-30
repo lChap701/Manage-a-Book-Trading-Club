@@ -31,7 +31,10 @@ const userSchema = new Schema(
         },
         url: {
           type: String,
-          required: [() => this.oauth, "{PATH} is required"],
+          required: [
+            () => this.oauth && this.provider != "google",
+            "{PATH} is required",
+          ],
         },
         provider: {
           type: String,

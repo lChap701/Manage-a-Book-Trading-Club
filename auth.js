@@ -32,7 +32,6 @@ module.exports = () => {
       let user = await crud.getUser({
         $and: [
           { "accounts.id": profile.id },
-          { "accounts.url": profile.profileUrl },
           { "accounts.provider": profile.provider },
         ],
       });
@@ -71,6 +70,7 @@ module.exports = () => {
     return await crud.addUser({
       username: profile.username,
       name: profile.displayName,
+      email: profile.emails[0],
       /* address: profile._json.location.split(ADDRESS_REGEX)[0],
       city: profile._json.location.split(CITY_REGEX)[0],
       state: profile._json.location.split(STATE_REGEX)[0],
@@ -91,8 +91,9 @@ module.exports = () => {
         try {
           console.log("User " + username + " attempted to log in.");
           const user = await crud.getUser({ username: username });
+          console.log(user.validateSync());
           req.session.error =
-            !user || !bcrypt.compareSync(password, user.password);
+            !user || !bcrypt.compareSync(password, user.password) || user.validateSync();
           return req.session.error ? done(null, false) : done(null, user);
         } catch (err) {
           return done(err);
