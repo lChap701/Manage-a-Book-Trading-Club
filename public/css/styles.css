@@ -46,13 +46,13 @@ form[name="Create Request"] {
 }
 
 /* Spinner Loader */
+
 .overlay {
   background: rgba(0, 0, 0, 0.9);
   position: fixed;
   width: 100%;
   height: 100%;
   left: 0;
-  top: 0;
   z-index: 0;
 }
 
@@ -62,6 +62,7 @@ form[name="Create Request"] {
 }
 
 /* Panel */
+
 .panel {
   margin: 20px auto 0;
 }
@@ -163,6 +164,7 @@ form[name="Create Request"] {
 }
 
 /* Skeleton Loader */
+
 .skeleton-wrapper {
   position: relative;
 }
@@ -212,6 +214,7 @@ form[name="Create Request"] {
 
 .shimmer {
   width: 50%;
+  top: 0;
   opacity: 0.2;
   background: rgba(238, 238, 238, 0.966);
   transform: skewX(-20deg);
@@ -231,6 +234,7 @@ form[name="Create Request"] {
 }
 
 /* Media Queries */
+
 @media screen and (max-width: 991px) {
   .dropdown-menu {
     padding: 0 !important;
@@ -239,11 +243,9 @@ form[name="Create Request"] {
     border: none !important;
     border-radius: 0 !important;
   }
-
   .dropdown-item {
     color: rgba(255, 255, 255, 0.5) !important;
   }
-
   .dropdown-item:focus,
   .dropdown-item:hover,
   .dropdown-item.active,
