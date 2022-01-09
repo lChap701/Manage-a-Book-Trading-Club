@@ -255,7 +255,11 @@ form[name="Create Request"] {
 }
 
 @media screen and (max-height: 700px) {
-  .panel-body {
+  .panel:not([name="Sign Up"]) .panel-body {
     max-height: 400px;
+  }
+
+  .panel[name="Sign Up"] {
+    margin-bottom: 3em;
   }
 }
