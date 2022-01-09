@@ -119,7 +119,7 @@ form[name="Create Request"] {
   width: 240px;
 }
 
-.list-group:not(.list-group-flush) .list-group-item:first-child {
+.list-group:not(.list-group-flush) .list-group-item:not(:last-child) {
   border-bottom: none !important;
 }
 
@@ -251,5 +251,11 @@ form[name="Create Request"] {
   .dropdown-item.active,
   .dropdown-item:active {
     background: none !important;
+  }
+}
+
+@media screen and (max-height: 700px) {
+  .panel-body {
+    max-height: 400px;
   }
 }
