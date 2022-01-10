@@ -19,30 +19,7 @@ const userSchema = new Schema(
     zipPostal: { type: String, trim: true },
     preciseLocation: { type: Boolean, default: true },
     oauth: { type: Boolean, default: false },
-    accounts: [
-      {
-        id: {
-          type: String,
-          required: [() => this.oauth, "{PATH} is required"],
-        },
-        username: {
-          type: String,
-          required: [() => this.oauth, "{PATH} is required"],
-        },
-        url: {
-          type: String,
-          required: [
-            () => this.oauth && this.provider != "google",
-            "{PATH} is required",
-          ],
-        },
-        provider: {
-          type: String,
-          enum: ["github", "facebook", "twitter", "google"],
-          required: [() => this.oauth, "{PATH} is required"],
-        },
-      },
-    ],
+    accounts: [{ type: Schema.Types.ObjectId, ref: "Auth" }],
     books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
   },
   {
