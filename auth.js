@@ -29,17 +29,14 @@ module.exports = () => {
   const getUser = async (req, accessToken, refreshToken, profile, cb) => {
     console.log(profile);
     try {
-      let user = await crud.getUser({
-        $and: [
-          { "accounts.id": profile.id },
-          { "accounts.provider": profile.provider },
-        ],
+      let user = await crud.getAuth({
+        $and: [{ id: profile.id }, { provider: profile.provider }],
       });
 
-      console.log(req.baseUrl);
+      console.log(req.session.baseUrl);
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
-      if (req.baseUrl == "/signup") {
+      if (req.session.baseUrl == "/signup") {
         if (user) {
           return cb(false);
         } else {
@@ -62,20 +59,21 @@ module.exports = () => {
   const createUser = async (profile) => {
     const account = {
       id: profile.id,
-      username: profile.username,
-      url: profile.profileUrl,
       provider: profile.provider,
     };
+
+    console.log(profile._json);
+    console.log(profile._json.location.split(","));
 
     return await crud.addUser({
       username: profile.username,
       name: profile.displayName,
-      email: profile.emails[0],
-      /* address: profile._json.location.split(ADDRESS_REGEX)[0],
-      city: profile._json.location.split(CITY_REGEX)[0],
-      state: profile._json.location.split(STATE_REGEX)[0],
-      country: profile._json.location.split(COUNTRY_REGEX)[0],
-      zipPostal: profile._json.location.split(ZIP_POSTAL_CODE_REGEX)[0], */
+      email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
+      address: profile._json.location || "",
+      /*city: profile._json.location.split(", ")[1],
+      state: profile._json.location.split(", ")[2],
+      country: profile._json.location.split(", ")[3],
+      zipPostal: profile._json.location.split(", ")[4], */
       oauth: true,
       accounts: [account],
     });
