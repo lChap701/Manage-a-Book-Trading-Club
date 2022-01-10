@@ -1,4 +1,5 @@
 const Users = require("./models/Users");
+const Auth = require("./models/Auth");
 const Books = require("./models/Books");
 const Requests = require("./models/Requests");
 const Trades = require("./models/Trades");
@@ -10,6 +11,7 @@ const Trades = require("./models/Trades");
  */
 const crud = {
   addUser: (data) => new Users(data).save(),
+  addAuth: (data) => new Auth(data).save(),
   addBook: (data) => new Books(data).save(),
   addRequest: (data) => new Requests(data).save(),
   addTrade: (data) => new Trades(data).save(),
@@ -18,13 +20,16 @@ const crud = {
   getBooks: (user) => Books.find({ user: user }),
   getRequests: () => Requests.find(),
   getUser: (data) => Users.findOne(data),
+  getAuth: (data) => Auth.findOne(data),
   getBook: (id) => Books.findOne({ _id: id }),
   getRequest: (id) => Requests.findOne({ _id: id }),
   updateUser: (id, data) => Users.updateOne({ _id: id }, data),
   updateBook: (id, data) => Books.updateOne({ _id: id }, data),
   deleteUser: (id) => Users.deleteOne({ _id: id }),
+  deleteAuth: (data) => Auth.deleteOne(data),
   deleteBook: (id) => Books.deleteOne({ _id: id }),
   deleteRequest: (id) => Requests.deleteOne({ _id: id }),
+  deleteAllAuth: (user) => Auth.deleteMany({ user: user }),
   deleteRequests: (ids) => Requests.deleteMany({}).where("_id").in(ids),
   deleteTrades: (request) => Trades.deleteMany({ request: request }),
 };
