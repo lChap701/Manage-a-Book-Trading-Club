@@ -157,6 +157,7 @@ All URL paths part of this project.
 - **/session/user** - Allows the current user's data to be sent to the client
 - **/session/books** - Allows the book IDs part of requests to be sent to the client
 - **/session/success** - Allows success messages to be sent to the client
+- **/session/auth/error** - Allows OAuth error messages to be sent to the client
 
 ## Resources
 
