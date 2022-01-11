@@ -64,7 +64,7 @@ module.exports = () => {
       provider: profile.provider,
     });
 
-    return await crud.addUser({
+    const user = await crud.addUser({
       username: profile.username || profile.displayName,
       name: profile.displayName,
       email: Array.isArray(profile.emails) ? profile.emails[0].value : "",
@@ -72,6 +72,12 @@ module.exports = () => {
       oauth: true,
       accounts: [auth],
     });
+
+    // Links authenticated account to the user
+    auth.user = user._id;
+    auth.save();
+
+    return user;
   };
 
   // Local Strategies
