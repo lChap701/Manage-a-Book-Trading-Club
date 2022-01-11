@@ -40,9 +40,12 @@ module.exports = () => {
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.session.returnTo == "/signup") {
-        if (user) return cb(null, false);
+        if (user) return cb(null, false, { message: "" });
         user = await createUser(req, profile);
       }
+
+      // Removes 'returnTo' URL from the current session
+      delete req.session.returnTo;
 
       return user
         ? req.session.error
