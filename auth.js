@@ -43,10 +43,14 @@ module.exports = () => {
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.session.returnTo == "/signup") {
         if (user) return cb(null, false);
-        user = await createUser(profile);
+        user = await createUser(req, profile);
       }
 
-      return user ? cb(null, user) : cb(null, false);
+      return user
+        ? req.session.error
+          ? cb(null, false)
+          : cb(null, user)
+        : cb(null, false);
     } catch (err) {
       console.log(err);
       return cb(err);
@@ -55,25 +59,39 @@ module.exports = () => {
 
   /**
    * Creates new accounts using OAuth
+   * @param {*} req       Represents the request
    * @param {*} profile   Represents the profile of the user
    * @returns             Returns the newly created account
    */
-  const createUser = async (profile) => {
+  const createUser = async (req, profile) => {
+    // Saves authenticated account
     const auth = await crud.addAuth({
       id: profile.id,
       provider: profile.provider,
     });
     console.log(auth);
 
+    // Get a secret key for AES encrypting
+    const KEY = secretKeys.genKey();
+
+    // Saves the user
     const user = await crud.addUser({
       username: profile.username || profile.displayName,
       name: profile.displayName,
       email: Array.isArray(profile.emails) ? profile.emails[0].value : "",
-      address: profile._json.location || "",
+      address:
+        profile._json.location && profile._json.location.length > 0
+          ? CryptoJS.AES.encrypt(profile._json.location, KEY).toString()
+          : profile._json.location,
       oauth: true,
       accounts: [auth],
     });
     console.log(user);
+
+    // Checks if the secret key was saved in keys.xml (if the key was used)
+    if (profile._json.location && profile._json.location.length > 0) {
+      req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
+    }
 
     // Links authenticated account to the user
     auth.user = user._id;
@@ -112,7 +130,7 @@ module.exports = () => {
           // Get a secret key for AES encrypting
           const KEY = secretKeys.genKey();
 
-          // Save user
+          // Saves the user
           const user = await crud.addUser({
             username: username,
             password: bcrypt.hashSync(
