@@ -32,6 +32,7 @@ module.exports = (app) => {
         req.session.error = false;
         res.send(req.flash("error")[0]);
       } else {
+        req.session.returnTo = req.originalUrl;
         res.sendFile(process.cwd() + "/public/login.html");
       }
     })
@@ -51,6 +52,7 @@ module.exports = (app) => {
   app
     .route("/signup")
     .get(loggedIn, (req, res) => {
+      req.session.returnTo = req.originalUrl;
       res.sendFile(process.cwd() + "/public/signup.html");
     })
     .post(

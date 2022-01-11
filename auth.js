@@ -33,10 +33,10 @@ module.exports = () => {
         $and: [{ id: profile.id }, { provider: profile.provider }],
       });
 
-      console.log(req.session.baseUrl);
+      console.log(req.session.returnTo);
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
-      if (req.session.baseUrl == "/signup") {
+      if (req.session.returnTo == "/signup") {
         if (user) {
           return cb(false);
         } else {
