@@ -15,7 +15,6 @@ const crud = require("../crud");
  */
 module.exports = (app) => {
   const oauthOptions = {
-    failureRedirect: "/login",
     failureFlash: "Unable to authenticate your account",
     successRedirect: "/books",
   };
