@@ -87,7 +87,6 @@ module.exports = (app) => {
   app.get("/session/auth/error", (req, res) => {
     if (req.session.authError) {
       req.session.authError = false;
-      delete req.session.auth;
       res.send(req.flash("error")[0]);
     } else {
       res.send("");
