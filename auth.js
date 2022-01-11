@@ -36,11 +36,8 @@ module.exports = () => {
       });
       console.log(auth);
 
-      // Checks if user has been authenticated
-      if (!auth) return cb(false);
-
       // Gets user name based on the results of OAuth
-      let user = await crud.getUser({ _id: auth.user });
+      let user = auth ? await crud.getUser({ _id: auth.user }) : null;
       console.log(user);
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
