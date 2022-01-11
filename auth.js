@@ -57,10 +57,10 @@ module.exports = () => {
    * @returns             Returns the newly created account
    */
   const createUser = async (profile) => {
-    const account = {
+    const auth = await crud.addAuth({
       id: profile.id,
       provider: profile.provider,
-    };
+    });
 
     return await crud.addUser({
       username: profile.username || profile.displayName,
@@ -68,7 +68,7 @@ module.exports = () => {
       email: Array.isArray(profile.emails) ? profile.emails[0].value : "",
       address: profile._json.location || "",
       oauth: true,
-      accounts: [account],
+      accounts: [auth],
     });
   };
 
