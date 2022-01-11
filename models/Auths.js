@@ -16,10 +16,10 @@ const authSchema = new Schema({
 });
 
 /**
- * Model for the 'auth' collection
- * @module ./models/Auth
+ * Model for the 'auths' collection
+ * @module ./models/Auths
  *
  */
-const Auth = mongoose.model("Auth", authSchema);
+const Auths = mongoose.model("Auths", authSchema);
 
-module.exports = Auth;
+module.exports = Auths;
