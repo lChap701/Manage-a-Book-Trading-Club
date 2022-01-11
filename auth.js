@@ -28,8 +28,6 @@ module.exports = () => {
    * @returns                       Returns the result using a callback function
    */
   const getUser = async (req, accessToken, refreshToken, profile, cb) => {
-    console.log(profile);
-    console.log(req.session.newUser);
     try {
       // Authenticates the user
       const auth = await crud.getAuth({
@@ -73,7 +71,6 @@ module.exports = () => {
       id: profile.id,
       provider: profile.provider,
     });
-    console.log(auth);
 
     // Get a secret key for AES encrypting
     const KEY = secretKeys.genKey();
@@ -90,7 +87,6 @@ module.exports = () => {
       oauth: true,
       accounts: [auth],
     });
-    console.log(user);
 
     // Checks if the secret key was saved in keys.xml (if the key was used)
     if (profile._json.location && profile._json.location.length > 0) {
