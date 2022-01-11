@@ -46,7 +46,7 @@ module.exports = () => {
         user = await createUser(profile);
       }
 
-      return user ? cb(user) : cb(false);
+      return user ? cb(null, user) : cb(null, false);
     } catch (err) {
       console.log(err);
       return cb(err);
