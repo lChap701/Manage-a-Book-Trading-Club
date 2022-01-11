@@ -15,7 +15,7 @@ A project that was created to earn a certificate from freeCodeCamp and allows us
 
 For security, this project uses:
 
-- [CryptoJS](https://cryptojs.gitbook.io/docs/) for encrypt and decrypt users' addresses and zip/postal codes with [AES](https://cryptojs.gitbook.io/docs/#ciphers)
+- [CryptoJS](https://cryptojs.gitbook.io/docs/) to encrypt and decrypt users' addresses and zip/postal codes with [AES](https://cryptojs.gitbook.io/docs/#ciphers)
   - **NOTE:** All **[KEYS](<https://en.wikipedia.org/wiki/Key_(cryptography)>)** are **STORED** in _**keys.xml**_
 - [bcrypt](https://www.npmjs.com/package/bcrypt) to hash and verify passwords
 - [Helmet](https://www.npmjs.com/package/helmet) for extra protection
