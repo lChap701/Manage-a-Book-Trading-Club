@@ -14,10 +14,7 @@ const crud = require("../crud");
  *
  */
 module.exports = (app) => {
-  const oauthOptions = {
-    failureFlash: "Unable to authenticate your account",
-    successRedirect: "/books",
-  };
+  const oauthOptions = { successRedirect: "/books" };
 
   // Finishes setting up Passport
   auth();
@@ -26,13 +23,14 @@ module.exports = (app) => {
   app
     .route("/login")
     .get(loggedIn, (req, res) => {
+      console.log(req.flash("error")[0]);
       // Checks if an error message should be displayed
       if (req.session.error) {
         req.session.error = false;
         res.send(req.flash("error")[0]);
       } else {
-        req.session.returnTo = req.originalUrl;
         oauthOptions.failureRedirect = req.originalUrl;
+        oauthOptions.failureFlash = "Unable to authenticate your account";
         res.sendFile(process.cwd() + "/public/login.html");
       }
     })
@@ -53,8 +51,9 @@ module.exports = (app) => {
     .route("/signup")
     .get(loggedIn, (req, res) => {
       console.log(req.flash("error")[0]);
-      req.session.returnTo = req.originalUrl;
+      req.session.newUser = true;
       oauthOptions.failureRedirect = req.originalUrl;
+      oauthOptions.failureFlash = "This account has already been taken";
       res.sendFile(process.cwd() + "/public/signup.html");
     })
     .post(

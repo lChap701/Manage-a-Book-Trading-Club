@@ -28,7 +28,7 @@ module.exports = () => {
    */
   const getUser = async (req, accessToken, refreshToken, profile, cb) => {
     console.log(profile);
-    console.log(req.session.returnTo);
+    console.log(req.session.newUser);
     try {
       // Authenticates the user
       const auth = await crud.getAuth({
@@ -39,13 +39,16 @@ module.exports = () => {
       let user = auth ? await crud.getUser({ _id: auth.user }) : null;
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
-      if (req.session.returnTo == "/signup") {
+      if (req.session.newUser) {
         if (user) return cb(null, false);
         user = await createUser(req, profile);
       }
 
-      // Removes 'returnTo' URL from the current session
-      delete req.session.returnTo;
+      // Checks if error messages should be displayed
+      req.session.error = req.session.newUser ? Boolean(user) : !user;
+
+      // Removes 'newUser' from the current session
+      delete req.session.newUser;
 
       return user
         ? req.session.error
