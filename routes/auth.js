@@ -23,8 +23,7 @@ module.exports = (app) => {
   app
     .route("/login")
     .get(loggedIn, (req, res) => {
-      console.log(req.flash("error")[0]);
-      // Checks if an error message should be displayed
+      // Checks if an error message should be displayed (when not using OAuth)
       if (req.session.error) {
         req.session.error = false;
         res.send(req.flash("error")[0]);
@@ -50,10 +49,9 @@ module.exports = (app) => {
   app
     .route("/signup")
     .get(loggedIn, (req, res) => {
-      console.log(req.flash("error")[0]);
       req.session.newUser = true;
       oauthOptions.failureRedirect = req.originalUrl;
-      oauthOptions.failureFlash = "This account has already been taken";
+      oauthOptions.failureFlash = "This account has already been used";
       res.sendFile(process.cwd() + "/public/signup.html");
     })
     .post(

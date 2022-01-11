@@ -4,6 +4,7 @@ const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const secretKeys = require("./secretKeys");
 const crud = require("./crud");
+const e = require("connect-flash");
 
 /**
  * Module that sets up Passport serialization and all Passport strategies
@@ -38,20 +39,19 @@ module.exports = () => {
       // Gets user name based on the results of OAuth
       let user = auth ? await crud.getUser({ _id: auth.user }) : null;
 
-      // Checks for duplicate accounts to determine if the user should be able to create an account
+      // Checks for duplicate accounts (when creating an account) and other errors
       if (req.session.newUser) {
+        req.session.authError = Boolean(user);
         if (user) return cb(null, false);
         user = await createUser(req, profile);
+      } else {
+        req.session.authError = !user;
       }
 
-      // Checks if error messages should be displayed
-      req.session.error = req.session.newUser ? Boolean(user) : !user;
-
-      // Removes 'newUser' from the current session
       delete req.session.newUser;
 
       return user
-        ? req.session.error
+        ? req.session.authError
           ? cb(null, false)
           : cb(null, user)
         : cb(null, false);
@@ -94,7 +94,7 @@ module.exports = () => {
 
     // Checks if the secret key was saved in keys.xml (if the key was used)
     if (profile._json.location && profile._json.location.length > 0) {
-      req.session.error = !secretKeys.saveKey(KEY, user._id.toString());
+      req.session.authError = !secretKeys.saveKey(KEY, user._id.toString());
     }
 
     // Links authenticated account to the user
