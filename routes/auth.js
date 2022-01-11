@@ -30,6 +30,7 @@ module.exports = (app) => {
       // Checks if an error message should be displayed
       if (req.session.error) {
         req.session.error = false;
+        oauthOptions.failureRedirect = req.originalUrl;
         res.send(req.flash("error")[0]);
       } else {
         req.session.returnTo = req.originalUrl;
