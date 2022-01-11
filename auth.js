@@ -62,18 +62,11 @@ module.exports = () => {
       provider: profile.provider,
     };
 
-    console.log(profile._json);
-    console.log(profile._json.location.split(","));
-
     return await crud.addUser({
-      username: profile.username,
+      username: profile.username || profile.displayName,
       name: profile.displayName,
-      email: Array.isArray(profile.emails) ? profile.emails[0].value : null,
+      email: Array.isArray(profile.emails) ? profile.emails[0].value : "",
       address: profile._json.location || "",
-      /*city: profile._json.location.split(", ")[1],
-      state: profile._json.location.split(", ")[2],
-      country: profile._json.location.split(", ")[3],
-      zipPostal: profile._json.location.split(", ")[4], */
       oauth: true,
       accounts: [account],
     });
