@@ -28,20 +28,23 @@ module.exports = () => {
    */
   const getUser = async (req, accessToken, refreshToken, profile, cb) => {
     console.log(profile);
+    console.log(req.session.returnTo);
     try {
-      let user = await crud.getAuth({
+      // Authenticates the user
+      let auth = await crud.getAuth({
         $and: [{ id: profile.id }, { provider: profile.provider }],
       });
 
-      console.log(req.session.returnTo);
+      // Checks if user has been authenticated
+      if (!auth) return cb(false);
+
+      // Gets user name based on the results of OAuth
+      let user = await crud.getUser({ _id: auth.user });
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.session.returnTo == "/signup") {
-        if (user) {
-          return cb(false);
-        } else {
-          user = await createUser(profile);
-        }
+        if (user) return cb(false);
+        user = await createUser(profile);
       }
 
       return user ? cb(user) : cb(false);
