@@ -52,6 +52,7 @@ module.exports = (app) => {
   app
     .route("/signup")
     .get(loggedIn, (req, res) => {
+      console.log(req.flash("error")[0]);
       req.session.returnTo = req.originalUrl;
       oauthOptions.failureRedirect = req.originalUrl;
       res.sendFile(process.cwd() + "/public/signup.html");
