@@ -31,15 +31,17 @@ module.exports = () => {
     console.log(req.session.returnTo);
     try {
       // Authenticates the user
-      let auth = await crud.getAuth({
+      const auth = await crud.getAuth({
         $and: [{ id: profile.id }, { provider: profile.provider }],
       });
+      console.log(auth);
 
       // Checks if user has been authenticated
       if (!auth) return cb(false);
 
       // Gets user name based on the results of OAuth
       let user = await crud.getUser({ _id: auth.user });
+      console.log(user);
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.session.returnTo == "/signup") {

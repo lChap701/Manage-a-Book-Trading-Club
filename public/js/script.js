@@ -143,7 +143,7 @@ class BookExchange extends React.Component {
           <Prompt
             message={(location, action) => {
               if (action === "POP") {
-                return `Are you sure you want to go to ${location.pathname}? You will need to reload the page.`;
+                return `Are you sure you want to go to ${location.pathname}? You may need to reload the page.`;
               }
             }}
           />
