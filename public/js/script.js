@@ -1174,6 +1174,7 @@ class AccountForm extends React.Component {
 
     // Functions
     this.getSuccessMsg = this.getSuccessMsg.bind(this);
+    this.getAuthErrMsg = this.getAuthErrMsg.bind(this);
     this.getAddresses = this.getAddresses.bind(this);
     this.getCities = this.getCities.bind(this);
     this.getStates = this.getStates.bind(this);
@@ -1194,10 +1195,13 @@ class AccountForm extends React.Component {
   }
 
   /**
-   * Gets initial data for country and state input fields
+   * Gets initial data for country and state input fields and any messages (depending on the page)
    */
   componentDidMount() {
     if (this.props.formName == "Login") this.getSuccessMsg();
+    if (this.props.formName == "Login" || this.props.formName == "Sign Up") {
+      this.getAuthErrMsg();
+    }
 
     if (
       this.props.formName != "Login" &&
@@ -1209,7 +1213,20 @@ class AccountForm extends React.Component {
   }
 
   /**
-   * Gets success message
+   * Gets an OAuth error message or ""
+   */
+  getAuthErrMsg() {
+    let { errs } = this.state;
+    callApi(`${location.origin}/session/auth/error`).then((data) => {
+      errs[3] = data;
+      this.setState({
+        errs: errs,
+      });
+    });
+  }
+
+  /**
+   * Gets a success message or ""
    */
   getSuccessMsg() {
     callApi(`${location.origin}/session/success`).then((data) => {
@@ -1475,8 +1492,6 @@ class AccountForm extends React.Component {
     if (this.props.formName == "Reset Password") {
       data.newPassword = this.state.newPassword;
     }
-
-    console.log(data);
 
     // For when users try to sign up or update their account
     if (
