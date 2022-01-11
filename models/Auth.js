@@ -8,6 +8,7 @@ const authSchema = new Schema({
   },
   provider: {
     type: String,
+    lowercase: true,
     enum: ["github", "facebook", "twitter", "google"],
     required: "{PATH} is required",
   },

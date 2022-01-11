@@ -63,6 +63,7 @@ module.exports = () => {
       id: profile.id,
       provider: profile.provider,
     });
+    console.log(auth);
 
     const user = await crud.addUser({
       username: profile.username || profile.displayName,
@@ -72,6 +73,7 @@ module.exports = () => {
       oauth: true,
       accounts: [auth],
     });
+    console.log(user);
 
     // Links authenticated account to the user
     auth.user = user._id;
