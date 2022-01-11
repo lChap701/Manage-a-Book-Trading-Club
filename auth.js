@@ -40,7 +40,7 @@ module.exports = () => {
 
       // Checks for duplicate accounts to determine if the user should be able to create an account
       if (req.session.returnTo == "/signup") {
-        if (user) return cb(null, false, { message: "" });
+        if (user) return cb(null, false);
         user = await createUser(req, profile);
       }
 
