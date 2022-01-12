@@ -128,6 +128,7 @@ class BookExchange extends React.Component {
 
         // Determines if session should be passed to client
         if (data) this.setState({ user: data });
+        console.log(data);
       })
       .catch((e) => {
         alert(e);
@@ -271,18 +272,18 @@ class BookExchange extends React.Component {
               <Route exact path="/users/edit">
                 <EditProfile userId={this.state.user._id} />
               </Route>
-              <Route exact path="/users/:id">
-                <Profile myId={this.state.user._id} />
-              </Route>
-              <Route path="/users/:id/books">
-                <UserBooks login={this.state.login} />
-              </Route>
-              <Route path="/users/settings">
+              <Route exact path="/users/settings">
                 <Settings
                   userId={this.state.user._id}
                   oauth={this.state.user.oauth || false}
                   preciseLocation={this.state.user.preciseLocation || false}
                 />
+              </Route>
+              <Route exact path="/users/:id">
+                <Profile myId={this.state.user._id} />
+              </Route>
+              <Route path="/users/:id/books">
+                <UserBooks login={this.state.login} />
               </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
@@ -1220,7 +1221,7 @@ const Settings = (props) => {
       </div>
 
       <div className="panel-body p-4">
-        <ul className="list-group-flush">
+        <ul className="list-group">
           <li className="list-group-item">
             <div className="form-check-inline">
               <input
@@ -1282,7 +1283,7 @@ const Settings = (props) => {
       </div>
 
       <div className="panel-footer px-3 py-2">
-        <input type="submit" className="btn success" value="Save Changes" />
+        <input type="submit" className="btn btn-success" value="Save Changes" />
       </div>
     </form>
   );
