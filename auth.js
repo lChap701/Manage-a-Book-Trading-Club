@@ -40,13 +40,12 @@ module.exports = () => {
       // Checks for duplicate accounts (when creating an account) and other errors
       if (req.session.newUser) {
         req.session.authError = Boolean(user);
+        delete req.session.newUser;
         if (user) return cb(null, false);
         user = await createUser(req, profile);
       } else {
         req.session.authError = !user;
       }
-
-      delete req.session.newUser;
 
       return user
         ? req.session.authError
@@ -60,7 +59,7 @@ module.exports = () => {
   };
 
   /**
-   * Creates new accounts using OAuth
+   * Creates a new account using OAuth
    * @param {*} req       Represents the request
    * @param {*} profile   Represents the profile of the user
    * @returns             Returns the newly created account
