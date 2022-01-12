@@ -439,6 +439,61 @@ module.exports = (app) => {
         });
     });
 
+  // Displays and handles PUT/DELETE requests on the Book Exchange - Settings Page
+  app
+    .route("/users/settings")
+    .get(loggedOut, (req, res) => {
+      res.sendFile(process.cwd() + "/public/settings.html");
+    })
+    .put((req, res) => {
+      crud.getUser({ _id: req.body.id }).then((user) => {
+        if (!user) {
+          res.send("Unknown user");
+          return;
+        }
+
+        if (req.body.password) {
+          if (!bcrypt.compareSync(req.body.password, user.password)) {
+            res.send("Invalid password");
+            return;
+          }
+        }
+
+        const data = { preciseLocation: req.body.preciseLocation };
+
+        if (req.body.newPassword) data.password = req.body.newPassword;
+
+        crud
+          .updateUser(user._id, data)
+          .then(() => res.send("Your changes have been saved"))
+          .catch((err) => res.send(err));
+      });
+    })
+    .delete((req, res) => {
+      crud
+        .getUser({ _id: req.body.id })
+        .populate({ path: "books" })
+        .then((user) => {
+          if (!user) {
+            res.send("Unknown user");
+            return;
+          }
+
+          // Deletes everything linked account tied to the account
+          crud.deleteAllAuth(user._id).catch((ex) => console.log(ex));
+          user.books.forEach((book) => {
+            crud.deleteBook(book._id).catch((ex) => console.log(ex));
+            crud.deleteRequests(book.requests).catch((ex) => console.log(ex));
+          });
+
+          crud.deleteUser({ _id: user._id }).then(() => {
+            req.flash("success", "Your account has been deleted");
+            req.session.success = true;
+            res.redirect("/books");
+          });
+        });
+    });
+
   // Displays and handles POST requests on the Book Exchange - My Books Page
   app
     .route("/books/my")
