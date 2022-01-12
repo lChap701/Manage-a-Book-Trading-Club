@@ -226,6 +226,10 @@ class BookExchange extends React.Component {
                             text: "Edit Profile",
                           },
                           {
+                            path: "/users/settings",
+                            text: "Settings",
+                          },
+                          {
                             path: "/books/my",
                             text: "My Books",
                           },
@@ -1153,6 +1157,7 @@ const Settings = (props) => {
   let [usePreciseLocation, setUsePreciseLocation] = useState(
     props.preciseLocation
   );
+  let [allowNotifications, setAllowNotifications] = useState(true);
   let [password, setPassword] = useState({ old: "", new: "", confirm: "" });
 
   // Ensures that 'usePreciseLocation' is always updated
@@ -1223,61 +1228,112 @@ const Settings = (props) => {
       <div className="panel-body p-4">
         <ul className="list-group">
           <li className="list-group-item">
-            <div className="form-check-inline">
-              <input
-                type="checkbox"
-                id="usePreciseLocation"
-                name="usePreciseLocation"
-                className="form-check-input"
-                checked={usePreciseLocation}
-                onChange={() => setUsePreciseLocation(!usePreciseLocation)}
-              />
-              <label for="usePreciseLocation" className="form-check-label">
-                Make your exact location public?
-              </label>
-            </div>
+            <details>
+              <summary className="h4">Profile</summary>
+
+              <ul className="list-group list-group-flush ml-4">
+                <li className="list-group-item">
+                  <h5>Change Password</h5>
+                  <hr />
+                  {!props.oauth ? (
+                    <InputControl
+                      containerClass="form-group"
+                      id="psw"
+                      label="Old Password"
+                      type="text"
+                      required
+                      value={password.old}
+                      onChange={updatePasswordFields}
+                      validator="pswFeedback"
+                      err={errs[0]}
+                    />
+                  ) : (
+                    ""
+                  )}
+
+                  <InputControl
+                    containerClass="form-group"
+                    id="newPsw"
+                    label={props.oauth ? "Password" : "New Password"}
+                    type="text"
+                    required
+                    value={password.new}
+                    onChange={updatePasswordFields}
+                    validator="newPswFeedback"
+                    err={errs[0]}
+                  />
+
+                  <InputControl
+                    containerClass="form-group"
+                    id="confirmPsw"
+                    label="Confirm Password"
+                    type="text"
+                    required
+                    value={password.confirm}
+                    onChange={updatePasswordFields}
+                    validator="confirmPswFeedback"
+                    err={errs[1] || errs[0]}
+                  />
+                </li>
+                <li className="list-group-item">
+                  <h5>Delete Account</h5>
+                  <hr />
+                  <p>Please keep in mind that this action cannot be undone.</p>
+                  <DeleteAccountForm
+                    formName="Delete Account"
+                    id="deleteAccountModal"
+                    userId={props.userId}
+                  />
+                </li>
+              </ul>
+            </details>
           </li>
 
           <li className="list-group-item">
-            {!props.oauth ? (
-              <InputControl
-                containerClass="form-group"
-                id="psw"
-                label="Old Password"
-                type="text"
-                required
-                value={password.old}
-                onChange={updatePasswordFields}
-                validator="pswFeedback"
-                err={errs[0]}
-              />
-            ) : (
-              ""
-            )}
-
-            <InputControl
-              containerClass="form-group"
-              id="newPsw"
-              label={props.oauth ? "Password" : "New Password"}
-              type="text"
-              required
-              value={password.new}
-              onChange={updatePasswordFields}
-              validator="newPswFeedback"
-              err={errs[0]}
-            />
-
-            <InputControl
-              containerClass="form-group"
-              id="confirmPsw"
-              label="Confirm Password"
-              type="text"
-              required
-              value={password.confirm}
-              onChange={updatePasswordFields}
-              validator="confirmPswFeedback"
-              err={errs[1] || errs[0]}
-            />
+            <details>
+              <summary className="h4">Privacy</summary>
+              <div className="ml-4 list-group list-group-flush">
+                <div className="list-group-item">
+                  <div className="form-check-inline">
+                    <input
+                      type="checkbox"
+                      id="usePreciseLocation"
+                      name="usePreciseLocation"
+                      className="form-check-input"
+                      checked={usePreciseLocation}
+                      onChange={() =>
+                        setUsePreciseLocation(!usePreciseLocation)
+                      }
+                    />
+                    <label
+                      for="usePreciseLocation"
+                      className="form-check-label"
+                    >
+                      Make your exact location public
+                    </label>
+                  </div>
+                  <br />
+                  <div className="form-check-inline">
+                    <input
+                      type="checkbox"
+                      id="notifications"
+                      name="notifications"
+                      className="form-check-input"
+                      checked={allowNotifications}
+                      onChange={() =>
+                        setAllowNotifications(!allowNotifications)
+                      }
+                    />
+                    <label
+                      for="usePreciseLocation"
+                      className="form-check-label"
+                    >
+                      Use your email address to send notifications
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </details>
           </li>
         </ul>
       </div>
@@ -2068,11 +2124,11 @@ const SelectBooksForm = (props) => {
 };
 
 /**
- * Component for displaying a form for an option on the Settings page
+ * Component for displaying a form for deleting accounts on the Settings page
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
-const SettingOptionForm = (props) => {
+const DeleteAccountForm = (props) => {
   let [err, setErr] = useState("");
 
   /**
@@ -2083,13 +2139,8 @@ const SettingOptionForm = (props) => {
   const submitForm = async (e) => {
     e.preventDefault();
 
-    const data = { _id: props.userId };
-
     // Submits the form and gets the result
-    let res =
-      props.formName == "Delete Account"
-        ? await sendData(data, "DELETE")
-        : await sendData(data, "PUT");
+    let res = await sendData({ _id: props.userId }, "DELETE");
 
     // Checks if a new page should be displayed or if an error occurred
     if (res.includes("http")) {
@@ -2140,25 +2191,21 @@ const SettingOptionForm = (props) => {
               </div>
 
               <div className="modal-body">
-                {props.formName == "Delete Account" ? (
-                  <h4 className="text-center">
-                    Do you really wish to delete your account?
-                  </h4>
-                ) : (
-                  ""
-                )}
+                <h4 className="text-center">
+                  Do you really wish to delete your account?
+                </h4>
               </div>
 
               <div className="modal-footer">
-                <button type="submit" class="btn btn-primary">
-                  {props.formName == "Delete Account" ? "Yes" : "Save"}
+                <button type="submit" className="btn btn-primary">
+                  Yes
                 </button>
                 <button
                   type="button"
-                  class="btn btn-danger"
+                  className="btn btn-danger"
                   data-dismiss="modal"
                 >
-                  {props.formName == "Delete Account" ? "No" : "Cancel"}
+                  No
                 </button>
               </div>
             </div>
