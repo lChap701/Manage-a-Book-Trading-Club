@@ -446,7 +446,7 @@ module.exports = (app) => {
       res.sendFile(process.cwd() + "/public/settings.html");
     })
     .put((req, res) => {
-      crud.getUser({ _id: req.body.id }).then((user) => {
+      crud.getUser({ _id: req.body._id }).then((user) => {
         if (!user) {
           res.send("Unknown user");
           return;
@@ -471,7 +471,7 @@ module.exports = (app) => {
     })
     .delete((req, res) => {
       crud
-        .getUser({ _id: req.body.id })
+        .getUser({ _id: req.body._id })
         .populate({ path: "books" })
         .then((user) => {
           if (!user) {

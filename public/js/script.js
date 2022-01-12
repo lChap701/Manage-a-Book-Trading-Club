@@ -1212,11 +1212,11 @@ const Settings = (props) => {
   return (
     <form
       onSubmit={submitForm}
-      className="panel shadow-lg"
+      className="panel shadow-lg my-3"
       name="Settings"
       novalidate="true"
     >
-      <div className="panel-header text-white p-1">
+      <div className="panel-header text-white p-2">
         <h2>Settings</h2>
       </div>
 
