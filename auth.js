@@ -29,12 +29,12 @@ module.exports = () => {
    */
   const getUser = async (req, accessToken, refreshToken, profile, cb) => {
     try {
-      // Authenticates the user
+      // Gets authenticated account (if one exists)
       const auth = await crud.getAuth({
         $and: [{ id: profile.id }, { provider: profile.provider }],
       });
 
-      // Gets user name based on the results of OAuth
+      // Gets user name based on the results of what was found
       let user = auth ? await crud.getUser({ _id: auth.user }) : null;
 
       // Checks for duplicate accounts (when creating an account) and other errors
