@@ -277,6 +277,13 @@ class BookExchange extends React.Component {
               <Route path="/users/:id/books">
                 <UserBooks login={this.state.login} />
               </Route>
+              <Route path="/users/settings">
+                <Settings
+                  userId={this.state.user._id}
+                  oauth={this.state.user.oauth || false}
+                  preciseLocation={this.state.user.preciseLocation || false}
+                />
+              </Route>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
               <Route path="/password/reset" component={ResetPassword} />
@@ -1136,6 +1143,152 @@ const UserBooks = (props) => {
 };
 
 /**
+ * Component for displaying content on the Settings page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Settings = (props) => {
+  let [errs, setErrs] = useState(["Password is required"]);
+  let [usePreciseLocation, setUsePreciseLocation] = useState(
+    props.preciseLocation
+  );
+  let [password, setPassword] = useState({ old: "", new: "", confirm: "" });
+
+  // Ensures that 'usePreciseLocation' is always updated
+  useEffect(() => {
+    setUsePreciseLocation(props.preciseLocation);
+  }, [props.preciseLocation]);
+
+  /**
+   * Saves changes to password fields while the user is typing
+   * @param {InputControlEvent} e    Represents the event that occurred
+   */
+  const updatePasswordFields = (e) => {
+    if (e.target.id == "psw") {
+      setPassword({ ...password, old: e.target.value });
+    } else if (e.target.id == "newPsw") {
+      setPassword({ ...password, new: e.target.value });
+    } else {
+      setPassword({ ...password, new: e.target.value });
+    }
+  };
+
+  /**
+   * Handles form validation and form submission
+   * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
+   */
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    // Checks if the user confirmed the new password
+    if (password.new != password.confirm) {
+      setErrs([...errs, "Password doesn't match"]);
+    }
+
+    // Determines if form should be submitted
+    if (!validateForm() || errs.length > 1) return;
+
+    const data = {
+      _id: props.userId,
+      preciseLocation: usePreciseLocation,
+    };
+
+    if (password.old) data.password = password.old;
+    if (password.new) data.newPassword = password.new;
+
+    // Submits the form and gets the result
+    let res = await sendData(data, "PUT");
+
+    // Checks if a new page should be displayed or if an error occurred
+    if (res.includes("http")) {
+      location.href = res;
+    } else {
+      setErrs([...errs, res]);
+    }
+  };
+
+  return (
+    <form
+      onSubmit={submitForm}
+      className="panel shadow-lg"
+      name="Settings"
+      novalidate="true"
+    >
+      <div className="panel-header text-white p-1">
+        <h2>Settings</h2>
+      </div>
+
+      <div className="panel-body p-4">
+        <ul className="list-group-flush">
+          <li className="list-group-item">
+            <div className="form-check-inline">
+              <input
+                type="checkbox"
+                id="usePreciseLocation"
+                name="usePreciseLocation"
+                className="form-check-input"
+                checked={usePreciseLocation}
+                onChange={() => setUsePreciseLocation(!usePreciseLocation)}
+              />
+              <label for="usePreciseLocation" className="form-check-label">
+                Make your exact location public?
+              </label>
+            </div>
+          </li>
+
+          <li className="list-group-item">
+            {!props.oauth ? (
+              <InputControl
+                containerClass="form-group"
+                id="psw"
+                label="Old Password"
+                type="text"
+                required
+                value={password.old}
+                onChange={updatePasswordFields}
+                validator="pswFeedback"
+                err={errs[0]}
+              />
+            ) : (
+              ""
+            )}
+
+            <InputControl
+              containerClass="form-group"
+              id="newPsw"
+              label={props.oauth ? "Password" : "New Password"}
+              type="text"
+              required
+              value={password.new}
+              onChange={updatePasswordFields}
+              validator="newPswFeedback"
+              err={errs[0]}
+            />
+
+            <InputControl
+              containerClass="form-group"
+              id="confirmPsw"
+              label="Confirm Password"
+              type="text"
+              required
+              value={password.confirm}
+              onChange={updatePasswordFields}
+              validator="confirmPswFeedback"
+              err={errs[1] || errs[0]}
+            />
+          </li>
+        </ul>
+      </div>
+
+      <div className="panel-footer px-3 py-2">
+        <input type="submit" className="btn success" value="Save Changes" />
+      </div>
+    </form>
+  );
+};
+
+/**
  * Component for displaying and handling forms on the Login, Sign Up, Reset Password, and Edit Profile pages
  */
 class AccountForm extends React.Component {
@@ -1653,6 +1806,369 @@ class AccountForm extends React.Component {
 }
 
 /**
+ * Component for displaying and handling forms on the home page and the My Books page
+ */
+class BookForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    // States
+    this.state = {
+      _id: props._id || "",
+      title: props.title || "",
+      description: props.description || "",
+      errs: ["Title is required", "Description is required"],
+    };
+
+    // Functions
+    this.saveTitle = this.saveTitle.bind(this);
+    this.saveDescription = this.saveDescription.bind(this);
+    this.submitForm = this.submitForm.bind(this);
+    this.sendToUrl = this.sendToUrl.bind(this);
+  }
+
+  /**
+   * Saves the title of a book
+   * @param {InputControlEvent} e   Represents the event that occurred
+   */
+  saveTitle(e) {
+    this.setState({ title: e.target.value });
+  }
+
+  /**
+   * Saves the description provided by the user
+   * @param {InputControlEvent} e   Represents the event that occurred
+   */
+  saveDescription(e) {
+    this.setState({ description: e.target.value });
+  }
+
+  /**
+   * Handles form validation and form submission
+   * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
+   */
+  async submitForm(e) {
+    e.preventDefault();
+
+    // Determines if form should be submitted
+    if (!validateForm()) return;
+
+    const data = { user: this.props.userId };
+
+    if (this.props.formName != "Delete Book") {
+      data.title = this.state.title;
+      data.description = this.state.description;
+    }
+
+    // Submits the form and gets the result
+    let res =
+      this.props.formName == "Edit Book"
+        ? await this.sendToUrl(data, "PUT")
+        : this.props.formName == "Delete Book"
+        ? await this.sendToUrl(data, "DELETE")
+        : await sendData(data);
+
+    // Checks if the page should reload
+    if (res == "success") {
+      location.reload();
+    } else {
+      let { errs } = this.state;
+      errs[0] = res;
+      this.setState({ errs: errs });
+    }
+  }
+
+  /**
+   * Sends data to form handlers for the Edit Book and Delete Book forms
+   * @param {*} data            Represents the data that should be submitted
+   * @param {String} method     Represents the HTTP method to use
+   * @returns                   Returns a message
+   */
+  async sendToUrl(data, method) {
+    try {
+      const URL =
+        method == "PUT"
+          ? `/books/${this.state._id}/update`
+          : `/books/${this.state._id}/delete`;
+
+      const res = await fetch(URL, {
+        method: method,
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Ensures that an error message is displayed
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+      return await res.text();
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
+    }
+  }
+
+  render() {
+    return (
+      <form
+        name={this.props.formName}
+        className="modal fade"
+        tabindex="-1"
+        id={this.props.id}
+        role="dialog"
+        aria-labelledby={`${this.props.id}Label`}
+        aria-hidden="true"
+        onSubmit={this.submitForm}
+        novalidate="true"
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id={`${this.props.id}Label`}>
+                {this.props.formName}
+              </h5>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <InputControl
+                containerClass="form-group"
+                id="title"
+                label="Title"
+                type="text"
+                required={!Boolean(this.props.readonly)}
+                readonly={Boolean(this.props.readonly)}
+                value={this.state.title}
+                onChange={this.saveTitle}
+                validator="titleFeedback"
+                err={this.state.errs[0]}
+              />
+
+              <InputControl
+                containerClass="form-group"
+                id="desc"
+                label="Description"
+                type="text"
+                placeholder="Author, condition..."
+                required={!Boolean(this.props.readonly)}
+                readonly={Boolean(this.props.readonly)}
+                value={this.state.description}
+                onChange={this.saveDescription}
+                validator="descFeedback"
+                err={this.state.errs[1]}
+              />
+            </div>
+
+            <div className="modal-footer">
+              <input
+                type="submit"
+                className="btn btn-primary"
+                value={
+                  this.props.formName == "Edit Book"
+                    ? "Update Book"
+                    : this.props.formName
+                }
+              />
+              <input
+                type="button"
+                className="btn btn-danger"
+                data-dismiss="modal"
+                value="Cancel"
+              />
+            </div>
+          </div>
+        </div>
+      </form>
+    );
+  }
+}
+
+/**
+ * Component for displaying a form for selecting books to use for trades
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const SelectBooksForm = (props) => {
+  let [books, setBooks] = useState([]);
+
+  /**
+   * Gets books to give/take during trades and selects books that are in use
+   */
+  const getBooksToUse = useCallback(async () => {
+    let json = await callApi(
+      `${location.origin}/requests/new/books/select?to=${props.to}`,
+      "JSON"
+    );
+    setBooks(json);
+  }, []);
+
+  // Calls getBooksToUse() function once
+  useEffect(() => getBooksToUse(), []);
+
+  return (
+    <form
+      action="/requests/new/books"
+      method="POST"
+      name={props.formName}
+      className="modal fade"
+      tabindex="-1"
+      id={props.id}
+      role="dialog"
+      aria-labelledby={`${props.id}Label`}
+      aria-hidden="true"
+    >
+      <div className="modal-dialog modal-lg" role="document">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title" id={`${props.id}Label`}>
+              {`${props.formName}`}
+            </h5>
+            <button
+              type="button"
+              className="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div className="modal-body">
+            <BookListGroup
+              books={books}
+              booksInUse={JSON.stringify(
+                props.booksInUse.map((sb) => `${sb._id}`)
+              )}
+            />
+          </div>
+
+          <div className="modal-footer">
+            <input type="submit" className="btn btn-primary" value="Continue" />
+            <input
+              type="button"
+              className="btn btn-danger"
+              data-dismiss="modal"
+              value="Cancel"
+            />
+          </div>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+/**
+ * Component for displaying a form for an option on the Settings page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const SettingOptionForm = (props) => {
+  let [err, setErr] = useState("");
+
+  /**
+   * Handles form validation and form submission
+   * @param {SubmitEvent} e   Represents the event that occurred
+   * @returns                 Returns nothing or is void
+   */
+  const submitForm = async (e) => {
+    e.preventDefault();
+
+    const data = { _id: props.userId };
+
+    // Submits the form and gets the result
+    let res =
+      props.formName == "Delete Account"
+        ? await sendData(data, "DELETE")
+        : await sendData(data, "PUT");
+
+    // Checks if a new page should be displayed or if an error occurred
+    if (res.includes("http")) {
+      location.href = res;
+    } else {
+      setErr(res);
+    }
+  };
+
+  return (
+    <div>
+      <button
+        className="btn btn-danger"
+        type="button"
+        data-toggle="modal"
+        data-target={`#${props.id}`}
+      >
+        {props.formName}
+      </button>
+
+      <div>
+        {err ? <Alert class="bg-danger" msg={err} /> : ""}
+
+        <form
+          className="modal fade"
+          name={props.formName}
+          onSubmit={submitForm}
+          tabindex="-1"
+          id={props.id}
+          role="dialog"
+          aria-labelledby={`${props.id}Label`}
+          aria-hidden="true"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id={`${props.id}Label`}>
+                  {props.formName}
+                </h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <div className="modal-body">
+                {props.formName == "Delete Account" ? (
+                  <h4 className="text-center">
+                    Do you really wish to delete your account?
+                  </h4>
+                ) : (
+                  ""
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <button type="submit" class="btn btn-primary">
+                  {props.formName == "Delete Account" ? "Yes" : "Save"}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  data-dismiss="modal"
+                >
+                  {props.formName == "Delete Account" ? "No" : "Cancel"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+/**
  * Component for handling the layout of the Login form
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
@@ -2019,6 +2535,7 @@ const SocialMedia = (props) => {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
+
             <div className="modal-body">
               <Link
                 to="/auth/google"
@@ -2054,6 +2571,7 @@ const SocialMedia = (props) => {
                 GitHub
               </Link>
             </div>
+
             <div className="modal-footer">
               <button type="button" class="btn btn-danger" data-dismiss="modal">
                 Cancel
@@ -2061,267 +2579,6 @@ const SocialMedia = (props) => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Component for displaying and handling forms on the home page and the My Books page
- */
-class BookForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    // States
-    this.state = {
-      _id: props._id || "",
-      title: props.title || "",
-      description: props.description || "",
-      errs: ["Title is required", "Description is required"],
-    };
-
-    // Functions
-    this.saveTitle = this.saveTitle.bind(this);
-    this.saveDescription = this.saveDescription.bind(this);
-    this.submitForm = this.submitForm.bind(this);
-    this.sendToUrl = this.sendToUrl.bind(this);
-  }
-
-  /**
-   * Saves the title of a book
-   * @param {InputControlEvent} e   Represents the event that occurred
-   */
-  saveTitle(e) {
-    this.setState({ title: e.target.value });
-  }
-
-  /**
-   * Saves the description provided by the user
-   * @param {InputControlEvent} e   Represents the event that occurred
-   */
-  saveDescription(e) {
-    this.setState({ description: e.target.value });
-  }
-
-  /**
-   * Handles form validation and form submission
-   * @param {SubmitEvent} e   Represents the event that occurred
-   * @returns                 Returns nothing or is void
-   */
-  async submitForm(e) {
-    e.preventDefault();
-
-    // Determines if form should be submitted
-    if (!validateForm()) return;
-
-    const data = { user: this.props.userId };
-
-    if (this.props.formName != "Delete Book") {
-      data.title = this.state.title;
-      data.description = this.state.description;
-    }
-
-    // Submits the form and gets the result
-    let res =
-      this.props.formName == "Edit Book"
-        ? await this.sendToUrl(data, "PUT")
-        : this.props.formName == "Delete Book"
-        ? await this.sendToUrl(data, "DELETE")
-        : await sendData(data);
-
-    // Checks if the page should reload
-    if (res == "success") {
-      location.reload();
-    } else {
-      let { errs } = this.state;
-      errs[0] = res;
-      this.setState({ errs: errs });
-    }
-  }
-
-  /**
-   * Sends data to form handlers for the Edit Book and Delete Book forms
-   * @param {*} data            Represents the data that should be submitted
-   * @param {String} method     Represents the HTTP method to use
-   * @returns                   Returns a message
-   */
-  async sendToUrl(data, method) {
-    try {
-      const URL =
-        method == "PUT"
-          ? `/books/${this.state._id}/update`
-          : `/books/${this.state._id}/delete`;
-
-      const res = await fetch(URL, {
-        method: method,
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      // Ensures that an error message is displayed
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-
-      return await res.text();
-    } catch (err) {
-      alert(err.message);
-      console.error(err);
-    }
-  }
-
-  render() {
-    return (
-      <form
-        name={this.props.formName}
-        className="modal fade"
-        tabindex="-1"
-        id={this.props.id}
-        role="dialog"
-        aria-labelledby={`${this.props.id}Label`}
-        aria-hidden="true"
-        onSubmit={this.submitForm}
-        novalidate="true"
-      >
-        <div className="modal-dialog" role="document">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id={`${this.props.id}Label`}>
-                {this.props.formName}
-              </h5>
-              <button
-                type="button"
-                className="close"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-
-            <div className="modal-body">
-              <InputControl
-                containerClass="form-group"
-                id="title"
-                label="Title"
-                type="text"
-                required={!Boolean(this.props.readonly)}
-                readonly={Boolean(this.props.readonly)}
-                value={this.state.title}
-                onChange={this.saveTitle}
-                validator="titleFeedback"
-                err={this.state.errs[0]}
-              />
-
-              <InputControl
-                containerClass="form-group"
-                id="desc"
-                label="Description"
-                type="text"
-                placeholder="Author, condition..."
-                required={!Boolean(this.props.readonly)}
-                readonly={Boolean(this.props.readonly)}
-                value={this.state.description}
-                onChange={this.saveDescription}
-                validator="descFeedback"
-                err={this.state.errs[1]}
-              />
-            </div>
-
-            <div className="modal-footer">
-              <input
-                type="submit"
-                className="btn btn-primary"
-                value={
-                  this.props.formName == "Edit Book"
-                    ? "Update Book"
-                    : this.props.formName
-                }
-              />
-              <input
-                type="button"
-                className="btn btn-danger"
-                data-dismiss="modal"
-                value="Cancel"
-              />
-            </div>
-          </div>
-        </div>
-      </form>
-    );
-  }
-}
-
-/**
- * Component for displaying a spinner loading animation
- * @returns   Returns the content that should be displayed
- */
-const Spinner = () => {
-  return (
-    <div className="overlay d-flex justify-content-center align-items-center">
-      <div className="spinner-border text-light" role="status">
-        <span className="sr-only">Loading...</span>
-      </div>
-    </div>
-  );
-};
-
-/**
- * Component for displaying a spinner loading animation for buttons
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the dropdown menu that should be displayed
- */
-const SpinnerButton = (props) => {
-  return (
-    <button className={props.class} type="button" disabled>
-      <span
-        className="spinner-grow spinner-grow-sm"
-        role="status"
-        aria-hidden="true"
-      ></span>
-      <span class="sr-only">Loading...</span>
-    </button>
-  );
-};
-
-/**
- * Component for creating dropdown menus in the navbar
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the dropdown menu that should be displayed
- */
-const Dropdown = (props) => {
-  return (
-    <div className="dropdown">
-      <a
-        className="nav-link dropdown-toggle"
-        href="#"
-        id={props.id}
-        role="button"
-        data-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-      >
-        {props.dropLinkText}
-      </a>
-
-      <div
-        className={`dropdown-menu${
-          props.id == "userDropdownMenuLink" ? " dropdown-menu-right" : ""
-        }`}
-        aria-labelledby={props.id}
-      >
-        {props.links.map((link) => {
-          return (
-            <NavLink
-              className="dropdown-item nav-item"
-              exact={Boolean(link.exact)}
-              to={link.path}
-            >
-              {link.text}
-            </NavLink>
-          );
-        })}
       </div>
     </div>
   );
@@ -2446,159 +2703,6 @@ const BookListGroup = (props) => {
       </ul>
       <input id="books" name="books" type="text" hidden value={selectedBooks} />
     </div>
-  );
-};
-
-/**
- * Component for displaying options for editing or deleting a book
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const Options = (props) => {
-  return (
-    <div className="options">
-      <button
-        type="button"
-        className="btn btn-primary"
-        data-toggle="modal"
-        data-target="#editBookModal"
-      >
-        <i className="bi bi-pencil-fill"></i>
-      </button>
-      <BookForm
-        id="editBookModal"
-        formName="Edit Book"
-        userId={props.myId}
-        _id={props._id}
-        title={props.title}
-        description={props.description}
-      />
-      <button
-        type="button"
-        className="btn btn-danger"
-        data-toggle="modal"
-        data-target="#deleteBookModal"
-      >
-        <i className="bi bi-trash-fill"></i>
-      </button>
-      <BookForm
-        id="deleteBookModal"
-        formName="Delete Book"
-        userId={props.myId}
-        _id={props._id}
-        title={props.title}
-        description={props.description}
-        readonly={true}
-      />
-    </div>
-  );
-};
-
-/**
- * Component for displaying a form for selecting books to use for trades
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const SelectBooksForm = (props) => {
-  let [books, setBooks] = useState([]);
-
-  /**
-   * Gets books to give/take during trades and selects books that are in use
-   */
-  const getBooksToUse = useCallback(async () => {
-    let json = await callApi(
-      `${location.origin}/requests/new/books/select?to=${props.to}`,
-      "JSON"
-    );
-    setBooks(json);
-  }, []);
-
-  // Calls getBooksToUse() function once
-  useEffect(() => getBooksToUse(), []);
-
-  return (
-    <form
-      action="/requests/new/books"
-      method="POST"
-      name={props.formName}
-      className="modal fade"
-      tabindex="-1"
-      id={props.id}
-      role="dialog"
-      aria-labelledby={`${props.id}Label`}
-      aria-hidden="true"
-    >
-      <div className="modal-dialog modal-lg" role="document">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title" id={`${props.id}Label`}>
-              {`${props.formName}`}
-            </h5>
-            <button
-              type="button"
-              className="close"
-              data-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
-          <div className="modal-body">
-            <BookListGroup
-              books={books}
-              booksInUse={JSON.stringify(
-                props.booksInUse.map((sb) => `${sb._id}`)
-              )}
-            />
-          </div>
-
-          <div className="modal-footer">
-            <input type="submit" className="btn btn-primary" value="Continue" />
-            <input
-              type="button"
-              className="btn btn-danger"
-              data-dismiss="modal"
-              value="Cancel"
-            />
-          </div>
-        </div>
-      </div>
-    </form>
-  );
-};
-
-/**
- * Component for display books that were or are to be given/taken
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
- */
-const GiveTakeBooks = (props) => {
-  return (
-    <li className="list-group-item">
-      {props.requests > 0 ? (
-        <small>
-          <Link className="float-right" to={`/books/${props._id}/requests`}>
-            Requests{" "}
-            <span className="badge badge-primary">{props.requests}</span>
-          </Link>
-        </small>
-      ) : (
-        ""
-      )}
-      <h5 className="my-1">
-        {props.title}
-        {props.user ? (
-          <small>
-            <span className="text-muted"> from</span>
-            <Link to={`/users/${props.user._id}`}> {props.user.username}</Link>
-          </small>
-        ) : (
-          ""
-        )}
-      </h5>
-      <b>{props.description}</b>
-    </li>
   );
 };
 
@@ -2732,15 +2836,81 @@ const TradeListGroup = (props) => {
 };
 
 /**
- * Component for displaying alerts
+ * Component for displaying options for editing or deleting a book
  * @param {*} props     Represents the props that were passed
  * @returns             Returns the content that should be displayed
  */
-const Alert = (props) => {
+const Options = (props) => {
   return (
-    <div className={props.class} role="alert">
-      {props.msg}
+    <div className="options">
+      <button
+        type="button"
+        className="btn btn-primary"
+        data-toggle="modal"
+        data-target="#editBookModal"
+      >
+        <i className="bi bi-pencil-fill"></i>
+      </button>
+      <BookForm
+        id="editBookModal"
+        formName="Edit Book"
+        userId={props.myId}
+        _id={props._id}
+        title={props.title}
+        description={props.description}
+      />
+      <button
+        type="button"
+        className="btn btn-danger"
+        data-toggle="modal"
+        data-target="#deleteBookModal"
+      >
+        <i className="bi bi-trash-fill"></i>
+      </button>
+      <BookForm
+        id="deleteBookModal"
+        formName="Delete Book"
+        userId={props.myId}
+        _id={props._id}
+        title={props.title}
+        description={props.description}
+        readonly={true}
+      />
     </div>
+  );
+};
+
+/**
+ * Component for display books that were or are to be given/taken
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const GiveTakeBooks = (props) => {
+  return (
+    <li className="list-group-item">
+      {props.requests > 0 ? (
+        <small>
+          <Link className="float-right" to={`/books/${props._id}/requests`}>
+            Requests{" "}
+            <span className="badge badge-primary">{props.requests}</span>
+          </Link>
+        </small>
+      ) : (
+        ""
+      )}
+      <h5 className="my-1">
+        {props.title}
+        {props.user ? (
+          <small>
+            <span className="text-muted"> from</span>
+            <Link to={`/users/${props.user._id}`}> {props.user.username}</Link>
+          </small>
+        ) : (
+          ""
+        )}
+      </h5>
+      <b>{props.description}</b>
+    </li>
   );
 };
 
@@ -2858,6 +3028,93 @@ const Select = (props) => {
         ""
       )}
     </div>
+  );
+};
+
+/**
+ * Component for creating dropdown menus in the navbar
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the dropdown menu that should be displayed
+ */
+const Dropdown = (props) => {
+  return (
+    <div className="dropdown">
+      <a
+        className="nav-link dropdown-toggle"
+        href="#"
+        id={props.id}
+        role="button"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        {props.dropLinkText}
+      </a>
+
+      <div
+        className={`dropdown-menu${
+          props.id == "userDropdownMenuLink" ? " dropdown-menu-right" : ""
+        }`}
+        aria-labelledby={props.id}
+      >
+        {props.links.map((link) => {
+          return (
+            <NavLink
+              className="dropdown-item nav-item"
+              exact={Boolean(link.exact)}
+              to={link.path}
+            >
+              {link.text}
+            </NavLink>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying alerts
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Alert = (props) => {
+  return (
+    <div className={props.class} role="alert">
+      {props.msg}
+    </div>
+  );
+};
+
+/**
+ * Component for displaying a spinner loading animation
+ * @returns   Returns the content that should be displayed
+ */
+const Spinner = () => {
+  return (
+    <div className="overlay d-flex justify-content-center align-items-center">
+      <div className="spinner-border text-light" role="status">
+        <span className="sr-only">Loading...</span>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Component for displaying a spinner loading animation for buttons
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the dropdown menu that should be displayed
+ */
+const SpinnerButton = (props) => {
+  return (
+    <button className={props.class} type="button" disabled>
+      <span
+        className="spinner-grow spinner-grow-sm"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span class="sr-only">Loading...</span>
+    </button>
   );
 };
 
