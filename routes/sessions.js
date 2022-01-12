@@ -11,7 +11,14 @@ module.exports = (app) => {
   // Routing for determining if the user is logged in
   app.get("/session/user", (req, res) => {
     res.json(
-      req.user ? { _id: req.user._id, username: req.user.username } : null
+      req.user
+        ? {
+            _id: req.user._id,
+            username: req.user.username,
+            preciseLocation: req.user.preciseLocation,
+            oauth: req.user.oauth,
+          }
+        : null
     );
   });
 
