@@ -107,15 +107,6 @@ form[name="Create Request"] {
   background: #cee5ff;
 }
 
-/* For Firefox */
-
-@supports (scrollbar-color: #81beff #cee5ff) {
-  .panel-body {
-    scrollbar-color: #81beff #cee5ff;
-    scrollbar-width: thin;
-  }
-}
-
 .panel-body .list-group-flush .list-group-item:last-child {
   margin-bottom: 0 !important;
 }
@@ -243,6 +234,15 @@ form[name="Create Request"] {
   }
 }
 
+/* For Firefox */
+
+@supports (scrollbar-color: #81beff #cee5ff) {
+  .panel-body {
+    scrollbar-color: #81beff #cee5ff;
+    scrollbar-width: thin;
+  }
+}
+
 /* Media Queries */
 
 @media screen and (max-width: 991px) {
@@ -257,7 +257,7 @@ form[name="Create Request"] {
   .dropdown-item {
     color: rgba(255, 255, 255, 0.5) !important;
   }
-  
+
   .dropdown-item:focus,
   .dropdown-item:hover,
   .dropdown-item.active,
