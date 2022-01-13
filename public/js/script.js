@@ -226,12 +226,12 @@ class BookExchange extends React.Component {
                             text: "Edit Profile",
                           },
                           {
-                            path: "/users/settings",
-                            text: "Settings",
-                          },
-                          {
                             path: "/books/my",
                             text: "My Books",
+                          },
+                          {
+                            path: "/users/settings",
+                            text: "Settings",
                           },
                           {
                             path: "/logout",
@@ -1157,8 +1157,34 @@ const Settings = (props) => {
   let [usePreciseLocation, setUsePreciseLocation] = useState(
     props.preciseLocation
   );
-  let [allowNotifications, setAllowNotifications] = useState(true);
+  let [emailNotifications, setEmailNotifications] = useState(false);
   let [password, setPassword] = useState({ old: "", new: "", confirm: "" });
+  const socialLinks = [
+    {
+      path: "/auth/google",
+      btn: "btn-outline-primary",
+      icon: "bi bi-google",
+      for: "Google",
+    },
+    {
+      path: "/auth/facebook",
+      btn: "btn-facebook",
+      icon: "bi bi-facebook",
+      for: "Facebook",
+    },
+    {
+      path: "/auth/twitter",
+      btn: "btn-twitter",
+      icon: "bi bi-twitter",
+      for: "Twitter",
+    },
+    {
+      path: "/auth/github",
+      btn: "btn-github",
+      icon: "bi bi-github",
+      for: "GitHub",
+    },
+  ];
 
   // Ensures that 'usePreciseLocation' is always updated
   useEffect(() => {
@@ -1228,9 +1254,8 @@ const Settings = (props) => {
       <div className="panel-body p-4">
         <ul className="list-group">
           <li className="list-group-item">
-            <details>
+            <details open>
               <summary className="h4">Profile</summary>
-
               <ul className="list-group list-group-flush ml-4">
                 <li className="list-group-item px-2">
                   <h5>Change Password</h5>
@@ -1276,9 +1301,13 @@ const Settings = (props) => {
                   />
                 </li>
                 <li className="list-group-item px-2">
-                  <h5>Delete Account</h5>
+                  <h5 className="text-danger font-weight-bold">
+                    Delete Account
+                  </h5>
                   <hr />
-                  <p>Please keep in mind that this action cannot be undone.</p>
+                  <p className="text-danger">
+                    Please keep in mind that this action cannot be undone.
+                  </p>
                   <DeleteAccountForm
                     formName="Delete Account"
                     id="deleteAccountModal"
@@ -1288,7 +1317,6 @@ const Settings = (props) => {
               </ul>
             </details>
           </li>
-
           <li className="list-group-item">
             <details>
               <summary className="h4">Privacy</summary>
@@ -1307,30 +1335,58 @@ const Settings = (props) => {
                     />
                     <label
                       for="usePreciseLocation"
-                      className="form-check-label"
+                      className="form-check-label font-weight-bold"
                     >
-                      Make your exact location public
+                      Keep your exact location public
                     </label>
                   </div>
                   <br />
+                  <small className="form-check-info">
+                    Your address and zip code/postal code will be displayed on
+                    your profile.
+                  </small>
+
                   <div className="form-check-inline">
                     <input
                       type="checkbox"
                       id="notifications"
                       name="notifications"
                       className="form-check-input"
-                      checked={allowNotifications}
+                      checked={emailNotifications}
                       onChange={() =>
-                        setAllowNotifications(!allowNotifications)
+                        setEmailNotifications(!emailNotifications)
                       }
                     />
                     <label
                       for="usePreciseLocation"
-                      className="form-check-label"
+                      className="form-check-label font-weight-bold"
                     >
-                      Use your email address to send notifications
+                      Recieve notification emails
                     </label>
                   </div>
+                  <br />
+                  <small className="form-check-info">
+                    Your email address will be shared with us to email
+                    notifications to you.
+                  </small>
+                </div>
+              </div>
+            </details>
+          </li>
+          <li className="list-group-item">
+            <details>
+              <summary className="h4">Linked Accounts</summary>
+              <div className="list-group list-group-flush ml-4">
+                <div className="list-group-item px-2">
+                  {socialLinks.map((link) => (
+                    <Link
+                      to={link.path}
+                      className={`btn btn-lg btn-block btn-social ${link.btn}`}
+                    >
+                      <i className={link.icon}></i>
+                      Link {link.for}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </details>

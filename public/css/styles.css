@@ -11,6 +11,11 @@ body {
   border-width: 1px 0 !important;
 }
 
+.form-check-info {
+  display: flex;
+  margin-left: 1.5em;
+}
+
 form[name="Create Request"] {
   margin: 0;
 }
