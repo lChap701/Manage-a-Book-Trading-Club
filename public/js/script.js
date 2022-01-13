@@ -1232,7 +1232,7 @@ const Settings = (props) => {
               <summary className="h4">Profile</summary>
 
               <ul className="list-group list-group-flush ml-4">
-                <li className="list-group-item">
+                <li className="list-group-item px-2">
                   <h5>Change Password</h5>
                   <hr />
                   {!props.oauth ? (
@@ -1275,7 +1275,7 @@ const Settings = (props) => {
                     err={errs[1] || errs[0]}
                   />
                 </li>
-                <li className="list-group-item">
+                <li className="list-group-item px-2">
                   <h5>Delete Account</h5>
                   <hr />
                   <p>Please keep in mind that this action cannot be undone.</p>
@@ -1292,8 +1292,8 @@ const Settings = (props) => {
           <li className="list-group-item">
             <details>
               <summary className="h4">Privacy</summary>
-              <div className="ml-4 list-group list-group-flush">
-                <div className="list-group-item">
+              <div className="list-group list-group-flush ml-4">
+                <div className="list-group-item px-2">
                   <div className="form-check-inline">
                     <input
                       type="checkbox"
