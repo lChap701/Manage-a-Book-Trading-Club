@@ -109,15 +109,15 @@ module.exports = (app) => {
     })
     .put((req, res) => {
       crud.getUser({ username: req.body.username }).then((user) => {
-        if (!user || !bcrypt.compareSync(req.body.password, user.password)) {
-          res.send("Invalid username or password");
+        if (!user) {
+          res.send("Account not found");
           return;
         }
 
         crud
           .updateUser(user._id, {
             password: bcrypt.hashSync(
-              req.body.newPassword,
+              req.body.password,
               parseInt(process.env.SALT_ROUNDS)
             ),
           })
@@ -485,6 +485,13 @@ module.exports = (app) => {
             crud.deleteBook(book._id).catch((ex) => console.log(ex));
             crud.deleteRequests(book.requests).catch((ex) => console.log(ex));
           });
+
+          // Updates books requested by the user
+          crud
+            .getRequests()
+            .where("_id")
+            .in(book.requests)
+            .then((requests) => {});
 
           crud.deleteUser({ _id: user._id }).then(() => {
             req.flash("success", "Your account has been deleted");
