@@ -33,7 +33,7 @@ async function callApi(url, type = "text") {
 
 /**
  * Validates input fields in the form and determines if the form is valid
- * @returns     Returns a boolean value that determines if the form should be submitted
+ * @returns   Returns a boolean value that determines if the form should be submitted
  */
 function validateForm() {
   let valid = true;
@@ -292,7 +292,7 @@ class BookExchange extends React.Component {
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
               <Route path="/password/reset" component={ResetPassword} />
-              <Route path="/logout">
+              <Route path="/l\ogout">
                 <Redirect to="/books" />
               </Route>
             </Switch>
@@ -1153,12 +1153,17 @@ const UserBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Settings = (props) => {
-  let [errs, setErrs] = useState(["Password is required"]);
+  let [err, setErr] = useState("");
+  let [successMsg, setSuccessMsg] = useState("");
   let [usePreciseLocation, setUsePreciseLocation] = useState(
     props.preciseLocation
   );
   let [emailNotifications, setEmailNotifications] = useState(false);
-  let [password, setPassword] = useState({ old: "", new: "", confirm: "" });
+  let [password, setPassword] = useState({
+    old: { text: "", err: "" },
+    new: { text: "", err: "Password is required" },
+    confirm: { text: "", err: "Password is required" },
+  });
   const socialLinks = [
     {
       path: "/auth/google",
@@ -1197,11 +1202,20 @@ const Settings = (props) => {
    */
   const updatePasswordFields = (e) => {
     if (e.target.id == "psw") {
-      setPassword({ ...password, old: e.target.value });
+      setPassword({
+        ...password,
+        old: { text: e.target.value, err: password.old.err },
+      });
     } else if (e.target.id == "newPsw") {
-      setPassword({ ...password, new: e.target.value });
+      setPassword({
+        ...password,
+        new: { text: e.target.value, err: password.new.err },
+      });
     } else {
-      setPassword({ ...password, new: e.target.value });
+      setPassword({
+        ...password,
+        confirm: { text: e.target.value, err: password.confirm.err },
+      });
     }
   };
 
@@ -1213,191 +1227,238 @@ const Settings = (props) => {
   const submitForm = async (e) => {
     e.preventDefault();
 
-    // Checks if the user confirmed the new password
-    if (password.new != password.confirm) {
-      setErrs([...errs, "Password doesn't match"]);
+    // Compares the password (depending on the form)
+    if (e.target.name == "Change Password") {
+      const confirmPsw = document.querySelector("input#confirmPsw");
+
+      if (password.new.text != password.confirm.text) {
+        setPassword({
+          ...password,
+          confirm: {
+            text: password.confirm.text,
+            err: "Password does not match",
+          },
+        });
+        confirmPsw.classList.add("is-invalid");
+      } else {
+        setPassword({
+          ...password,
+          confirm: {
+            text: password.confirm.text,
+            err: "Password is required",
+          },
+        });
+        confirmPsw.classList.remove("is-invalid");
+      }
     }
 
     // Determines if form should be submitted
-    if (!validateForm() || errs.length > 1) return;
+    if (!validateForm() || confirmPsw.classList.contains("is-invalid")) return;
 
-    const data = {
-      _id: props.userId,
-      preciseLocation: usePreciseLocation,
-    };
+    const data = { _id: props.userId };
 
-    if (password.old) data.password = password.old;
-    if (password.new) data.newPassword = password.new;
+    // Checks what data should be submitted
+    if (e.target.name == "Change Password") {
+      data.password = password.old.text;
+      data.newPassword = password.new.text;
+    } else {
+      data.preciseLocation = usePreciseLocation;
+    }
 
     // Submits the form and gets the result
     let res = await sendData(data, "PUT");
 
     // Checks if a new page should be displayed or if an error occurred
-    if (res.includes("http")) {
-      location.href = res;
+    if (res == "Your changes have been saved") {
+      setSuccessMsg(res);
     } else {
-      setErrs([...errs, res]);
+      setErr(res);
     }
   };
 
   return (
-    <form
-      onSubmit={submitForm}
-      className="panel shadow-lg my-3"
-      name="Settings"
-      novalidate="true"
-    >
-      <div className="panel-header text-white p-2">
-        <h2>Settings</h2>
-      </div>
+    <div>
+      {err ? (
+        <Alert class="alert alert-danger" msg={err} />
+      ) : successMsg ? (
+        <Alert class="alert alert-info" msg={successMsg} />
+      ) : (
+        ""
+      )}
 
-      <div className="panel-body p-4">
-        <ul className="list-group">
-          <li className="list-group-item">
-            <details open>
-              <summary className="h4">Profile</summary>
-              <ul className="list-group list-group-flush ml-4">
-                <li className="list-group-item px-2">
-                  <h5>Change Password</h5>
-                  <hr />
-                  {!props.oauth ? (
-                    <InputControl
-                      containerClass="form-group"
-                      id="psw"
-                      label="Old Password"
-                      type="text"
-                      required
-                      value={password.old}
-                      onChange={updatePasswordFields}
-                      validator="pswFeedback"
-                      err={errs[0]}
-                    />
-                  ) : (
-                    ""
-                  )}
+      <div className="panel shadow-lg my-3">
+        <div className="panel-header text-white p-2">
+          <h2>Settings</h2>
+        </div>
 
-                  <InputControl
-                    containerClass="form-group"
-                    id="newPsw"
-                    label={props.oauth ? "Password" : "New Password"}
-                    type="text"
-                    required
-                    value={password.new}
-                    onChange={updatePasswordFields}
-                    validator="newPswFeedback"
-                    err={errs[0]}
-                  />
-
-                  <InputControl
-                    containerClass="form-group"
-                    id="confirmPsw"
-                    label="Confirm Password"
-                    type="text"
-                    required
-                    value={password.confirm}
-                    onChange={updatePasswordFields}
-                    validator="confirmPswFeedback"
-                    err={errs[1] || errs[0]}
-                  />
-                </li>
-                <li className="list-group-item px-2">
-                  <h5 className="text-danger font-weight-bold">
-                    Delete Account
-                  </h5>
-                  <hr />
-                  <p className="text-danger">
-                    Please keep in mind that this action cannot be undone.
-                  </p>
-                  <DeleteAccountForm
-                    formName="Delete Account"
-                    id="deleteAccountModal"
-                    userId={props.userId}
-                  />
-                </li>
-              </ul>
-            </details>
-          </li>
-          <li className="list-group-item">
-            <details>
-              <summary className="h4">Privacy</summary>
-              <div className="list-group list-group-flush ml-4">
-                <div className="list-group-item px-2">
-                  <div className="form-check-inline">
-                    <input
-                      type="checkbox"
-                      id="usePreciseLocation"
-                      name="usePreciseLocation"
-                      className="form-check-input"
-                      checked={usePreciseLocation}
-                      onChange={() =>
-                        setUsePreciseLocation(!usePreciseLocation)
-                      }
-                    />
-                    <label
-                      for="usePreciseLocation"
-                      className="form-check-label font-weight-bold"
+        <div className="panel-body p-4">
+          <ul className="list-group">
+            <li className="list-group-item">
+              <details open>
+                <summary className="h4">Profile</summary>
+                <ul className="list-group list-group-flush ml-4">
+                  <li className="list-group-item px-2">
+                    <form
+                      name="Change Password"
+                      novalidate="true"
+                      onSubmit={submitForm}
                     >
-                      Keep your exact location public
-                    </label>
+                      <h5>Change Password</h5>
+                      <hr />
+                      {!props.oauth ? (
+                        <InputControl
+                          containerClass="form-group"
+                          id="psw"
+                          label="Old Password"
+                          type="password"
+                          required
+                          value={password.old.text}
+                          onChange={updatePasswordFields}
+                          validator="pswFeedback"
+                          err={password.old.err}
+                        />
+                      ) : (
+                        ""
+                      )}
+
+                      <InputControl
+                        containerClass="form-group"
+                        id="newPsw"
+                        label={props.oauth ? "Password" : "New Password"}
+                        type="password"
+                        required
+                        value={password.new.text}
+                        onChange={updatePasswordFields}
+                        validator="newPswFeedback"
+                        err={password.new.err}
+                      />
+
+                      <InputControl
+                        containerClass="form-group"
+                        id="confirmPsw"
+                        label="Confirm Password"
+                        type="password"
+                        required
+                        value={password.confirm.text}
+                        onChange={updatePasswordFields}
+                        validator="confirmPswFeedback"
+                        err={password.confirm.err}
+                      />
+
+                      <input
+                        type="submit"
+                        className="btn btn-success"
+                        value="Update Password"
+                      />
+                    </form>
+                  </li>
+                  <li className="list-group-item px-2">
+                    <h5 className="text-danger font-weight-bold">
+                      Delete Account
+                    </h5>
+                    <hr />
+                    <p className="text-danger">
+                      Please keep in mind that this action cannot be undone.
+                    </p>
+                    <DeleteAccountForm
+                      formName="Delete Account"
+                      id="deleteAccountModal"
+                      userId={props.userId}
+                    />
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li className="list-group-item">
+              <details>
+                <summary className="h4">Privacy</summary>
+                <div className="list-group list-group-flush ml-4">
+                  <div className="list-group-item px-2">
+                    <form
+                      name="Privacy"
+                      novalidate="true"
+                      onSubmit={submitForm}
+                    >
+                      <div className="form-check-inline">
+                        <input
+                          type="checkbox"
+                          id="usePreciseLocation"
+                          name="usePreciseLocation"
+                          className="form-check-input"
+                          checked={usePreciseLocation}
+                          onChange={() =>
+                            setUsePreciseLocation(!usePreciseLocation)
+                          }
+                        />
+                        <label
+                          for="usePreciseLocation"
+                          className="form-check-label font-weight-bold"
+                        >
+                          Keep your exact location public
+                        </label>
+                      </div>
+                      <br />
+                      <small className="form-check-info">
+                        Your address and zip code/postal code will be displayed
+                        on your profile.
+                      </small>
+
+                      <div className="form-check-inline">
+                        <input
+                          type="checkbox"
+                          id="notifications"
+                          name="notifications"
+                          className="form-check-input"
+                          checked={emailNotifications}
+                          onChange={() =>
+                            setEmailNotifications(!emailNotifications)
+                          }
+                        />
+                        <label
+                          for="usePreciseLocation"
+                          className="form-check-label font-weight-bold"
+                        >
+                          Recieve notification emails
+                        </label>
+                      </div>
+                      <br />
+                      <small className="form-check-info">
+                        Your email address will be shared with us to email
+                        notifications to you.
+                      </small>
+                      <hr />
+                      <input
+                        type="submit"
+                        className="btn btn-success"
+                        value="Save Changes"
+                      />
+                    </form>
                   </div>
-                  <br />
-                  <small className="form-check-info">
-                    Your address and zip code/postal code will be displayed on
-                    your profile.
-                  </small>
-
-                  <div className="form-check-inline">
-                    <input
-                      type="checkbox"
-                      id="notifications"
-                      name="notifications"
-                      className="form-check-input"
-                      checked={emailNotifications}
-                      onChange={() =>
-                        setEmailNotifications(!emailNotifications)
-                      }
-                    />
-                    <label
-                      for="usePreciseLocation"
-                      className="form-check-label font-weight-bold"
-                    >
-                      Recieve notification emails
-                    </label>
+                </div>
+              </details>
+            </li>
+            <li className="list-group-item">
+              <details>
+                <summary className="h4">Linked Accounts</summary>
+                <div className="list-group list-group-flush ml-4">
+                  <div className="list-group-item px-2">
+                    {socialLinks.map((link) => (
+                      <Link
+                        to={link.path}
+                        className={`btn btn-lg btn-block btn-social ${link.btn}`}
+                      >
+                        <i className={link.icon}></i>
+                        Link {link.for}
+                      </Link>
+                    ))}
                   </div>
-                  <br />
-                  <small className="form-check-info">
-                    Your email address will be shared with us to email
-                    notifications to you.
-                  </small>
                 </div>
-              </div>
-            </details>
-          </li>
-          <li className="list-group-item">
-            <details>
-              <summary className="h4">Linked Accounts</summary>
-              <div className="list-group list-group-flush ml-4">
-                <div className="list-group-item px-2">
-                  {socialLinks.map((link) => (
-                    <Link
-                      to={link.path}
-                      className={`btn btn-lg btn-block btn-social ${link.btn}`}
-                    >
-                      <i className={link.icon}></i>
-                      Link {link.for}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </details>
-          </li>
-        </ul>
+              </details>
+            </li>
+          </ul>
+        </div>
       </div>
-
-      <div className="panel-footer px-3 py-2">
-        <input type="submit" className="btn btn-success" value="Save Changes" />
-      </div>
-    </form>
+    </div>
   );
 };
 
@@ -1413,7 +1474,6 @@ class AccountForm extends React.Component {
       _id: props._id || "",
       username: props.username || "",
       password: "",
-      newPassword: "",
       email: props.email || "",
       name: props.name || "",
       address: props.address || "",
@@ -1448,7 +1508,6 @@ class AccountForm extends React.Component {
     this.getZipPostalCodes = this.getZipPostalCodes.bind(this);
     this.saveUsername = this.saveUsername.bind(this);
     this.savePassword = this.savePassword.bind(this);
-    this.saveNewPassword = this.saveNewPassword.bind(this);
     this.saveEmail = this.saveEmail.bind(this);
     this.saveName = this.saveName.bind(this);
     this.saveAddress = this.saveAddress.bind(this);
@@ -1642,13 +1701,6 @@ class AccountForm extends React.Component {
   }
 
   /**
-   * Saves the new password while the user is typing
-   * @param {InputControlEvent} e    Represents the event that occurred
-   */
-  saveNewPassword(e) {
-    this.setState({ newPassword: e.target.value });
-  }
-  /**
    * Saves the user's email while the user is typing
    * @param {InputControlEvent} e    Represents the event that occurred
    */
@@ -1754,11 +1806,6 @@ class AccountForm extends React.Component {
           }
         : { _id: this.state._id, username: this.state.username };
 
-    // For when users try to reset their password
-    if (this.props.formName == "Reset Password") {
-      data.newPassword = this.state.newPassword;
-    }
-
     // For when users try to sign up or update their account
     if (
       this.props.formName != "Login" &&
@@ -1825,10 +1872,8 @@ class AccountForm extends React.Component {
             <ResetPasswordFormLayout
               username={this.state.username}
               saveUsername={this.saveUsername}
-              oldPassword={this.state.password}
-              saveOldPassword={this.savePassword}
-              newPassword={this.state.newPassword}
-              saveNewPassword={this.saveNewPassword}
+              newPassword={this.state.password}
+              saveNewPassword={this.savePassword}
               errs={this.state.errs}
             />
           ) : (
@@ -2343,31 +2388,17 @@ const ResetPasswordFormLayout = (props) => {
         err={props.errs[0]}
       />
 
-      <div className="row">
-        <InputControl
-          containerClass="form-group col"
-          id="oldPsw"
-          label="Old Password"
-          type="password"
-          required
-          value={props.oldPassword}
-          onChange={props.saveOldPassword}
-          validator="oldPswFeedback"
-          err={props.errs[1]}
-        />
-
-        <InputControl
-          containerClass="form-group col"
-          id="newPsw"
-          label="New Password"
-          type="password"
-          required
-          value={props.newPassword}
-          onChange={props.saveNewPassword}
-          validator="newPswFeedback"
-          err={props.errs[1]}
-        />
-      </div>
+      <InputControl
+        containerClass="form-group"
+        id="newPsw"
+        label="New Password"
+        type="password"
+        required
+        value={props.newPassword}
+        onChange={props.saveNewPassword}
+        validator="newPswFeedback"
+        err={props.errs[1]}
+      />
     </div>
   );
 };
