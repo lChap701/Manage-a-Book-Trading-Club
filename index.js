@@ -92,10 +92,15 @@ sessions(app);
 // Redirects to the home page
 app.get("/", (req, res) => res.redirect("/books"));
 
-// Displays the home page
-app.get("/books", (req, res) => {
-  res.sendFile(process.cwd() + "/public/index.html");
-});
+// Displays the home page and handles DELETE requests
+app
+  .route("/books")
+  .get((req, res) => {
+    res.sendFile(process.cwd() + "/public/index.html");
+  })
+  .delete((req, res) => {
+    res.sendFile(process.cwd() + "/public/index.html");
+  });
 
 // Displays the Book Exchange - Requests for (book) Page
 app.get("/books/:bookId/requests", (req, res) => {
@@ -216,7 +221,7 @@ app.get("/users", (req, res) => {
   res.sendFile(process.cwd() + "/public/users.html");
 });
 
-// Displays and handles PUT requests for the Book Exchange - (username)'s Profile Page 
+// Displays and handles PUT requests for the Book Exchange - (username)'s Profile Page
 app
   .route("/users/:id")
   .get((req, res) => {
