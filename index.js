@@ -248,24 +248,6 @@ app.get("/users/:id/books", (req, res) => {
   });
 });
 
-// Form handler for the Add Password and Change Password forms/modals
-app.put("/users/:id/password", (req, res) => {
-  crud.getUser({ _id: req.params.id }).then((user) => {
-    if (!user) {
-      res.send("Unknown user");
-      return;
-    }
-
-    crud
-      .updateUser(req.params.id, { password: req.body.password })
-      .then(() => res.redirect("/login"))
-      .catch((ex) => {
-        console.log(ex.message);
-        res.send(ex.message);
-      });
-  });
-});
-
 // Displays the 404 Error Page
 app.use((req, res, next) => res.status(404).type("text").send("Not Found"));
 
