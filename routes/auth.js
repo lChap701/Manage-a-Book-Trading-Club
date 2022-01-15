@@ -506,7 +506,7 @@ module.exports = (app) => {
           crud.deleteRequests(requests).catch((ex) => console.log(ex));
 
           // Deletes the user's account
-          crud.deleteUser({ _id: user._id }).then(() => {
+          crud.deleteUser(user._id).then(() => {
             req.flash("success", "Your account has been deleted");
             req.session.success = true;
             res.redirect("/books");
