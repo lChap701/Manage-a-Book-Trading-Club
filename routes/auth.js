@@ -5,6 +5,7 @@ const passport = require("passport");
 const auth = require("../auth");
 const secretKeys = require("../secretKeys");
 const crud = require("../crud");
+const { request } = require("chai");
 
 /**
  * Module that handles routing for OAuth/Passport
@@ -452,11 +453,12 @@ module.exports = (app) => {
           return;
         }
 
-        if (req.body.password) {
-          if (!bcrypt.compareSync(req.body.password, user.password)) {
-            res.send("Invalid password");
-            return;
-          }
+        if (
+          req.body.password &&
+          !bcrypt.compareSync(req.body.password, user.password)
+        ) {
+          res.send("Invalid password");
+          return;
         }
 
         const data = { preciseLocation: req.body.preciseLocation };
@@ -479,20 +481,31 @@ module.exports = (app) => {
             return;
           }
 
-          // Deletes everything linked account tied to the account
-          crud.deleteAllAuth(user._id).catch((ex) => console.log(ex));
-          user.books.forEach((book) => {
-            crud.deleteBook(book._id).catch((ex) => console.log(ex));
-            crud.deleteRequests(book.requests).catch((ex) => console.log(ex));
-          });
+          let requests = user.books.map((book) => String(book.requests));
 
-          // Updates books requested by the user
+          // Updates books that were requested by the user
           crud
-            .getRequests()
+            .getAllBooks()
+            .where("requests")
+            .in(requests)
             .where("_id")
-            .in(book.requests)
-            .then((requests) => {});
+            .nin(user.books.map((book) => book._id))
+            .then((books) => {
+              books.forEach((book) => {
+                if (book.numOfRequests > 0) --book.numOfRequests;
+                book.requests = book.requests.filter(
+                  (request) => !requests.includes(String(request))
+                );
+                book.save();
+              });
+            });
 
+          // Deletes everything tied to the account
+          crud.deleteAllAuth(user._id).catch((ex) => console.log(ex));
+          crud.deleteBooks(user._id).catch((ex) => console.log(ex));
+          crud.deleteRequests(requests).catch((ex) => console.log(ex));
+
+          // Deletes the user's account
           crud.deleteUser({ _id: user._id }).then(() => {
             req.flash("success", "Your account has been deleted");
             req.session.success = true;
