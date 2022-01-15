@@ -30,6 +30,7 @@ const crud = {
   deleteBook: (id) => Books.deleteOne({ _id: id }),
   deleteRequest: (id) => Requests.deleteOne({ _id: id }),
   deleteAllAuth: (user) => Auths.deleteMany({ user: user }),
+  deleteBooks: (user) => Books.deleteMany({ user: user }),
   deleteRequests: (ids) => Requests.deleteMany({}).where("_id").in(ids),
   deleteTrades: (request) => Trades.deleteMany({ request: request }),
 };
