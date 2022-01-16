@@ -1160,7 +1160,7 @@ const Settings = (props) => {
   );
   let [emailNotifications, setEmailNotifications] = useState(false);
   let [password, setPassword] = useState({
-    old: { text: "", err: "" },
+    old: { text: "", err: "Password is required" },
     new: { text: "", err: "Password is required" },
     confirm: { text: "", err: "Password is required" },
   });
@@ -1227,10 +1227,10 @@ const Settings = (props) => {
   const submitForm = async (e) => {
     e.preventDefault();
 
+    const confirmPsw = document.querySelector("input#confirmPsw");
+
     // Compares the password (depending on the form)
     if (e.target.name == "Change Password") {
-      const confirmPsw = document.querySelector("input#confirmPsw");
-
       if (password.new.text != password.confirm.text) {
         setPassword({
           ...password,
@@ -1266,13 +1266,41 @@ const Settings = (props) => {
     }
 
     // Submits the form and gets the result
-    let res = await sendData(data, "PUT");
+    let res =
+      e.target.name == "Change Password"
+        ? await sendToUrl(data)
+        : await sendData(data, "PUT");
 
     // Checks if a new page should be displayed or if an error occurred
     if (res == "Your changes have been saved") {
       setSuccessMsg(res);
     } else {
       setErr(res);
+    }
+  };
+
+  /**
+   * Sends data to form handler for the Change Password form
+   * @param {*} data    Represents the data that should be submitted
+   * @returns           Returns a message
+   */
+  const sendToUrl = async (data) => {
+    try {
+      const res = await fetch("/password/update", {
+        method: "PUT",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Ensures that an error message is displayed
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+
+      return await res.text();
+    } catch (err) {
+      alert(err.message);
+      console.error(err);
     }
   };
 
@@ -2263,7 +2291,7 @@ const DeleteAccountForm = (props) => {
       </button>
 
       <div>
-        {err ? <Alert class="bg-danger" msg={err} /> : ""}
+        {err ? <Prompt message={err} /> : ""}
 
         <form
           className="modal fade"
