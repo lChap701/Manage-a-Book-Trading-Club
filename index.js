@@ -255,7 +255,12 @@ app.put("/password/update", (req, res) => {
     }
 
     crud
-      .updateUser(user._id, { password: req.body.newPassword })
+      .updateUser(user._id, {
+        password: bcrypt.hashSync(
+          req.body.newPassword,
+          parseInt(process.env.SALT_ROUNDS)
+        ),
+      })
       .then(() => res.send("Your changes have been saved"))
       .catch((err) => res.send(err));
   });
