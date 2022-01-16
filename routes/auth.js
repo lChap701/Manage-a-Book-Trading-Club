@@ -1,11 +1,9 @@
 require("dotenv").config();
-const bcrypt = require("bcryptjs");
 const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const auth = require("../auth");
 const secretKeys = require("../secretKeys");
 const crud = require("../crud");
-const { request } = require("chai");
 
 /**
  * Module that handles routing for OAuth/Passport
@@ -101,38 +99,6 @@ module.exports = (app) => {
     "/auth/google/callback",
     passport.authenticate("google", oauthOptions)
   );
-
-  // Displays the Book Exchange - Reset Password Page
-  app
-    .route("/password/reset")
-    .get(loggedIn, (req, res) => {
-      res.sendFile(process.cwd() + "/public/passwordReset.html");
-    })
-    .put((req, res) => {
-      crud.getUser({ username: req.body.username }).then((user) => {
-        if (!user) {
-          res.send("Account not found");
-          return;
-        }
-
-        crud
-          .updateUser(user._id, {
-            password: bcrypt.hashSync(
-              req.body.password,
-              parseInt(process.env.SALT_ROUNDS)
-            ),
-          })
-          .then(() => {
-            req.session.success = true;
-            req.flash("success", "Changed Password");
-            res.redirect("/login");
-          })
-          .catch((ex) => {
-            console.log(ex.message);
-            res.send(ex.message);
-          });
-      });
-    });
 
   // Displays and handles POST requests for the Book Exchange - Create Requests Page
   app
@@ -453,20 +419,8 @@ module.exports = (app) => {
           return;
         }
 
-        if (
-          req.body.password &&
-          !bcrypt.compareSync(req.body.password, user.password)
-        ) {
-          res.send("Invalid password");
-          return;
-        }
-
-        const data = { preciseLocation: req.body.preciseLocation };
-
-        if (req.body.newPassword) data.password = req.body.newPassword;
-
         crud
-          .updateUser(user._id, data)
+          .updateUser(user._id, { preciseLocation: req.body.preciseLocation })
           .then(() => res.send("Your changes have been saved"))
           .catch((err) => res.send(err));
       });
