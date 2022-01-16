@@ -64,6 +64,9 @@ const connectDB = require("./db.config");
 connectDB();
 const crud = require("./crud");
 
+// bcrypt Setup
+const bcrypt = require("bcryptjs");
+
 // Allows stylesheets, JS scripts, and other files to be loaded
 app.use("/css", express.static(process.cwd() + "/public/css"));
 app.use("/js", express.static(process.cwd() + "/public/js"));
@@ -194,6 +197,67 @@ app.delete("/books/:bookId/delete", (req, res) => {
           console.log(ex.message);
         });
     });
+  });
+});
+
+// Displays the Book Exchange - Reset Password Page
+app
+  .route("/password/reset")
+  .get((req, res) => {
+    res.sendFile(process.cwd() + "/public/passwordReset.html");
+  })
+  .put((req, res) => {
+    crud.getUser({ username: req.body.username }).then((user) => {
+      if (!user) {
+        res.send("Account not found");
+        return;
+      }
+
+      crud
+        .updateUser(user._id, {
+          password: bcrypt.hashSync(
+            req.body.password,
+            parseInt(process.env.SALT_ROUNDS)
+          ),
+        })
+        .then(() => {
+          req.session.success = true;
+          req.flash("success", "Changed Password");
+
+          // Redirects based on if the user is logged in
+          if (req.isAuthenticated()) {
+            res.redirect("/users/settings");
+          } else {
+            res.redirect("/login");
+          }
+        })
+        .catch((ex) => {
+          console.log(ex.message);
+          res.send(ex.message);
+        });
+    });
+  });
+
+// Routing for updating the user's password
+app.put("/password/update", (req, res) => {
+  crud.getUser({ _id: req.body._id }).then((user) => {
+    if (!user) {
+      res.send("Unknown user");
+      return;
+    }
+
+    if (
+      req.body.password &&
+      !bcrypt.compareSync(req.body.password, user.password)
+    ) {
+      res.send("Invalid password");
+      return;
+    }
+
+    crud
+      .updateUser(user._id, { password: req.body.newPassword })
+      .then(() => res.send("Your changes have been saved"))
+      .catch((err) => res.send(err));
   });
 });
 
