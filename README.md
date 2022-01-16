@@ -102,16 +102,20 @@ All URL paths part of this project.
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
   - When successful, redirects to **/users/:id**
+- **/users/settings** - Allows the user to change their settings
+  - Displays the _settings.html_ file
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
 
-### Login, Signup, and Passwords Paths
+### Login, Signup, and Password Paths
 
 - **/login** - Allows users to login
   - Redirects to **/books** when the user is logged in
 - **/signup** - Allows users to create accounts
   - Redirects to **/books** when the user is logged in or has signed up
 - **/password/reset** - Allows users to reset their password
-  - Redirects to **/books** when the user is logged in
-  - When successful, redirects to **/login**
+  - When successful, redirects to **/login** or **/users/settings**
+- **/password/update** - Allows users to update their password
 
 ### OAuth Paths
 
