@@ -22,7 +22,7 @@ const userSchema = new Schema(
     zipPostal: { type: String, trim: true },
     preciseLocation: { type: Boolean, default: true },
     oauth: { type: Boolean, default: false },
-    accounts: [{ type: Schema.Types.ObjectId, ref: "Auth" }],
+    accounts: [{ type: Schema.Types.ObjectId, ref: "Auths" }],
     books: [{ type: Schema.Types.ObjectId, ref: "Books" }],
   },
   {
