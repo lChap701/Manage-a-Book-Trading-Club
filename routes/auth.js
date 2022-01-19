@@ -445,10 +445,11 @@ module.exports = (app) => {
             .where("_id")
             .nin(user.books.map((book) => book._id))
             .then((books) => {
+              console.log(books);
               books.forEach((book) => {
                 if (book.numOfRequests > 0) --book.numOfRequests;
                 book.requests = book.requests.filter(
-                  (request) => !requests.includes(String(request))
+                  (request) => !requests.includes(request.toString())
                 );
                 book.save();
               });
