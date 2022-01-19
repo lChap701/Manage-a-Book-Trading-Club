@@ -16,7 +16,7 @@ module.exports = (app) => {
             _id: req.user._id,
             username: req.user.username,
             preciseLocation: req.user.preciseLocation,
-            oauth: req.user.oauth,
+            accounts: req.user.accounts,
           }
         : null
     );
