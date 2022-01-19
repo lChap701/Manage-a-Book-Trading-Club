@@ -279,8 +279,8 @@ class BookExchange extends React.Component {
               <Route exact path="/users/settings">
                 <Settings
                   userId={this.state.user._id}
-                  oauth={this.state.user.oauth || false}
-                  preciseLocation={this.state.user.preciseLocation || false}
+                  accounts={this.state.user.accounts || []}
+                  preciseLocation={this.state.user.preciseLocation}
                 />
               </Route>
               <Route exact path="/users/:id">
@@ -1153,6 +1153,7 @@ const UserBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Settings = (props) => {
+  console.log(props);
   let [err, setErr] = useState("");
   let [successMsg, setSuccessMsg] = useState("");
   let [usePreciseLocation, setUsePreciseLocation] = useState(
@@ -1333,7 +1334,7 @@ const Settings = (props) => {
                     >
                       <h5>Change Password</h5>
                       <hr />
-                      {!props.oauth ? (
+                      {props.accounts.length > 0 ? (
                         <InputControl
                           containerClass="form-group"
                           id="psw"
@@ -1352,7 +1353,11 @@ const Settings = (props) => {
                       <InputControl
                         containerClass="form-group"
                         id="newPsw"
-                        label={props.oauth ? "Password" : "New Password"}
+                        label={
+                          props.accounts.length > 0
+                            ? "New Password"
+                            : "Password"
+                        }
                         type="password"
                         required
                         value={password.new.text}
@@ -1392,6 +1397,7 @@ const Settings = (props) => {
                       formName="Delete Account"
                       id="deleteAccountModal"
                       userId={props.userId}
+                      setErr={setErr}
                     />
                   </li>
                 </ul>
@@ -1410,8 +1416,8 @@ const Settings = (props) => {
                       <div className="form-check-inline">
                         <input
                           type="checkbox"
-                          id="usePreciseLocation"
-                          name="usePreciseLocation"
+                          id="preciseLocation"
+                          name="preciseLocation"
                           className="form-check-input"
                           checked={usePreciseLocation}
                           onChange={() =>
@@ -1419,7 +1425,7 @@ const Settings = (props) => {
                           }
                         />
                         <label
-                          for="usePreciseLocation"
+                          for="preciseLocation"
                           className="form-check-label font-weight-bold"
                         >
                           Keep your exact location public
@@ -1470,9 +1476,13 @@ const Settings = (props) => {
                 <summary className="h4">Linked Accounts</summary>
                 <div className="list-group list-group-flush ml-4">
                   <div className="list-group-item px-2">
-                    {socialLinks.map((link) => (
+                    {socialLinks.map((link, i) => (
                       <Link
-                        to={link.path}
+                        to={
+                          props.accounts.length > 0 && props.accounts[i]
+                            ? `/users/${props.userId}/unlink/${props.accounts[i]}`
+                            : link.path
+                        }
                         className={`btn btn-lg btn-block btn-social ${link.btn}`}
                       >
                         <i className={link.icon}></i>
@@ -2258,8 +2268,6 @@ const SelectBooksForm = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const DeleteAccountForm = (props) => {
-  let [err, setErr] = useState("");
-
   /**
    * Handles form validation and form submission
    * @param {SubmitEvent} e   Represents the event that occurred
@@ -2275,7 +2283,7 @@ const DeleteAccountForm = (props) => {
     if (res.includes("http")) {
       location.href = res;
     } else {
-      setErr(res);
+      props.setErr(res);
     }
   };
 
@@ -2290,57 +2298,53 @@ const DeleteAccountForm = (props) => {
         {props.formName}
       </button>
 
-      <div>
-        {err ? <Prompt message={err} /> : ""}
+      <form
+        className="modal fade"
+        name={props.formName}
+        onSubmit={submitForm}
+        tabindex="-1"
+        id={props.id}
+        role="dialog"
+        aria-labelledby={`${props.id}Label`}
+        aria-hidden="true"
+      >
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id={`${props.id}Label`}>
+                {props.formName}
+              </h5>
+              <button
+                type="button"
+                className="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
 
-        <form
-          className="modal fade"
-          name={props.formName}
-          onSubmit={submitForm}
-          tabindex="-1"
-          id={props.id}
-          role="dialog"
-          aria-labelledby={`${props.id}Label`}
-          aria-hidden="true"
-        >
-          <div className="modal-dialog" role="document">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id={`${props.id}Label`}>
-                  {props.formName}
-                </h5>
-                <button
-                  type="button"
-                  className="close"
-                  data-dismiss="modal"
-                  aria-label="Close"
-                >
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
+            <div className="modal-body">
+              <h4 className="text-center">
+                Do you really wish to delete your account?
+              </h4>
+            </div>
 
-              <div className="modal-body">
-                <h4 className="text-center">
-                  Do you really wish to delete your account?
-                </h4>
-              </div>
-
-              <div className="modal-footer">
-                <button type="submit" className="btn btn-primary">
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  data-dismiss="modal"
-                >
-                  No
-                </button>
-              </div>
+            <div className="modal-footer">
+              <button type="submit" className="btn btn-primary">
+                Yes
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-dismiss="modal"
+              >
+                No
+              </button>
             </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 };
