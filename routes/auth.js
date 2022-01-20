@@ -469,6 +469,29 @@ module.exports = (app) => {
         });
     });
 
+  // Routing for unlinking authenticated accounts from a user's account
+  app.get("/users/:id/unlink/:authId", loggedOut, (req, res) => {
+    crud.getUser({ _id: req.params.id }).then((user) => {
+      if (!user) {
+        res.send("Unknown user");
+        return;
+      }
+
+      crud
+        .deleteAuth(req.params.authId)
+        .then(() => {
+          user.accounts = user.accounts.filter(
+            (account) => String(account) != req.params.authId
+          );
+          user.save();
+          req.flash("success", "Removed linked account");
+          req.session.success = true;
+          res.redirect("..");
+        })
+        .catch((err) => res.send(err));
+    });
+  });
+
   // Displays and handles POST requests on the Book Exchange - My Books Page
   app
     .route("/books/my")
