@@ -134,6 +134,7 @@ class BookExchange extends React.Component {
         alert(e);
         console.error(e);
       });
+      
   }
 
   render() {
@@ -279,6 +280,7 @@ class BookExchange extends React.Component {
               <Route exact path="/users/settings">
                 <Settings
                   userId={this.state.user._id}
+                  hasPassword={this.state.user.hasPassword}
                   accounts={this.state.user.accounts || []}
                   preciseLocation={this.state.user.preciseLocation}
                 />
@@ -1333,7 +1335,7 @@ const Settings = (props) => {
                     >
                       <h5>Change Password</h5>
                       <hr />
-                      {props.accounts.length > 0 ? (
+                      {props.accounts.length == 0 && props.hasPassword ? (
                         <InputControl
                           containerClass="form-group"
                           id="psw"
@@ -1353,7 +1355,7 @@ const Settings = (props) => {
                         containerClass="form-group"
                         id="newPsw"
                         label={
-                          props.accounts.length > 0
+                          props.accounts.length == 0 && props.hasPassword
                             ? "New Password"
                             : "Password"
                         }
