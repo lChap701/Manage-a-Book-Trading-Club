@@ -1518,12 +1518,12 @@ class AccountForm extends React.Component {
       state: props.state || "",
       country: props.country || "",
       zipPostal: props.zipPostalCode || "",
-      errs: [
-        "Username is required",
-        "Password is required",
-        "Invalid email address",
-        "",
-      ],
+      errs: {
+        username: "Username is required",
+        password: "Password is required",
+        email: "Invalid email address",
+        msg: "",
+      },
       options: {
         addresses: [],
         cities: [],
@@ -1578,11 +1578,9 @@ class AccountForm extends React.Component {
    * Gets an OAuth error message or ""
    */
   getAuthErrMsg() {
-    let { errs } = this.state;
     callApi(`${location.origin}/session/auth/error`).then((data) => {
-      errs[3] = data;
       this.setState({
-        errs: errs,
+        errs: { ...this.state.errs, msg: data },
       });
     });
   }
@@ -1868,17 +1866,15 @@ class AccountForm extends React.Component {
     if (res.includes("http")) {
       location.href = res;
     } else {
-      let { errs } = this.state;
-      errs[3] = res;
-      this.setState({ errs: errs });
+      this.setState({ errs: { ...this.state.errs, msg: res } });
     }
   }
 
   render() {
     return (
       <div>
-        {this.state.errs[3] != "" ? (
-          <Alert class="alert alert-danger" msg={this.state.errs[3]} />
+        {this.state.errs.msg != "" ? (
+          <Alert class="alert alert-danger" msg={this.state.errs.msg} />
         ) : this.state.success != "" ? (
           <Alert class="alert alert-success" msg={this.state.success} />
         ) : (
@@ -2367,7 +2363,7 @@ const LoginFormLayout = (props) => {
         value={props.username}
         onChange={props.saveUsername}
         validator="unameFeedback"
-        err={props.errs[0]}
+        err={props.errs.username}
       />
 
       <InputControl
@@ -2379,7 +2375,7 @@ const LoginFormLayout = (props) => {
         value={props.password}
         onChange={props.savePassword}
         validator="pswFeedback"
-        err={props.errs[1]}
+        err={props.errs.password}
       />
 
       <div className="form-check-inline">
@@ -2416,7 +2412,7 @@ const ResetPasswordFormLayout = (props) => {
         value={props.username}
         onChange={props.saveUsername}
         validator="unameFeedback"
-        err={props.errs[0]}
+        err={props.errs.username}
       />
 
       <InputControl
@@ -2428,7 +2424,7 @@ const ResetPasswordFormLayout = (props) => {
         value={props.newPassword}
         onChange={props.saveNewPassword}
         validator="newPswFeedback"
-        err={props.errs[1]}
+        err={props.errs.password}
       />
     </div>
   );
@@ -2469,7 +2465,7 @@ const AccountFormLayout = (props) => {
             readonly={Boolean(props.readonly)}
             onChange={props.saveUsername || null}
             validator={!Boolean(props.readonly) ? "unameFeedback" : null}
-            err={props.errs ? props.errs[0] : null}
+            err={props.errs ? props.errs.username : null}
           />
         ) : (
           <SkeletonFormControl containerClass="form-group col" required />
@@ -2486,7 +2482,7 @@ const AccountFormLayout = (props) => {
               value={props.password}
               onChange={props.savePassword}
               validator="pswFeedback"
-              err={props.errs[1]}
+              err={props.errs.password}
             />
           ) : (
             <SkeletonFormControl containerClass="form-group col" required />
@@ -2507,7 +2503,7 @@ const AccountFormLayout = (props) => {
             readonly={Boolean(props.readonly)}
             onChange={props.saveEmail || null}
             validator={!props.readonly ? "emailFeedback" : null}
-            err={props.errs ? props.errs[2] : null}
+            err={props.errs ? props.errs.email : null}
           />
         ) : (
           <SkeletonFormControl containerClass="form-group col" />
