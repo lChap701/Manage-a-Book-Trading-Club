@@ -15,6 +15,7 @@ module.exports = (app) => {
         ? {
             _id: req.user._id,
             username: req.user.username,
+            hasPassword: Boolean(req.user.password),
             preciseLocation: req.user.preciseLocation,
             accounts: req.user.accounts,
           }
