@@ -134,7 +134,6 @@ class BookExchange extends React.Component {
         alert(e);
         console.error(e);
       });
-      
   }
 
   render() {
@@ -1335,7 +1334,7 @@ const Settings = (props) => {
                     >
                       <h5>Change Password</h5>
                       <hr />
-                      {props.accounts.length == 0 && props.hasPassword ? (
+                      {props.hasPassword ? (
                         <InputControl
                           containerClass="form-group"
                           id="psw"
@@ -1351,33 +1350,33 @@ const Settings = (props) => {
                         ""
                       )}
 
-                      <InputControl
-                        containerClass="form-group"
-                        id="newPsw"
-                        label={
-                          props.accounts.length == 0 && props.hasPassword
-                            ? "New Password"
-                            : "Password"
-                        }
-                        type="password"
-                        required
-                        value={password.new.text}
-                        onChange={updatePasswordFields}
-                        validator="newPswFeedback"
-                        err={password.new.err}
-                      />
+                      <div className="row">
+                        <InputControl
+                          containerClass="form-group col"
+                          id="newPsw"
+                          label={
+                            props.hasPassword ? "New Password" : "Password"
+                          }
+                          type="password"
+                          required
+                          value={password.new.text}
+                          onChange={updatePasswordFields}
+                          validator="newPswFeedback"
+                          err={password.new.err}
+                        />
 
-                      <InputControl
-                        containerClass="form-group"
-                        id="confirmPsw"
-                        label="Confirm Password"
-                        type="password"
-                        required
-                        value={password.confirm.text}
-                        onChange={updatePasswordFields}
-                        validator="confirmPswFeedback"
-                        err={password.confirm.err}
-                      />
+                        <InputControl
+                          containerClass="form-group col"
+                          id="confirmPsw"
+                          label="Confirm Password"
+                          type="password"
+                          required
+                          value={password.confirm.text}
+                          onChange={updatePasswordFields}
+                          validator="confirmPswFeedback"
+                          err={password.confirm.err}
+                        />
+                      </div>
 
                       <input
                         type="submit"
