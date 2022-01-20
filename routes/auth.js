@@ -435,9 +435,14 @@ module.exports = (app) => {
             return;
           }
 
-          let requests = user.books.map((book) => String(book.requests));
+          // Get all requests that include the user
+          let requests = [];
+          user.books.forEach((book) => {
+            requests.push(...book.requests.map((request) => String(request)));
+          });
+          requests = [...new Set(requests)];
 
-          // Updates books that were requested by the user
+          // Updates all books part of requests that include the user
           crud
             .getAllBooks()
             .where("requests")
@@ -445,7 +450,6 @@ module.exports = (app) => {
             .where("_id")
             .nin(user.books.map((book) => book._id))
             .then((books) => {
-              console.log(books);
               books.forEach((book) => {
                 if (book.numOfRequests > 0) --book.numOfRequests;
                 book.requests = book.requests.filter(
@@ -461,11 +465,15 @@ module.exports = (app) => {
           crud.deleteRequests(requests).catch((ex) => console.log(ex));
 
           // Deletes the user's account
-          crud.deleteUser(user._id).then(() => {
-            req.flash("success", "Your account has been deleted");
-            req.session.success = true;
-            res.redirect("/books");
-          });
+          crud
+            .deleteUser(user._id)
+            .then(() => {
+              secretKeys.removeKey(user._id.toString());
+              req.flash("success", "Your account has been deleted");
+              req.session.success = true;
+              res.redirect("/books");
+            })
+            .catch((ex) => res.send(ex));
         });
     });
 
