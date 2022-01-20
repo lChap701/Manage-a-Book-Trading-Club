@@ -317,27 +317,6 @@ app.get("/users/:id/books", (req, res) => {
   });
 });
 
-// Routing for unlinking authenticated accounts from a user's account
-app.get("/users/:id/unlink/:authId", (req, res) => {
-  crud.getUser({ _id: req.params.id }).then((user) => {
-    if (!user) {
-      res.send("Unknown user");
-      return;
-    }
-
-    crud
-      .deleteAuth(req.params.authId)
-      .then(() => {
-        user.accounts = user.accounts.filter(
-          (account) => String(account) != req.params.authId
-        );
-        user.save();
-        res.send("Removed linked account");
-      })
-      .catch((err) => res.send(err));
-  });
-});
-
 // Displays the 404 Error Page
 app.use((req, res, next) => res.status(404).type("text").send("Not Found"));
 
