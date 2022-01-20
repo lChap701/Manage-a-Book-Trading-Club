@@ -1153,7 +1153,6 @@ const UserBooks = (props) => {
  * @returns             Returns the content that should be displayed
  */
 const Settings = (props) => {
-  console.log(props);
   let [err, setErr] = useState("");
   let [successMsg, setSuccessMsg] = useState("");
   let [usePreciseLocation, setUsePreciseLocation] = useState(
