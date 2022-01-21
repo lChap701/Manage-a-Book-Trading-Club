@@ -97,13 +97,20 @@ All URL paths part of this project.
     - Redirects to **/books** when logged out
 - **/users/:id/books** - Shows another user's books
   - Displays the _books.html_ file
+- **/users/:id/unlink/:authId"** - Allows users to remove linked accounts
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
+  - When successful, redirects to **/users/settings**
 - **/users/edit** - Allows users to update their accounts
   - Displays the _editProfile.html_ file
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
-  - When successful, redirects to **/users/:id**
 - **/users/settings** - Allows the user to change their settings
   - Displays the _settings.html_ file
+  - Requires the user to be logged in
+    - Redirects to **/books** when logged out
+- **/users/notifications** - Allows the user to view notifications
+  - Displays the _notifications.html_ file
   - Requires the user to be logged in
     - Redirects to **/books** when logged out
 
@@ -162,6 +169,8 @@ All URL paths part of this project.
 - **/session/books** - Allows the book IDs part of requests to be sent to the client
 - **/session/success** - Allows success messages to be sent to the client
 - **/session/auth/error** - Allows OAuth error messages to be sent to the client
+- **/session/auth/accounts** - Allows the current user's linked accounts to be sent to the client
+- **/session/notifications** - Allows notifications to be sent to the client
 
 ## Resources
 
