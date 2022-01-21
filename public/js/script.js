@@ -280,7 +280,6 @@ class BookExchange extends React.Component {
                 <Settings
                   userId={this.state.user._id}
                   hasPassword={this.state.user.hasPassword}
-                  accounts={this.state.user.accounts || []}
                   preciseLocation={this.state.user.preciseLocation}
                 />
               </Route>
@@ -293,9 +292,6 @@ class BookExchange extends React.Component {
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
               <Route path="/password/reset" component={ResetPassword} />
-              <Route path="/l\ogout">
-                <Redirect to="/books" />
-              </Route>
             </Switch>
           </div>
         </Router>
@@ -1168,6 +1164,7 @@ const UserBooks = (props) => {
 const Settings = (props) => {
   let [err, setErr] = useState("");
   let [successMsg, setSuccessMsg] = useState("");
+  let [accounts, setAccounts] = useState([]);
   let [usePreciseLocation, setUsePreciseLocation] = useState(
     props.preciseLocation
   );
@@ -1204,10 +1201,18 @@ const Settings = (props) => {
     },
   ];
 
-  // Gets an OAuth error message or ""
+  // Gets an OAuth error message, success message, or """ and gets all linked accounts
   useEffect(() => {
     callApi(`${location.origin}/session/auth/error`).then((data) => {
       setErr(data);
+    });
+
+    callApi(`${location.origin}/session/success`).then((data) => {
+      setSuccessMsg(data);
+    });
+
+    callApi(`${location.origin}/session/auth/accounts`, "JSON").then((data) => {
+      setAccounts(data);
     });
   }, []);
 
@@ -1538,14 +1543,26 @@ const Settings = (props) => {
                     {socialLinks.map((link, i) => (
                       <Link
                         to={
-                          props.accounts.length > 0 && props.accounts[i]
-                            ? `/users/${props.userId}/unlink/${props.accounts[i]}`
+                          accounts.find(
+                            (account) =>
+                              account.provider == link.for.toLocaleLowerCase()
+                          )
+                            ? `/users/${props.userId}/unlink/${
+                                accounts.find(
+                                  (account) =>
+                                    account.provider ==
+                                    link.for.toLocaleLowerCase()
+                                )._id
+                              }`
                             : link.path
                         }
                         className={`btn btn-lg btn-block btn-social ${link.btn}`}
                       >
                         <i className={link.icon}></i>
-                        {props.accounts.length > 0 && props.accounts[i]
+                        {accounts.find(
+                          (account) =>
+                            account.provider == link.for.toLocaleLowerCase()
+                        )
                           ? `Unlink ${link.for}`
                           : `Link ${link.for}`}
                       </Link>
