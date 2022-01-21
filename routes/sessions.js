@@ -84,7 +84,6 @@ module.exports = (app) => {
   app.get("/session/success", (req, res) => {
     if (req.session.success) {
       req.session.success = false;
-      console.log(req.flash("success"));
       res.send(req.flash("success")[0]);
     } else {
       res.send("");
