@@ -1163,10 +1163,9 @@ const UserBooks = (props) => {
 
 /**
  * Component for displaying content on the Notifications page
- * @param {*} props     Represents the props that were passed
- * @returns             Returns the content that should be displayed
+ * @returns   Returns the content that should be displayed
  */
-const Notifications = (props) => {
+const Notifications = () => {
   let [msg, setMsg] = useState("");
   let [notifications, setNotifications] = useState([]);
 
