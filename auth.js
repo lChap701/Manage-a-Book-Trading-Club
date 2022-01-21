@@ -52,7 +52,7 @@ module.exports = () => {
       }
 
       return req.isAuthenticated()
-        ? cb(null, await linkAccount(user, profile))
+        ? cb(null, await linkAccount(user, req, profile))
         : user
         ? req.session.authError
           ? cb(null, false)
