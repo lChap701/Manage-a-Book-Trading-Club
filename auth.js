@@ -108,10 +108,11 @@ module.exports = () => {
   /**
    * Links an authenticated accounts to the user's account
    * @param {*} user      Represents the current user
+   * @param {*} req       Represents the request
    * @param {*} profile   Represents the profile of the user
    * @returns             Returns the newly created account
    */
-  const linkAccount = async (user, profile) => {
+  const linkAccount = async (user, req, profile) => {
     // Saves authenticated account
     const auth = await crud.addAuth({
       id: profile.id,
@@ -123,6 +124,8 @@ module.exports = () => {
     user.oauth = true;
     user.accounts.push(auth);
     user.save();
+
+    req.session.success = true;
 
     return user;
   };
