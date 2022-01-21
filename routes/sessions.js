@@ -125,22 +125,30 @@ module.exports = (app) => {
   // Routing for getting all notifications that have not expired
   app.get("/session/notifications", (req, res) => {
     if (!req.user) {
-      res.json([]);
+      res.send("Please login");
       return;
     }
 
-    // Gets all notifications within the past 30 days
-    crud.getNotifications(req.user._id).then((notifications) => {
-      // Go back 30 days ago
-      let longTimeAgo = new Date();
-      longTimeAgo.setDate(lastMonth.getDate() - 30);
+    // Go back 30 days ago
+    let longTimeAgo = new Date();
+    longTimeAgo.setDate(lastMonth.getDate() - 30);
 
-      res.json(
-        notifications
-          .filter((notification) => notification.sentOn >= longTimeAgo)
-          .sort((a, b) => b.sentOn - a.setOn)
-          .map((notification) => notification.message)
-      );
-    });
+    // Gets all notifications within the past 30 days
+    crud
+      .getNotifications(req.user._id)
+      .where("sentOn")
+      .gte(longTimeAgo)
+      .then((notifications) => {
+        // Send a message to the client based on the amount of notifications left
+        if (notifications.length == 0) {
+          res.send("All caught up!");
+        } else {
+          res.json(
+            notifications
+              .sort((a, b) => b.sentOn - a.setOn)
+              .map((notification) => notification.message)
+          );
+        }
+      });
   });
 };
