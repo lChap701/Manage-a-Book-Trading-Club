@@ -1271,7 +1271,7 @@ const Settings = (props) => {
 
   /**
    * Validates the 'Change Password' form is being submitted
-   * @returns               Returns a boolean value that determines if the form should be submitted
+   * @returns   Returns a boolean value that determines if the form should be submitted
    */
   const validateThisForm = () => {
     let valid = true;
