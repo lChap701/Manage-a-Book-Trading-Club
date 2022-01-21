@@ -414,7 +414,7 @@ module.exports = (app) => {
     .get(loggedOut, (req, res) => {
       oauthOptions.successRedirect = req.originalUrl;
       oauthOptions.successFlash = req.session.success
-        ? "Removed linked account"
+        ? "Removed Account"
         : "Linked Account";
       oauthOptions.failureRedirect = req.originalUrl;
       oauthOptions.failureFlash = "This account has already been used";
