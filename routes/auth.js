@@ -475,7 +475,7 @@ module.exports = (app) => {
             .deleteUser(user._id)
             .then(() => {
               secretKeys.removeKey(user._id.toString());
-              req.flash("success", "Your account has been deleted");
+              oauthOptions.successFlash = "Your account has been deleted";
               req.session.success = true;
               res.redirect("/books");
             })
