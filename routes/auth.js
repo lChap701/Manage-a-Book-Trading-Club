@@ -408,7 +408,7 @@ module.exports = (app) => {
         });
     });
 
-  // Displays the Book Exchange - Settings Page
+  // Displays the Book Exchange - Notifications Page
   app.get("/users/notifications", loggedOut, (req, res) => {
     res.send(process.cwd() + "/public/notifications.html");
   });
