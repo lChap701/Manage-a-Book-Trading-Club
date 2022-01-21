@@ -34,8 +34,12 @@ module.exports = () => {
         $and: [{ id: profile.id }, { provider: profile.provider }],
       });
 
-      // Gets user name based on the results of what was found
-      let user = auth ? await crud.getUser({ _id: auth.user }) : null;
+      // Gets user name based on the results of what was found and if the user is logged in
+      let user = req.isAuthenticated()
+        ? req.user
+        : auth
+        ? await crud.getUser({ _id: auth.user })
+        : null;
 
       // Checks for duplicate accounts (when creating an account) and other errors
       if (req.session.newUser) {
@@ -47,7 +51,9 @@ module.exports = () => {
         req.session.authError = !user;
       }
 
-      return user
+      return req.isAuthenticated()
+        ? cb(null, await linkAccount(user, profile))
+        : user
         ? req.session.authError
           ? cb(null, false)
           : cb(null, user)
@@ -95,6 +101,28 @@ module.exports = () => {
     // Links authenticated account to the user
     auth.user = user._id;
     auth.save();
+
+    return user;
+  };
+
+  /**
+   * Links an authenticated accounts to the user's account
+   * @param {*} user      Represents the current user
+   * @param {*} profile   Represents the profile of the user
+   * @returns             Returns the newly created account
+   */
+  const linkAccount = async (user, profile) => {
+    // Saves authenticated account
+    const auth = await crud.addAuth({
+      id: profile.id,
+      provider: profile.provider,
+      user: user._id,
+    });
+
+    // Links authenticated account to the user
+    user.oauth = true;
+    user.accounts.push(auth);
+    user.save();
 
     return user;
   };
