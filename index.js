@@ -261,7 +261,7 @@ app.put("/password/update", (req, res) => {
           parseInt(process.env.SALT_ROUNDS)
         ),
       })
-      .then(() => res.send("Your changes have been saved"))
+      .then(() => res.send("Your password has been changed"))
       .catch((err) => res.send(err));
   });
 });
