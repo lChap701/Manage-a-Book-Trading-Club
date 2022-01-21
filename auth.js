@@ -36,7 +36,9 @@ module.exports = () => {
 
       // Gets user name based on the results of what was found and if the user is logged in
       let user = req.isAuthenticated()
-        ? req.user
+        ? !auth
+          ? req.user
+          : null
         : auth
         ? await crud.getUser({ _id: auth.user })
         : null;
