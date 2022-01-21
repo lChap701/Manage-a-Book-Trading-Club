@@ -1227,39 +1227,18 @@ const Settings = (props) => {
    */
   const submitForm = async (e) => {
     e.preventDefault();
+    const FORM = e.target.name;
 
-    const confirmPsw = document.querySelector("input#confirmPsw");
-
-    // Compares the password (depending on the form)
-    if (e.target.name == "Change Password") {
-      if (password.new.text != password.confirm.text) {
-        setPassword({
-          ...password,
-          confirm: {
-            text: password.confirm.text,
-            err: "Password does not match",
-          },
-        });
-        confirmPsw.classList.add("is-invalid");
-      } else {
-        setPassword({
-          ...password,
-          confirm: {
-            text: password.confirm.text,
-            err: "Password is required",
-          },
-        });
-        confirmPsw.classList.remove("is-invalid");
-      }
+    // Determines if the form should be submitted
+    if (FORM == "Change Password" && !validateThisForm()) {
+      setSuccessMsg("");
+      return;
     }
-
-    // Determines if form should be submitted
-    if (!validateForm() || confirmPsw.classList.contains("is-invalid")) return;
 
     const data = { _id: props.userId };
 
     // Checks what data should be submitted
-    if (e.target.name == "Change Password") {
+    if (FORM == "Change Password") {
       data.password = password.old.text;
       data.newPassword = password.new.text;
     } else {
@@ -1268,16 +1247,77 @@ const Settings = (props) => {
 
     // Submits the form and gets the result
     let res =
-      e.target.name == "Change Password"
+      FORM == "Change Password"
         ? await sendToUrl(data)
         : await sendData(data, "PUT");
+    console.log(res);
 
     // Checks if a new page should be displayed or if an error occurred
-    if (res == "Your changes have been saved") {
+    if (res.includes("change")) {
+      if (FORM == "Change Password") {
+        setPassword({
+          ...password,
+          old: { text: "", err: password.old.err },
+          new: { text: "", err: password.new.err },
+          confirm: { text: "", err: password.confirm.err },
+        });
+      }
       setSuccessMsg(res);
+      setErr("");
     } else {
       setErr(res);
     }
+  };
+
+  /**
+   * Validates the 'Change Password' form is being submitted
+   * @returns               Returns a boolean value that determines if the form should be submitted
+   */
+  const validateThisForm = () => {
+    let valid = true;
+    const confirmPsw = document.querySelector("input#confirmPsw");
+
+    // Validates input fields
+    document
+      .querySelectorAll(
+        "form[name='Change Password'] input:not([type='submit'])"
+      )
+      .forEach((input) => {
+        if (
+          !input.checkValidity() ||
+          (input.value.trim().length == 0 && input.required)
+        ) {
+          input.classList.add("is-invalid");
+          valid = false;
+        } else if (input.classList.contains("is-invalid")) {
+          input.classList.remove("is-invalid");
+        }
+      });
+
+    if (!valid) return false;
+
+    // Compares the password
+    if (password.new.text != password.confirm.text) {
+      setPassword({
+        ...password,
+        confirm: {
+          text: password.confirm.text,
+          err: "Password does not match",
+        },
+      });
+      confirmPsw.classList.add("is-invalid");
+    } else {
+      setPassword({
+        ...password,
+        confirm: {
+          text: password.confirm.text,
+          err: "Password is required",
+        },
+      });
+      confirmPsw.classList.remove("is-invalid");
+    }
+
+    return valid;
   };
 
   /**
