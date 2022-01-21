@@ -408,6 +408,11 @@ module.exports = (app) => {
         });
     });
 
+  // Displays the Book Exchange - Settings Page
+  app.get("/users/notifications", loggedOut, (req, res) => {
+    res.send(process.cwd() + "/public/notifications.html");
+  });
+
   // Displays and handles PUT/DELETE requests on the Book Exchange - Settings Page
   app
     .route("/users/settings")
