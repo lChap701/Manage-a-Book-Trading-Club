@@ -1192,6 +1192,13 @@ const Settings = (props) => {
     },
   ];
 
+  // Gets an OAuth error message or ""
+  useEffect(() => {
+    callApi(`${location.origin}/session/auth/error`).then((data) => {
+      setErr(data);
+    });
+  }, []);
+
   // Ensures that 'usePreciseLocation' is always updated
   useEffect(() => {
     setUsePreciseLocation(props.preciseLocation);
