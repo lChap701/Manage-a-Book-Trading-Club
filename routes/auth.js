@@ -500,7 +500,7 @@ module.exports = (app) => {
           user.save();
           req.flash("success", "Removed linked account");
           req.session.success = true;
-          res.redirect("..");
+          res.redirect("/users/settings");
         })
         .catch((err) => res.send(err));
     });
