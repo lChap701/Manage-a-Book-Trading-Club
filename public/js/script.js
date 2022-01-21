@@ -312,6 +312,7 @@ class BookExchange extends React.Component {
 const Books = (props) => {
   let [books, setBooks] = useState([]);
   let [msg, setMsg] = useState("");
+  let [success, setSuccess] = useState("");
 
   /**
    * Gets all books
@@ -329,47 +330,58 @@ const Books = (props) => {
   // Calls the getBooks() function once
   useEffect(() => getBooks(), []);
 
+  // Gets a success message or ""
+  useEffect(() => {
+    callApi(`${location.origin}/session/success`).then((data) => {
+      setSuccess(data);
+    });
+  }, []);
+
   return (
-    <form
-      action="/requests/new/books"
-      method="POST"
-      className="panel shadow-lg"
-    >
-      <div className="panel-header text-white p-1">
-        <h2 className="text-center">Books</h2>
-      </div>
+    <div>
+      {success ? <Alert class="alert alert-success" msg={success} /> : ""}
 
-      <div className="panel-body">
-        {msg.length > 0 ? (
-          <div className="p-5">
-            <h4 className="text-muted text-center mt-1">{msg}</h4>
-          </div>
-        ) : (
-          <BookListGroup flush={true} myId={props.userId} books={books} />
-        )}
-      </div>
+      <form
+        action="/requests/new/books"
+        method="POST"
+        className="panel shadow-lg"
+      >
+        <div className="panel-header text-white p-1">
+          <h2 className="text-center">Books</h2>
+        </div>
 
-      <div className="panel-footer px-3 py-2">
-        {!props.ready ? (
-          <SpinnerButton class="btn btn-success w-25" />
-        ) : !props.login ? (
-          <Link className="btn btn-success" to="/login">
-            Login to Add Books and Submit Requests
-          </Link>
-        ) : (
-          <div className="buttons">
-            <input
-              className="btn btn-success"
-              type="submit"
-              value="New Request"
-            />
-            <Link className="btn btn-primary" to="/books/my">
-              Add Books
+        <div className="panel-body">
+          {msg.length > 0 ? (
+            <div className="p-5">
+              <h4 className="text-muted text-center mt-1">{msg}</h4>
+            </div>
+          ) : (
+            <BookListGroup flush={true} myId={props.userId} books={books} />
+          )}
+        </div>
+
+        <div className="panel-footer px-3 py-2">
+          {!props.ready ? (
+            <SpinnerButton class="btn btn-success w-25" />
+          ) : !props.login ? (
+            <Link className="btn btn-success" to="/login">
+              Login to Add Books and Submit Requests
             </Link>
-          </div>
-        )}
-      </div>
-    </form>
+          ) : (
+            <div className="buttons">
+              <input
+                className="btn btn-success"
+                type="submit"
+                value="New Request"
+              />
+              <Link className="btn btn-primary" to="/books/my">
+                Add Books
+              </Link>
+            </div>
+          )}
+        </div>
+      </form>
+    </div>
   );
 };
 
@@ -1533,7 +1545,9 @@ const Settings = (props) => {
                         className={`btn btn-lg btn-block btn-social ${link.btn}`}
                       >
                         <i className={link.icon}></i>
-                        Link {link.for}
+                        {props.accounts.length > 0 && props.accounts[i]
+                          ? `Unlink ${link.for}`
+                          : `Link ${link.for}`}
                       </Link>
                     ))}
                   </div>
