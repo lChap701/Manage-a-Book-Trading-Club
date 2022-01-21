@@ -17,7 +17,6 @@ module.exports = (app) => {
             username: req.user.username,
             hasPassword: Boolean(req.user.password),
             preciseLocation: req.user.preciseLocation,
-            accounts: req.user.accounts,
           }
         : null
     );
@@ -81,7 +80,7 @@ module.exports = (app) => {
       });
   });
 
-  // Routing for getting success messages for the Book Exchange - All Requests Page
+  // Routing for getting success messages
   app.get("/session/success", (req, res) => {
     if (req.session.success) {
       req.session.success = false;
@@ -99,5 +98,27 @@ module.exports = (app) => {
     } else {
       res.send("");
     }
+  });
+
+  // Routing for getting the provider of linked accounts
+  app.get("/session/auth/accounts", (req, res) => {
+    if (!req.user) {
+      res.json([]);
+      return;
+    }
+
+    crud
+      .getUser({ _id: req.user._id })
+      .populate({ path: "accounts" })
+      .then((user) => {
+        res.json(
+          user.accounts.map((account) => {
+            return {
+              _id: account._id,
+              provider: account.provider,
+            };
+          })
+        );
+      });
   });
 };
