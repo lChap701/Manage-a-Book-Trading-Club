@@ -230,6 +230,10 @@ class BookExchange extends React.Component {
                             text: "My Books",
                           },
                           {
+                            path: "/users/notifications",
+                            text: "Notifications",
+                          },
+                          {
                             path: "/users/settings",
                             text: "Settings",
                           },
@@ -276,6 +280,7 @@ class BookExchange extends React.Component {
               <Route exact path="/users/edit">
                 <EditProfile userId={this.state.user._id} />
               </Route>
+              <Route exact path="/users/notifications"></Route>
               <Route exact path="/users/settings">
                 <Settings
                   userId={this.state.user._id}
@@ -1152,6 +1157,54 @@ const UserBooks = (props) => {
           </div>
         </form>
       )}
+    </div>
+  );
+};
+
+/**
+ * Component for displaying content on the Notifications page
+ * @param {*} props     Represents the props that were passed
+ * @returns             Returns the content that should be displayed
+ */
+const Notifications = (props) => {
+  let [msg, setMsg] = useState("");
+  let [notifications, setNotifications] = useState([]);
+
+  /**
+   * Gets all notifications
+   */
+  const getNotifications = useCallback(async () => {
+    let data = await callApi(`${location.origin}/session/notifications`);
+
+    try {
+      setNotifications(JSON.parse(data));
+    } catch {
+      setMsg(data);
+    }
+  });
+
+  // Calls the getNotifications() function once
+  useEffect(() => getNotifications(), []);
+
+  return (
+    <div className="panel shadow-lg my-3">
+      <div className="panel-header text-white p-2">
+        <h2>Notifications</h2>
+      </div>
+
+      <div className="panel-body p-4">
+        {msg ? (
+          <div className="p-5">
+            <h4 className="text-muted text-center mt-1">{msg}</h4>
+          </div>
+        ) : (
+          <ul className="list-group">
+            {notifications.map((notification) => (
+              <li className="list-group-item">{notification}</li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
