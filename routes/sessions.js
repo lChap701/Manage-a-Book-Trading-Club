@@ -121,4 +121,26 @@ module.exports = (app) => {
         );
       });
   });
+
+  // Routing for getting all notifications that have not expired
+  app.get("/session/notifications", (req, res) => {
+    if (!req.user) {
+      res.json([]);
+      return;
+    }
+
+    // Gets all notifications within the past 30 days
+    crud.getNotifications(req.user._id).then((notifications) => {
+      // Go back 30 days ago
+      let longTimeAgo = new Date();
+      longTimeAgo.setDate(lastMonth.getDate() - 30);
+
+      res.json(
+        notifications
+          .filter((notification) => notification.sentOn >= longTimeAgo)
+          .sort((a, b) => b.sentOn - a.setOn)
+          .map((notification) => notification.message)
+      );
+    });
+  });
 };
