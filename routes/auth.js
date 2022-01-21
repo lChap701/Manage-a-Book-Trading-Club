@@ -413,6 +413,7 @@ module.exports = (app) => {
     .route("/users/settings")
     .get(loggedOut, (req, res) => {
       oauthOptions.successRedirect = req.originalUrl;
+      oauthOptions.successFlash = "Linked Account";
       oauthOptions.failureRedirect = req.originalUrl;
       oauthOptions.failureFlash = "This account has already been used";
       res.sendFile(process.cwd() + "/public/settings.html");
