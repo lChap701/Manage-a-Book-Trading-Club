@@ -2400,7 +2400,7 @@ const DeleteAccountForm = (props) => {
 
             <div className="modal-body">
               <h4 className="text-center">
-                Do you really wish to delete your account?
+                Do you wish to delete your account?
               </h4>
             </div>
 
