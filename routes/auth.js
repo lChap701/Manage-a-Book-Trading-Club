@@ -413,7 +413,7 @@ module.exports = (app) => {
     .route("/users/settings")
     .get(loggedOut, (req, res) => {
       oauthOptions.successRedirect = req.originalUrl;
-      oauthOptions.successFlash = req.session.succes
+      oauthOptions.successFlash = req.session.success
         ? "Removed linked account"
         : "Linked Account";
       oauthOptions.failureRedirect = req.originalUrl;
