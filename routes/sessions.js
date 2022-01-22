@@ -130,14 +130,14 @@ module.exports = (app) => {
     }
 
     // Go back 30 days ago
-    let longTimeAgo = new Date();
-    longTimeAgo.setDate(lastMonth.getDate() - 30);
+    let past30Days = new Date();
+    past30Days.setDate(past30Days.getDate() - 30);
 
     // Gets all notifications within the past 30 days
     crud
       .getNotifications(req.user._id)
       .where("sentOn")
-      .gte(longTimeAgo)
+      .gte(past30Days)
       .then((notifications) => {
         // Send a message to the client based on the amount of notifications left
         if (notifications.length == 0) {
