@@ -14,6 +14,7 @@ const userSchema = new Schema(
       },
     },
     email: { type: String, trim: true },
+    emailNotifications: { type: Boolean },
     name: { type: String, trim: true },
     address: { type: String, trim: true },
     city: { type: String, trim: true },
