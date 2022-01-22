@@ -286,6 +286,7 @@ class BookExchange extends React.Component {
                   userId={this.state.user._id}
                   hasPassword={this.state.user.hasPassword}
                   preciseLocation={this.state.user.preciseLocation}
+                  emailNotifications={this.state.user.emailNotifications}
                 />
               </Route>
               <Route exact path="/users/:id">
@@ -1177,7 +1178,7 @@ const Notifications = () => {
 
     try {
       setNotifications(JSON.parse(data));
-    } catch {
+    } catch (e) {
       setMsg(data);
     }
   });
@@ -1220,7 +1221,9 @@ const Settings = (props) => {
   let [usePreciseLocation, setUsePreciseLocation] = useState(
     props.preciseLocation
   );
-  let [emailNotifications, setEmailNotifications] = useState(false);
+  let [emailNotifications, setEmailNotifications] = useState(
+    props.emailNotifications
+  );
   let [password, setPassword] = useState({
     old: { text: "", err: "Password is required" },
     new: { text: "", err: "Password is required" },
@@ -1272,6 +1275,11 @@ const Settings = (props) => {
   useEffect(() => {
     setUsePreciseLocation(props.preciseLocation);
   }, [props.preciseLocation]);
+
+  // Ensures that 'emailNotifications' is always updated
+  useEffect(() => {
+    setEmailNotifications(props.emailNotifications);
+  }, [props.emailNotifications]);
 
   /**
    * Saves changes to password fields while the user is typing
