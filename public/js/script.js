@@ -1327,6 +1327,7 @@ const Settings = (props) => {
       data.newPassword = password.new.text;
     } else {
       data.preciseLocation = usePreciseLocation;
+      data.emailNotifications = emailNotifications;
     }
 
     // Submits the form and gets the result
@@ -1334,7 +1335,6 @@ const Settings = (props) => {
       FORM == "Change Password"
         ? await sendToUrl(data)
         : await sendData(data, "PUT");
-    console.log(res);
 
     // Checks if a new page should be displayed or if an error occurred
     if (res.includes("change")) {

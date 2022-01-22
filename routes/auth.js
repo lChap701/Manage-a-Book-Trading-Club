@@ -431,7 +431,10 @@ module.exports = (app) => {
         }
 
         crud
-          .updateUser(user._id, { preciseLocation: req.body.preciseLocation })
+          .updateUser(user._id, {
+            preciseLocation: req.body.preciseLocation,
+            emailNotifications: req.body.emailNotifications,
+          })
           .then(() => res.send("Your changes have been saved"))
           .catch((err) => res.send(err));
       });

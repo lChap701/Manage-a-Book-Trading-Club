@@ -17,6 +17,7 @@ module.exports = (app) => {
             username: req.user.username,
             hasPassword: Boolean(req.user.password),
             preciseLocation: req.user.preciseLocation,
+            emailNotifications: Boolean(req.user.emailNotifications),
           }
         : null
     );
