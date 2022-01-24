@@ -6,7 +6,7 @@ const notificationSchema = new Schema(
     message: { type: String, required: "{PATH} is required" },
     category: {
       type: String,
-      enum: ["Requests", "Trades", "Users", "Security Updates"],
+      enum: ["Requests", "Trades", "Books", "Users", "Security Updates"],
       required: "{PATH} is required",
     },
     user: { type: Schema.Types.ObjectId, ref: "Users" },
