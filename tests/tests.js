@@ -1636,7 +1636,10 @@ suite("Unit Tests", () => {
     ids.users.forEach((id) => {
       crud
         .deleteUser(id)
-        .then(secretKeys.removeKey(id))
+        .then(() => {
+          secretKeys.removeKey(id);
+          crud.deleteNotifications(id).catch((err) => console.log(err));
+        })
         .catch((err) => console.log(err));
     });
 
