@@ -2170,6 +2170,7 @@ class BookForm extends React.Component {
     this.saveTitle = this.saveTitle.bind(this);
     this.saveDescription = this.saveDescription.bind(this);
     this.submitForm = this.submitForm.bind(this);
+    this.validateThisForm = this.validateThisForm.bind(this);
     this.sendToUrl = this.sendToUrl.bind(this);
   }
 
@@ -2196,9 +2197,10 @@ class BookForm extends React.Component {
    */
   async submitForm(e) {
     e.preventDefault();
+    console.log(this.props);
 
     // Determines if form should be submitted
-    if (!validateForm()) return;
+    if (!this.validateThisForm()) return;
 
     const data = { user: this.props.userId };
 
@@ -2214,6 +2216,7 @@ class BookForm extends React.Component {
         : this.props.formName == "Delete Book"
         ? await this.sendToUrl(data, "DELETE")
         : await sendData(data);
+    console.log(res);
 
     // Checks if the page should reload
     if (res == "success") {
@@ -2226,6 +2229,33 @@ class BookForm extends React.Component {
   }
 
   /**
+   * Validates the form that is being submitted
+   * @returns   Returns a boolean value that determines if the form should be submitted
+   */
+  validateThisForm() {
+    let valid = true;
+
+    // Validates input fields
+    document
+      .querySelectorAll(
+        `form[name='${this.props.formName}'] input:not([type='submit'])`
+      )
+      .forEach((input) => {
+        if (
+          !input.checkValidity() ||
+          (input.value.trim().length == 0 && input.required)
+        ) {
+          input.classList.add("is-invalid");
+          valid = false;
+        } else if (input.classList.contains("is-invalid")) {
+          input.classList.remove("is-invalid");
+        }
+      });
+
+    return valid;
+  }
+
+  /**
    * Sends data to form handlers for the Edit Book and Delete Book forms
    * @param {*} data            Represents the data that should be submitted
    * @param {String} method     Represents the HTTP method to use
@@ -2235,8 +2265,9 @@ class BookForm extends React.Component {
     try {
       const URL =
         method == "PUT"
-          ? `/books/${this.state._id}/update`
-          : `/books/${this.state._id}/delete`;
+          ? `${location.origin}/books/${this.state._id}/update`
+          : `${location.origin}/books/${this.state._id}/delete`;
+      console.log(URL);
 
       const res = await fetch(URL, {
         method: method,
@@ -2245,6 +2276,7 @@ class BookForm extends React.Component {
           "Content-Type": "application/json",
         },
       });
+      console.log(res);
 
       // Ensures that an error message is displayed
       if (!res.ok) throw new Error(`Request failed: ${res.status}`);
