@@ -239,6 +239,21 @@ form[name="Create Request"] {
   }
 }
 
+/* Notifications */
+
+.notification:hover,
+.notification:focus {
+  background: #f8f9fa !important;
+}
+
+.notification a {
+  color: initial !important;
+}
+
+.notification a:hover {
+  text-decoration: none !important;
+}
+
 /* For Firefox */
 
 @supports (scrollbar-color: #81beff #cee5ff) {
