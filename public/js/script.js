@@ -1179,6 +1179,7 @@ const Notifications = () => {
    */
   const getNotifications = useCallback(async () => {
     let data = await callApi(`${location.origin}/session/notifications`);
+    console.log(data);
 
     try {
       setNotifications(JSON.parse(data));
@@ -1204,7 +1205,18 @@ const Notifications = () => {
         ) : (
           <ul className="list-group">
             {notifications.map((notification) => (
-              <li className="list-group-item">{notification}</li>
+              <li className="list-group-item notification">
+                <small className="float-right text-muted">
+                  {notification.old}
+                </small>
+                {notification.link ? (
+                  <a href={notification.link} className="d-block">
+                    {notification.message}
+                  </a>
+                ) : (
+                  <div>{notification.message}</div>
+                )}
+              </li>
             ))}
           </ul>
         )}
