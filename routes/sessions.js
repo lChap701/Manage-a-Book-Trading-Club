@@ -1,5 +1,26 @@
 const crud = require("../crud");
 
+// Moment Setup
+const moment = require("moment");
+moment.updateLocale("en", {
+  relativeTime: {
+    future: "in %s",
+    past: "%s ago",
+    s: "%ds",
+    ss: "%ds",
+    m: "%dm",
+    mm: "%dm",
+    h: "%dh",
+    hh: "%dh",
+    d: "%d",
+    dd: "%dd",
+    M: "%dM",
+    MM: "%dM",
+    y: "%dy",
+    yy: "%dY",
+  },
+});
+
 /**
  * Routing for accessing session data
  * @module ./routes/session
@@ -146,8 +167,23 @@ module.exports = (app) => {
         } else {
           res.json(
             notifications
-              .sort((a, b) => b.sentOn - a.setOn)
-              .map((notification) => notification.message)
+              .sort((a, b) => b.sentOn - a.sentOn)
+              .map((notification) => {
+                return {
+                  message: notification.message,
+                  old: moment(notification.sentOn).fromNow(true),
+                  link:
+                    notification.category == "Books"
+                      ? "/books/my"
+                      : notification.category == "Users"
+                      ? "/users"
+                      : notification.category == "Requests"
+                      ? "/requests"
+                      : notification.category == "Trades"
+                      ? "/trades"
+                      : "",
+                };
+              })
           );
         }
       });
