@@ -2197,7 +2197,6 @@ class BookForm extends React.Component {
    */
   async submitForm(e) {
     e.preventDefault();
-    console.log(this.props);
 
     // Determines if form should be submitted
     if (!this.validateThisForm()) return;
@@ -2216,7 +2215,6 @@ class BookForm extends React.Component {
         : this.props.formName == "Delete Book"
         ? await this.sendToUrl(data, "DELETE")
         : await sendData(data);
-    console.log(res);
 
     // Checks if the page should reload
     if (res == "success") {
