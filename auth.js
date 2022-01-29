@@ -4,7 +4,7 @@ const CryptoJS = require("crypto-js");
 const passport = require("passport");
 const secretKeys = require("./secretKeys");
 const crud = require("./crud");
-const e = require("connect-flash");
+const notificationHandler = require("./notificationHandler");
 
 /**
  * Module that sets up Passport serialization and all Passport strategies
@@ -126,6 +126,12 @@ module.exports = () => {
     user.oauth = true;
     user.accounts.push(auth);
     user.save();
+
+    // Sends notification
+    notificationHandler.addToUsers({
+      message: "Linked account to your profile",
+      user: req.user._id,
+    });
 
     req.session.success = true;
 

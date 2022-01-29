@@ -63,6 +63,7 @@ app.use(flash());
 const connectDB = require("./db.config");
 connectDB();
 const crud = require("./crud");
+const notificationHandler = require("./notificationHandler");
 
 // bcrypt Setup
 const bcrypt = require("bcryptjs");
@@ -134,7 +135,16 @@ app.put("/books/:bookId/update", (req, res) => {
         title: req.body.title,
         description: req.body.description,
       })
-      .then(() => res.send("success"))
+      .then(() => {
+        notificationHandler
+          .addToBooks({
+            message: `Edited book ${req.body.title}`,
+            user: user._id,
+          })
+          .catch((err) => console.log(err));
+
+        res.send("success");
+      })
       .catch((ex) => {
         let error = "Title must be unique";
 
@@ -190,6 +200,13 @@ app.delete("/books/:bookId/delete", (req, res) => {
           );
           user.save();
 
+          notificationHandler
+            .addToBooks({
+              message: `Deleted the book ${book.title}`,
+              user: user._id,
+            })
+            .catch((err) => console.log(err));
+
           res.send("success");
         })
         .catch((ex) => {
@@ -223,6 +240,13 @@ app
         .then(() => {
           req.session.success = true;
           req.flash("success", "Changed Password");
+
+          notificationHandler
+            .addToSecurityUpdates({
+              message: "Changed Password",
+              user: user._id,
+            })
+            .catch((err) => console.log(err));
 
           // Redirects based on if the user is logged in
           if (req.isAuthenticated()) {
@@ -261,7 +285,15 @@ app.put("/password/update", (req, res) => {
           parseInt(process.env.SALT_ROUNDS)
         ),
       })
-      .then(() => res.send("Your password has been changed"))
+      .then(() => {
+        notificationHandler
+          .addToSecurityUpdates({
+            message: "Changed Password",
+            user: user._id,
+          })
+          .catch((err) => console.log(err));
+        res.send("Your password has been changed");
+      })
       .catch((err) => res.send(err));
   });
 });
@@ -275,6 +307,12 @@ app.get("/requests", (req, res) => {
 app.post("/requests/new/books", (req, res) => {
   let ids = [];
   let { books } = req.body;
+
+  if (!books) {
+    res.redirect("../new");
+    return;
+  }
+
   JSON.parse(books).forEach((bookId) => ids.push(bookId.replace("book", "")));
   req.session.books = ids;
   res.redirect("../new");

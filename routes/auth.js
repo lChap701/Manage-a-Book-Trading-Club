@@ -4,6 +4,7 @@ const passport = require("passport");
 const auth = require("../auth");
 const secretKeys = require("../secretKeys");
 const crud = require("../crud");
+const notificationHandler = require("../notificationHandler");
 
 /**
  * Module that handles routing for OAuth/Passport
@@ -145,6 +146,31 @@ module.exports = (app) => {
 
               // Removes books from session
               delete req.session.books;
+
+              console.log(
+                books.find((book) => String(book.user) != String(req.user._id))
+                  .user
+              );
+
+              // Send notifications
+              const notifications = [
+                {
+                  message: "Sent request",
+                  user: req.user._id,
+                },
+                {
+                  message: `Recieved request from ${req.user.username}`,
+                  user: books.find(
+                    (book) => String(book.user) != String(req.user._id)
+                  ).user,
+                },
+              ];
+              notifications.forEach((notification) => {
+                notificationHandler.addToRequests({
+                  message: notification.message,
+                  user: notification.user,
+                });
+              });
 
               // Displays success message
               req.flash("success", "Created Request");
@@ -303,6 +329,23 @@ module.exports = (app) => {
             request.tradedAt = new Date();
             request.save();
 
+            // Send notifications
+            const notifications = [
+              { message: "Accepted request", user: req.params.id },
+              {
+                message: `Traded books with ${req.user.username}`,
+                user: giveBooks[0].user,
+              },
+            ];
+            notifications.forEach((notification) => {
+              notificationHandler
+                .addToTrades({
+                  message: notification.message,
+                  user: notification.user,
+                })
+                .catch((err) => console.log(err));
+            });
+
             req.session.success = true;
             req.flash("success", "Accepted Request");
             res.redirect("/requests");
@@ -346,7 +389,26 @@ module.exports = (app) => {
         // Deletes the request
         crud
           .deleteRequest(request._id)
-          .then(() => res.redirect(".."))
+          .then(() => {
+            // Send notifications
+            const notifications = [
+              { message: "Cancelled request", user: req.user._id },
+              {
+                message: `${req.user.username} cancelled their request`,
+                user: request.takeBooks[0].user,
+              },
+            ];
+            notifications.forEach((notification) => {
+              notificationHandler
+                .addToRequests({
+                  message: notification.message,
+                  user: notification.user,
+                })
+                .catch((err) => console.log(err));
+            });
+
+            res.redirect("..");
+          })
           .catch((ex) => {
             console.log(ex);
             res.send(ex.message);
@@ -399,6 +461,13 @@ module.exports = (app) => {
           if (req.session.error) {
             req.flash("error", "Unable to update your account");
           } else {
+            notificationHandler
+              .addToUsers({
+                message: "Updated your account",
+                user: req.body._id,
+              })
+              .catch((err) => console.log(err));
+
             res.redirect("/users/" + req.body._id);
           }
         })
@@ -477,6 +546,7 @@ module.exports = (app) => {
           crud.deleteAllAuth(user._id).catch((ex) => console.log(ex));
           crud.deleteBooks(user._id).catch((ex) => console.log(ex));
           crud.deleteRequests(requests).catch((ex) => console.log(ex));
+          crud.deleteNotifications(user._id).catch((ex) => console.log(ex));
 
           // Deletes the user's account
           crud
@@ -504,6 +574,14 @@ module.exports = (app) => {
             (account) => String(account) != req.params.authId
           );
           user.save();
+
+          notificationHandler
+            .addToSecurityUpdates({
+              message: "Removed Linked Accounts",
+              user: user._id,
+            })
+            .catch((err) => console.log(err));
+
           req.session.success = true;
           res.redirect("/users/settings");
         })
@@ -529,6 +607,14 @@ module.exports = (app) => {
           .then((book) => {
             user.books.push(book);
             user.save();
+
+            notificationHandler
+              .addToBooks({
+                message: `Added book ${book.title}`,
+                user: user._id,
+              })
+              .catch((err) => console.log(err));
+
             res.send("success");
           })
           .catch((ex) => {
