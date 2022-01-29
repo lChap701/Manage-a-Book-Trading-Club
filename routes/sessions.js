@@ -176,7 +176,7 @@ module.exports = (app) => {
                     notification.category == "Books"
                       ? "/books/my"
                       : notification.category == "Users"
-                      ? "/users"
+                      ? `/users/${req.user._id}`
                       : notification.category == "Requests"
                       ? "/requests"
                       : notification.category == "Trades"
