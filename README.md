@@ -39,7 +39,7 @@ Three location APIs are used to display menu options:
 
 ## URL Paths
 
-All URL paths part of this project.
+Here are all URL paths that are used in this website.
 
 ### Redirect Paths
 
